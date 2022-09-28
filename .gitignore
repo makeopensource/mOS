@@ -1,0 +1,14 @@
+# Intermediates/Binaries
+**/*.i
+**/*.o
+**/*.bin
+**/*.elf
+mOS
+
+# Logging (Qemu)
+log.txt
+
+# Hidden Files
+**/.*
+!.gitignore
+!.github
