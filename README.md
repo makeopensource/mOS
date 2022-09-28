@@ -27,3 +27,5 @@ send signals by keyboard to do ✨stuff✨.
 ## Resources
 * https://www.qemu.org/
 * https://wiki.osdev.org/Main_Page
+
+* https://wiki.osdev.org/Linker_Scripts

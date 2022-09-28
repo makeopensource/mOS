@@ -1,6 +1,5 @@
 [org 0x7c00]
-KERNEL_OFFSET equ 0x1000
-
+OS_OFFSET equ 0x1000
 
 [bits 16]
 begin:
@@ -19,13 +18,13 @@ load_kernel:
     mov cl, 0x02 ;start at sector 2
     mov ch, 0x00 ;cylinder
     mov dh, 0x00 ;head
-    mov bx, KERNEL_OFFSET
+    mov bx, OS_OFFSET
     int 0x13 ;do read
     call enter_pm
 
 [bits 32]
 begin_pm:
-    call KERNEL_OFFSET
+    call OS_OFFSET
     hlt
     
 
