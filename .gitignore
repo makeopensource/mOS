@@ -1,8 +1,8 @@
 # Intermediates/Binaries
-**/*.i
-**/*.o
-**/*.bin
-**/*.elf
+*.i
+*.o
+*.bin
+*.elf
 mOS
 
 # Logging (Qemu)
