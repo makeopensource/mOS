@@ -5,10 +5,12 @@ LFLAGS=-melf_i386 --build-id=none
 ASM_BOOT_SECT_SOURCE=./src/boot/boot_sect.asm
 ASM_OS_ENTRY_SOURCE=./src/boot/os_entry.asm
 
-C_MAIN_SOURCE=./src/main.c
+C_MAIN_SOURCE=./src/os/main.c
 
-OBJ_NAMES=boot.o main.o os_entry.o
-LINK_OBJ_NAMES=main.o os_entry.o
+VGA_TEXT_SOURCE=./src/os/video/VGA_text.c
+
+OBJ_NAMES=boot.o main.o os_entry.o VGA_text.o
+LINK_OBJ_NAMES=main.o os_entry.o VGA_text.o
 
 .PHONY: clean qemu
 
@@ -18,6 +20,9 @@ mOS.bin: $(OBJ_NAMES)
 	cat boot.o intermediate.bin > mOS.bin 
 
 main.o: $(C_MAIN_SOURCE)
+	gcc -c $^ -o $@ $(CFLAGS)
+
+VGA_text.o: $(VGA_TEXT_SOURCE)
 	gcc -c $^ -o $@ $(CFLAGS)
 
 boot.o: $(ASM_BOOT_SECT_SOURCE)
