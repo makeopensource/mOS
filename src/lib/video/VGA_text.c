@@ -1,13 +1,5 @@
 #include "VGA_text.h"
 
-// note VGA's width is equal to it's stride in text mode
-
-#define VGA_MEMORY ((VGA_Char*)(0xB8000))
-#define VGA_WIDTH (80)
-#define VGA_HEIGHT (25)
-#define VGA_SIZE (VGA_WIDTH * VGA_HEIGHT)
-#define VGA_END (VGA_MEMORY +  VGA_SIZE)
-
 VGA_Char* cursor = VGA_MEMORY;
 
 VGA_Char getVGAchar(unsigned char chr, VGA_Color foreground, VGA_Color background) {

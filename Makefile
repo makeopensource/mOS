@@ -1,13 +1,13 @@
 CC=gcc
-CFLAGS=-Wall -Werror -Os -Wl,--oformat=binary -no-pie -m32 -s -falign-functions=4 -ffreestanding -masm=intel -fno-asynchronous-unwind-tables
-LFLAGS=-melf_i386 --build-id=none 
+CFLAGS=-Wall -Werror -Os -Wl,--oformat=binary -no-pie -m32 -s -falign-functions=4 -ffreestanding -masm=intel -fno-asynchronous-unwind-tables -I./src/lib/
+LFLAGS=-melf_i386 --build-id=none
 
 ASM_BOOT_SECT_SOURCE=./src/boot/boot_sect.asm
 ASM_OS_ENTRY_SOURCE=./src/boot/os_entry.asm
 
 C_MAIN_SOURCE=./src/os/main.c
 
-VGA_TEXT_SOURCE=./src/os/video/VGA_text.c
+VGA_TEXT_SOURCE=./src/lib/video/VGA_text.c
 
 OBJ_NAMES=boot.o main.o os_entry.o VGA_text.o
 LINK_OBJ_NAMES=main.o os_entry.o VGA_text.o

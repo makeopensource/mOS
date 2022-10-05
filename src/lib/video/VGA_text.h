@@ -1,6 +1,14 @@
 #ifndef VGA_TEXT_H
 #define VGA_TEXT_H
 
+// note VGA's width is equal to it's stride in text mode
+
+#define VGA_MEMORY ((VGA_Char*)(0xB8000))
+#define VGA_WIDTH (80)
+#define VGA_HEIGHT (25)
+#define VGA_SIZE (VGA_WIDTH * VGA_HEIGHT)
+#define VGA_END (VGA_MEMORY +  VGA_SIZE)
+
 // All the VGA colors, in order
 typedef enum {
     black,
@@ -38,7 +46,7 @@ VGA_Char getVGAchar(unsigned char chr, VGA_Color foreground, VGA_Color backgroun
 void writeText(const char* str, int x, int y, VGA_Color color);
 
 
-// effect cursor
+// affect cursor
 
 // prints with wrapping, println does the same but adds a new line. 
 void print(const char* str, VGA_Color color);
