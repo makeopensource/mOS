@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include "idt.h"
 
+#include "pic.h"
+
 #define UPPER_HALF 0xFFFF0000
 #define LOWER_HALF 0x0000FFFF
 #define GATE_MASK 0x00000F00
@@ -9,13 +11,10 @@
 #define PRESENT_MASK 0x00008000
 
 uint32_t getOffset (IdtEntry entry) {
-    return ((entry.upper & UPPER_HALF) | (entry.lower & LOWER_HALF));
+    return (((uint32_t)(entry.high) << 16) | (uint32_t)(entry.low));
 }
 
-uint16_t getSegmentSelector (IdtEntry entry) {
-    return (uint16_t)(entry.lower &  UPPER_HALF);
-}
-
+/* @TODO fix these
 uint8_t getGateType (IdtEntry entry) {
     return (uint8_t)((entry.upper & GATE_MASK) >> 8);
 }
@@ -26,22 +25,24 @@ uint8_t getPrivilegeLevels (IdtEntry entry) {
 
 bool isValid (IdtEntry entry) {
     return ((entry.upper & PRESENT_MASK) != 0);
-}
+}*/
 
-extern void* isr_stub_table[];
-static IdtEntry idt[256];
-static idtr_t idtr;
+extern void* idt_stub_table[];
+IdtEntry idt[256];
+idtr_t idtr;
 
 void makeInterruptTable () {
 
-    idtr.base = (uintptr_t)&idt[0];
-    idtr.limit = (uint16_t)sizeof(IdtEntry) * 255;
+    idtr.base = (uint32_t)(&idt);
+    idtr.limit = sizeof(IdtEntry) * 256 - 1;
 
-    for (uint8_t idx = 0; idx < 32; idx++) {
-        idtSetDesc(idx, isr_stub_table[idx], 0x8E);
+    for (uint8_t idx = 0; idx < 32 + 16; idx++) {
+        idtSetDesc(idx, idt_stub_table[idx], 0x8E);
     }
 
-    __asm__ volatile ("lidt [0]" : : "m"(idtr));
+    initPIC(32);
+
+    __asm__ volatile ("lidt [%0]" : : "r"(&idtr));
     __asm__ volatile ("sti");
 }
 
@@ -49,16 +50,21 @@ void idtSetDesc (uint8_t idx, void* isr, uint8_t flags) {
     IdtEntry *desc = &idt[idx];
 
     //set offset
-    desc->lower = (uint32_t)isr & 0xFFFF;
-    desc->upper = (uint32_t)isr & 0xFFFF0000;
+    desc->low = (uint32_t)isr & 0xFFFF;
+    desc->high = ((uint32_t)(isr) >> 16) & 0xFFFF;
 
     //set segment selector
-    desc->lower |= 0x08 << 16;
+    desc->selector = 0x08;
 
-    //set flags 1xx0xxxx
-    desc->upper |= (uint32_t)flags << 8;
+    desc->zero = 0;
+
+    //set flags
+    desc->flags = flags;
+}
+
+void isrHandler(isr_registers_t* state) {
 } 
 
-void exceptionHandler() {
-    __asm__ volatile ("cli; hlt");
-} 
+void irqHandler(isr_registers_t* state) {
+    ackPIC(state->vec_idx);
+}

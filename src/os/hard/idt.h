@@ -1,0 +1,36 @@
+#ifndef IDT_H
+#define IDT_H
+
+#include <stdint.h>
+#include <stdbool.h>
+
+typedef struct {
+    uint16_t low;
+    uint16_t selector;
+    uint8_t zero;
+    uint8_t flags;
+    uint16_t high;
+} __attribute__((packed)) IdtEntry;
+
+typedef struct {
+    uint16_t limit;
+    uint32_t base;
+} __attribute__((packed)) idtr_t;
+
+typedef struct {
+    uint32_t edi, esi, ebp, useless, ebx, edx, ecx, eax; // pushed by pushad
+    uint32_t gs, fs, es, ds; // pushed segment selectors
+    uint32_t vec_idx, err_code; // isr index and error code (0 when error is not applicable)
+    uint32_t eip, cs, eflags, esp, ss; // pushed by CPU during interrupt
+} isr_registers_t;
+
+// upper half of upper (16-31), lower half of lower (0-15)
+uint32_t getOffset(IdtEntry entry); //addr of entry point of ISR
+//uint8_t getGateType(IdtEntry entry); //bits 8-11 of upper
+//uint8_t getPrivilegeLevels (IdtEntry entry); //bits 13-14 of upper
+//bool isValid(IdtEntry entry); //check present bit (upper's 15th bit)
+
+void makeInterruptTable ();
+void idtSetDesc (uint8_t idx, void* isr, uint8_t flags); 
+
+#endif
