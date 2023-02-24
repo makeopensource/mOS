@@ -33,7 +33,7 @@
 isr_stub_%+%1:
 	push %1
 	stub_setup
-	;call isrHandler
+	call isrHandler
 	stub_end
 	iret
 %endmacro
@@ -43,7 +43,7 @@ isr_stub_%+%1:
 	push 0 ; dummy error code
 	push %1
 	stub_setup
-	;call isrHandler
+	call isrHandler
 	stub_end
 	iret
 %endmacro
@@ -53,7 +53,7 @@ irq_stub_%+%1:
 	push 0 ; dummy error code
 	push %1
 	stub_setup
-	;call irqHandler
+	call irqHandler
 	stub_end
 	iret
 %endmacro

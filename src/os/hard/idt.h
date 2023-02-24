@@ -26,11 +26,18 @@ typedef struct {
 
 // upper half of upper (16-31), lower half of lower (0-15)
 uint32_t getOffset(IdtEntry entry); //addr of entry point of ISR
-//uint8_t getGateType(IdtEntry entry); //bits 8-11 of upper
-//uint8_t getPrivilegeLevels (IdtEntry entry); //bits 13-14 of upper
-//bool isValid(IdtEntry entry); //check present bit (upper's 15th bit)
+uint8_t getGateType(IdtEntry entry); //bits 0-3 of flags
+uint8_t getPrivilegeLevels (IdtEntry entry); //bits 5-6 of flags
+bool isValid(IdtEntry entry); //check present bit (flags 7th bit)
 
 void makeInterruptTable ();
 void idtSetDesc (uint8_t idx, void* isr, uint8_t flags); 
+
+typedef void (*int_handler_t)(isr_registers_t*);
+
+// sets handlers for ISRs and IRQs, 0 <= isr_vec < 32, 0 <= irq_vec < 16.
+// note that IRQ0 is actually interrupt 32 (see init_pic)
+void isrSetHandler(uint8_t isr_vec, int_handler_t handler);
+void irqSetHandler(uint8_t irq_vec, int_handler_t handler);
 
 #endif
