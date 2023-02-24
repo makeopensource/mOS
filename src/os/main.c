@@ -1,6 +1,9 @@
+#include "hard/idt.h"
+
 #include "video/VGA_text.h"
 
 int os_main(){
+    makeInterruptTable();
 
     clearScreen(black);
 
@@ -12,7 +15,8 @@ int os_main(){
     const char *string = "Hello, World!";
     println(string, colour);
     
-    while (1==1) 
+
+    while (1==1)
         ;
         
     return 0;
