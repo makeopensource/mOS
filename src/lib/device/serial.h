@@ -37,20 +37,35 @@ void serialInit();
 // set the baud rate of a serial port and initialize
 void serialSetBaud(uint16_t port, uint16_t baud);
 
+// non-blocking read, returns 0 if buffer empty
+uint8_t serialReadByte(uint16_t port);
+
+// waits for a byte to be read
+uint8_t serialReadByteBlocking(uint16_t port);
+
+// reads n bytes into buffer, blocking until n recieved
+void serialRead(uint16_t port, uint8_t* buffer, size_t n);
+
+// returns the amount of bytes ready to be read in the buffer
+uint8_t serialReadReady(uint16_t port);
+
+bool serialEmpty(uint16_t port);
+
+
 // IMPORTANT!!! calling any send function before serialSend has finished is undefined behavior,
 // you have been warned.
 
 // sends a byte over serial, blocking
-void serialSendByte(uint16_t port, uint8_t data);
+void serialWriteByte(uint16_t port, uint8_t data);
 
 // sends n bytes over serial, blocking
-void serialSendBlocking(uint16_t port, uint8_t* data, size_t n);
+void serialWriteBlocking(uint16_t port, uint8_t* data, size_t n);
 
 // sends n bytes over serial, non-blocking
 // WARNING, WILL ENABLE INTERRUPTS
-void serialSend(uint16_t port, uint8_t* data, size_t n);
+void serialWrite(uint16_t port, uint8_t* data, size_t n);
 
 // returns true if the async serial send has finished
-bool serialSent(uint16_t port);
+bool serialWriteReady(uint16_t port);
 
 #endif

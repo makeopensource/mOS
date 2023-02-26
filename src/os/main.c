@@ -14,7 +14,7 @@ int os_main(){
 
     println("It booted!!!", green);
 
-    serialSend(COM1, (uint8_t*)("Hello, Serial!"), sizeof("Hello, Serial!"));
+    serialWrite(COM1, (uint8_t*)("Hello, Serial!"), sizeof("Hello, Serial!"));
 
     VGA_Color colour = light_cyan;
     const char *string = "Hello, World!";

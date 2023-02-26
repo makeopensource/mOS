@@ -92,25 +92,68 @@ void serialSetBaud(uint16_t port, uint16_t baud) {
     outb(port + 1, 0b11); // enable Data Ready (DR) and Transmit Empty (THRE) interrupts
 }
 
+/* read related functions */
+
+uint8_t serialReadByte(uint16_t port) {
+    outb(port + 1, 0b00); // disable serial interrupts
+    if (port == COM1) {
+        return ring_buffer_pop(&inCOM1);
+    } else {
+        return ring_buffer_pop(&inCOM2);
+    }
+    outb(port + 1, 0b11); // enable serial interrupts
+}
+
+uint8_t serialReadByteBlocking(uint16_t port) {
+    while (serialEmpty(port));
+
+    return serialReadByte(port);
+}
+
+void serialRead(uint16_t port, uint8_t* buffer, size_t n) {
+    for (int i = 0; i < n; ++i) {
+        buffer[i] = serialReadByteBlocking(port);
+    }
+}
+
+uint8_t serialReadReady(uint16_t port) {
+    if (port == COM1) {
+        return inCOM1.used;
+    } else {
+        return inCOM2.used;
+    }
+}
+
+bool serialEmpty(uint16_t port) {
+    if (port == COM1) {
+        return ring_buffer_empty(&inCOM1);
+    } else {
+        return ring_buffer_empty(&inCOM2);
+    }
+}
+
+
+/* Write related functions */
+
 bool transmitReady(uint16_t port) {
     return inb(port + 5) & TRANSMIT_READY_MASK; // check is transmission buffer is empty
 }
 
-void serialSendByte(uint16_t port, uint8_t data) {
+void serialWriteByte(uint16_t port, uint8_t data) {
     while (!transmitReady(port));
 
     outb(port, data);
 }
 
 // sends n bytes over serial, blocking
-void serialSendBlocking(uint16_t port, uint8_t* data, size_t n) {
+void serialWriteBlocking(uint16_t port, uint8_t* data, size_t n) {
     for (int i = 0; i < n; ++i) {
-        serialSendByte(port, data[i]);
+        serialWriteByte(port, data[i]);
     }
 }
 
 // sends n bytes over serial, non-blocking
-void serialSend(uint16_t port, uint8_t* data, size_t n) {
+void serialWrite(uint16_t port, uint8_t* data, size_t n) {
     clearInterrupts(); // disable cpu interrupts
     outb(port + 1, 0b00); // disable serial interrupts
 
@@ -126,7 +169,7 @@ void serialSend(uint16_t port, uint8_t* data, size_t n) {
     outb(port + 1, 0b11); // enable serial interrupts
 }
 
-bool serialSent(uint16_t port) {
+bool serialWriteReady(uint16_t port) {
     if (port == COM1) {
         return remainCOM1 == 0;
     } else {
