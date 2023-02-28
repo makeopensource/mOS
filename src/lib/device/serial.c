@@ -95,13 +95,11 @@ void serialSetBaud(uint16_t port, uint16_t baud) {
 /* read related functions */
 
 uint8_t serialReadByte(uint16_t port) {
-    outb(port + 1, 0b00); // disable serial interrupts
     if (port == COM1) {
         return ring_buffer_pop(&inCOM1);
     } else {
         return ring_buffer_pop(&inCOM2);
     }
-    outb(port + 1, 0b11); // enable serial interrupts
 }
 
 uint8_t serialReadByteBlocking(uint16_t port) {
