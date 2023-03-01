@@ -40,7 +40,7 @@ typedef void (*int_handler_t)(isr_registers_t*);
 void isrSetHandler(uint8_t isr_vec, int_handler_t handler);
 void irqSetHandler(uint8_t irq_vec, int_handler_t handler);
 
-static inline void clearInterrupts() {
+static inline void disableInterrupts() {
     __asm__ volatile ("cli");
 }
 

@@ -95,13 +95,16 @@ void serialSetBaud(uint16_t port, uint16_t baud) {
 /* read related functions */
 
 uint8_t serialReadByte(uint16_t port) {
+    disableInterrupts();
+    uint8_t out;
     if (port == COM1) {
-        return ring_buffer_pop(&inCOM1);
+        out = ring_buffer_pop(&inCOM1);
     } else {
-        return ring_buffer_pop(&inCOM2);
+        out = ring_buffer_pop(&inCOM2);
     }
+    enableInterrupts();
+    return out;
 }
-
 uint8_t serialReadByteBlocking(uint16_t port) {
     while (serialEmpty(port));
 
@@ -114,7 +117,7 @@ void serialRead(uint16_t port, uint8_t* buffer, size_t n) {
     }
 }
 
-uint8_t serialReadReady(uint16_t port) {
+size_t serialReadReady(uint16_t port) {
     if (port == COM1) {
         return inCOM1.used;
     } else {
@@ -152,7 +155,7 @@ void serialWriteBlocking(uint16_t port, uint8_t* data, size_t n) {
 
 // sends n bytes over serial, non-blocking
 void serialWrite(uint16_t port, uint8_t* data, size_t n) {
-    clearInterrupts(); // disable cpu interrupts
+    disableInterrupts(); // disable cpu interrupts
     outb(port + 1, 0b00); // disable serial interrupts
 
     if (port == COM1) {

@@ -47,7 +47,7 @@ uint8_t serialReadByteBlocking(uint16_t port);
 void serialRead(uint16_t port, uint8_t* buffer, size_t n);
 
 // returns the amount of bytes ready to be read in the buffer
-uint8_t serialReadReady(uint16_t port);
+size_t serialReadReady(uint16_t port);
 
 bool serialEmpty(uint16_t port);
 
