@@ -1,9 +1,9 @@
 OUTPUT_FORMAT("elf32-i386");
 
-ENTRY(start);
+ENTRY(_start);
 
 SECTIONS {
-    . = 0x00007E00;
+    . = 0x00001000;
     .text :  ALIGN(4) {
         os_entry.o(.text);
 	. = ALIGN(4);        

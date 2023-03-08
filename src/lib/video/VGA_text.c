@@ -60,7 +60,7 @@ void println(const char* str, VGA_Color color) {
 }
 
 void scroll() {
-    cursor -= VGA_HEIGHT; // move cursor up
+    cursor -= VGA_WIDTH; // move cursor up
     adjustCursor(); // bounds check
 
     VGA_Char* current = VGA_MEMORY;

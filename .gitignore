@@ -8,6 +8,9 @@ mOS
 # Emacs
 *.~
 
+# Powershell (b/c qemu's fussy)
+*.ps1
+
 # Logging (Qemu)
 log.txt
 
