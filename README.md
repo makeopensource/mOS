@@ -27,6 +27,7 @@ For contributing _fork_ this repository and then make your changes in the form o
  * qemu (specifically `qemu-system-x86`) on debian based systems you can install this with the apt package manager
  * gcc
  * nasm
+ * WSL (Windows only)
 
 ### Building
  * just run `make` in the root directory of the project
@@ -55,4 +56,4 @@ WARNING: Image format was not specified for 'mOS.bin' and probing guessed raw.
 	Specify the 'raw' format explicitly to remove the restrictions.
 
 ```
-You probably don't have the right qemu, see the second dependency.
+This warning is normal
