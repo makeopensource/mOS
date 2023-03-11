@@ -21,6 +21,13 @@ The major goal of this project is to recreate some of the functionality from a D
 ## Contributing
 For contributing _fork_ this repository and then make your changes in the form of Pull Requests to the main repository
 
+### Adding a new section to `/lib`
+* Edit these sections in the `Makefile` 
+  * Add a `<new lib>_SOURCE=./src/lib/<path to new lib>` variable
+  * Add the object files to the `OBJ_NAMES` and `LINK_OBJ_NAMES` variables
+  * Add a rule for your object file, just follow the format of the other lib  rules.
+
+
 ## Building and running
 ### Dependencies
  * make
@@ -57,3 +64,8 @@ WARNING: Image format was not specified for 'mOS.bin' and probing guessed raw.
 
 ```
 This warning is normal
+
+* When you run `make` and you get an error along the lines of 
+  `/usr/bin/ld: cannot find crt1.o: No such file or directory`
+  you likely only have the gcc for your current architecture that is 64bit. You need the 32bit support files. For that you can install them on debian based machines with `sudo apt install gcc-multilib`
+
