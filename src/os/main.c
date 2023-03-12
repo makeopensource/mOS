@@ -8,6 +8,7 @@ int os_main(){
     makeInterruptTable();
     serialInit();
 
+
     clearScreen(black);
 
     writeText("Welcome To mOS!", (80 - 15)/2, 5, red);
@@ -20,7 +21,7 @@ int os_main(){
     const char *string = "Hello, World!";
     println(string, colour);
     
-    while (1==1)
+    while (1!=0)
         ;
         
     return 0;

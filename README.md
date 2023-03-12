@@ -18,6 +18,23 @@ The major goal of this project is to recreate some of the functionality from a D
     * vi
     * ed
 
+## Contributing
+For contributing _fork_ this repository and then make your changes in the form of Pull Requests to the main repository
+
+## Building and running
+### Dependencies
+ * make
+ * qemu (specifically `qemu-system-x86`) on debian based systems you can install this with the apt package manager
+ * gcc
+ * nasm
+ * WSL (Windows only)
+
+### Building
+ * just run `make` in the root directory of the project
+
+### Running
+ * run `make qemu` in the root directory of the project
+
 ## General behavior
 boot and immediately drop to a prompt.
 programs can be executed from the prompt.
@@ -29,3 +46,14 @@ send signals by keyboard to do ✨stuff✨.
 * https://wiki.osdev.org/Main_Page
 
 * https://wiki.osdev.org/Linker_Scripts
+
+
+## FAQ
+* If you get an error like 
+```
+WARNING: Image format was not specified for 'mOS.bin' and probing guessed raw.
+	Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted
+	Specify the 'raw' format explicitly to remove the restrictions.
+
+```
+This warning is normal
