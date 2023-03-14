@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define IDT_ENTRIES 256
+#define ISR_COUNT 32
+#define IRQ_COUNT 16
+
 typedef struct {
     uint16_t low;
     uint16_t selector;

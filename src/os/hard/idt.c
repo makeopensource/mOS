@@ -10,6 +10,10 @@
 #define PRIVILEGE_MASK 0b01100000
 #define PRESENT_MASK 0b10000000
 
+#define DEFAULT_FLAGS 0x8E
+#define CODE_SEGMENT 0x8
+
+
 uint32_t getOffset (IdtEntry entry) {
     return (((uint32_t)(entry.high) << 16) | (uint32_t)(entry.low));
 }
@@ -27,22 +31,22 @@ bool isValid (IdtEntry entry) {
 }
 
 extern void* idt_stub_table[];
-static IdtEntry idt[256];
+static IdtEntry idt[IDT_ENTRIES];
 static idtr_t idtr;
 
 void makeInterruptTable () {
 
     idtr.base = (uint32_t)(&idt);
-    idtr.limit = sizeof(IdtEntry) * 256 - 1;
+    idtr.limit = sizeof(idt) - 1;
 
-    for (uint8_t idx = 0; idx < 32 + 16; idx++) {
-        idtSetDesc(idx, idt_stub_table[idx], 0x8E);
+    for (uint8_t idx = 0; idx < ISR_COUNT + IRQ_COUNT; idx++) {
+        idtSetDesc(idx, idt_stub_table[idx], DEFAULT_FLAGS);
     }
 
     initPIC(32);
 
     __asm__ volatile ("lidt [%0]" : : "r"(&idtr));
-    __asm__ volatile ("sti");
+    enableInterrupts();
 }
 
 void idtSetDesc (uint8_t idx, void* isr, uint8_t flags) {
@@ -53,7 +57,7 @@ void idtSetDesc (uint8_t idx, void* isr, uint8_t flags) {
     desc->high = ((uint32_t)(isr) >> 16) & 0xFFFF;
 
     //set segment selector
-    desc->selector = 0x08;
+    desc->selector = CODE_SEGMENT;
 
     desc->zero = 0;
 
@@ -61,8 +65,8 @@ void idtSetDesc (uint8_t idx, void* isr, uint8_t flags) {
     desc->flags = flags;
 }
 
-static int_handler_t isrHandlers[32] = {};
-static int_handler_t irqHandlers[16] = {};
+static int_handler_t isrHandlers[ISR_COUNT] = {};
+static int_handler_t irqHandlers[IRQ_COUNT] = {};
 
 
 void isrSetHandler(uint8_t isr_vec, int_handler_t handler) {
