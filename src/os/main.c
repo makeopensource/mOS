@@ -21,7 +21,7 @@ int os_main(){
     const char *string = "Hello, World!";
     println(string, colour);
     
-    while (1!=0)
+    while (1 + 1 == 2)
         ;
         
     return 0;

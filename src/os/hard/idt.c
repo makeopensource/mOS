@@ -90,3 +90,11 @@ void irqHandler(isr_registers_t* state) {
 
     ackPIC(state->vec_idx);
 }
+
+void disableInterrupts(void) {
+    __asm__ volatile ("cli");
+}
+
+void enableInterrupts(void) {
+    __asm__ volatile ("sti");
+}

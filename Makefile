@@ -13,9 +13,10 @@ C_MAIN_SOURCE=./src/os/main.c
 
 VGA_TEXT_SOURCE=./src/lib/video/VGA_text.c
 SERIAL_SOURCE=./src/lib/device/serial.c
+RING_BUFFER_SOURCE=./src/lib/container/ring_buffer.c
 
-OBJ_NAMES=boot.o main.o os_entry.o VGA_text.o idt.o idt_e.o pic.o serial.o
-LINK_OBJ_NAMES=main.o os_entry.o VGA_text.o idt_e.o idt.o pic.o serial.o
+OBJ_NAMES=boot.o main.o os_entry.o VGA_text.o idt.o idt_e.o pic.o serial.o ring_buffer.o
+LINK_OBJ_NAMES=main.o os_entry.o VGA_text.o idt_e.o idt.o pic.o serial.o ring_buffer.o
 
 .PHONY: clean qemu
 
@@ -31,6 +32,9 @@ VGA_text.o: $(VGA_TEXT_SOURCE)
 	gcc -c $^ -o $@ $(CFLAGS)
 
 serial.o: $(SERIAL_SOURCE)
+	gcc -c $^ -o $@ $(CFLAGS)
+
+ring_buffer.o: $(RING_BUFFER_SOURCE)
 	gcc -c $^ -o $@ $(CFLAGS)
 
 idt.o: $(C_IDT_SOURCE)
