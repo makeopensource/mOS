@@ -72,20 +72,27 @@ void serialInit() {
 // bits 6-7: trigger for DR interrupt,
 // 0b00 = 1byte, 0b01 = 4 bytes, then 8, then 14
 
+#define FIFO_ENABLE 0b1
+#define FIFO_CLEAR_RECV 0b10
+#define FIFO_CLEAR_SEND 0b100
+#define FIFO_DMA 0b1000
+#define FIFO_DATA_READY_INT 0b11000000
+#define FIFO_CLEAR (FIFO_CLEAR_RECV | FIFO_CLEAR_SEND)
+
 // port and baud are expected to be the provided macros in serial.h
 void serialSetBaud(uint16_t port, uint16_t baud) {
     // a strange thing to note is that port and port + 1 change meaning,
     // the meaning is dependant on port + 3's most significant bit
 
     outb(port + 3, 0); // ensure DLAB is 0
-    outb(port + 1, 0); // disable IRQs
+    outb(port + 1, 0); // disable serial IRQs
 
-    outb(port + 3, 0b10000000); // set DLAB to 1
-    outb(port + 0, (uint8_t)(baud & 0x00ff)); // set baud divisor
-    outb(port + 1, (uint8_t)((baud & 0xff00) >> 8));
+    outb(port + 3, 0b10000000); // set DLAB to 1 (DLAB is 7th bit of port + 3)
+    outb(port + 0, (uint8_t)(baud & 0x00ff)); // set baud divisor, low byte in port + 0
+    outb(port + 1, (uint8_t)((baud & 0xff00) >> 8)); // high byte in port + 1
 
     outb(port + 3, DATA8b | STOP1 | PARITY_NONE); // set data flags (also sets DLAB to 0)
-    outb(port + 2, 0b11000111); // enable fifo and clear buffers and enable dr interrupt
+    outb(port + 2, FIFO_ENABLE | FIFO_CLEAR | FIFO_DATA_READY_INT); // enable fifo and clear buffers and enable dr interrupt
 
     outb(port + 4, 0x0f); // enable hardware handshaking, kinda
 

@@ -15,6 +15,7 @@
 
 
 uint32_t getOffset (IdtEntry entry) {
+    // reconstruct the address
     return (((uint32_t)(entry.high) << 16) | (uint32_t)(entry.low));
 }
 
@@ -23,6 +24,7 @@ uint8_t getGateType (IdtEntry entry) {
 }
 
 uint8_t getPrivilegeLevels (IdtEntry entry) {
+    // mask the privilege bits then shift them to be 0 based
     return (entry.flags & PRIVILEGE_MASK) >> 5;
 }
 
@@ -37,14 +39,20 @@ static idtr_t idtr;
 void makeInterruptTable () {
 
     idtr.base = (uint32_t)(&idt);
+    
+    // used to calculate the end of the IDT, idtr.base + idtr.limit
+    // this result is the address of the last byte of the IDT. Without -1 it would be the byte after the IDT
     idtr.limit = sizeof(idt) - 1;
 
+    // Setup all the idt descriptors for both ISRs and IRQs
     for (uint8_t idx = 0; idx < ISR_COUNT + IRQ_COUNT; idx++) {
         idtSetDesc(idx, idt_stub_table[idx], DEFAULT_FLAGS);
     }
 
-    initPIC(32);
+    // we are offsetting IRQs to be right after the ISRs
+    initPIC(ISR_COUNT);
 
+    // load the IDT and then enable interrupts
     __asm__ volatile ("lidt [%0]" : : "r"(&idtr));
     enableInterrupts();
 }
@@ -53,8 +61,8 @@ void idtSetDesc (uint8_t idx, void* isr, uint8_t flags) {
     IdtEntry *desc = &idt[idx];
 
     //set offset
-    desc->low = (uint32_t)isr & 0xFFFF;
-    desc->high = ((uint32_t)(isr) >> 16) & 0xFFFF;
+    desc->low = (uint32_t)isr & 0xFFFF; // lowest 2 bytes of the address
+    desc->high = ((uint32_t)(isr) >> 16) & 0xFFFF; // upper 2 bytes of the address
 
     //set segment selector
     desc->selector = CODE_SEGMENT;
@@ -92,6 +100,7 @@ void irqHandler(isr_registers_t* state) {
         handler(state);
     }
 
+    // very important or else we get no more IRQs.
     ackPIC(state->vec_idx);
 }
 
