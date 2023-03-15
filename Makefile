@@ -4,14 +4,7 @@ LFLAGS=-melf_i386 --build-id=none
 
 ASM_BOOT_SECT_SOURCE=./src/boot/boot_sect.asm
 ASM_OS_ENTRY_SOURCE=./src/boot/os_entry.asm
-
 ASM_IDT_SOURCE=./src/os/hard/except.asm
-C_IDT_SOURCE=./src/os/hard/idt.c
-C_PIC_SOURCE=./src/os/hard/pic.c
-
-C_MAIN_SOURCE=./src/os/main.c
-
-VGA_TEXT_SOURCE=./src/lib/video/VGA_text.c
 
 BOOT_OBJ := boot.o
 OBJ_NAMES=src/os/main.o os_entry.o src/lib/video/VGA_text.o src/os/hard/idt.o idt_e.o src/os/hard/pic.o
