@@ -4,8 +4,6 @@
 
 #include "pic.h"
 
-#define UPPER_HALF 0xFFFF0000
-#define LOWER_HALF 0x0000FFFF
 #define GATE_MASK 0b00001111
 #define PRIVILEGE_MASK 0b01100000
 #define PRESENT_MASK 0b10000000
