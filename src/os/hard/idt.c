@@ -8,7 +8,21 @@
 #define PRIVILEGE_MASK 0b01100000
 #define PRESENT_MASK 0b10000000
 
-#define DEFAULT_FLAGS 0x8E
+// interrupt gates disable interrupts on entry, trap do not.
+#define GATE_INTR 0b1110
+#define GATE_TRAP 0b1111
+
+// privilege level of gates
+#define PRIV_KERNEL 0b0000000
+#define PRIV_KDEVICE 0b0100000
+#define PRIV_UDEVICE 0b1000000
+#define PRIV_USER 0b1100000
+
+#define GATE_PRESENT 0b10000000
+
+#define DEFAULT_FLAGS (GATE_PRESENT | PRIV_KERNEL | GATE_INTR)
+
+// see GDT for details
 #define CODE_SEGMENT 0x8
 
 
@@ -44,6 +58,7 @@ void makeInterruptTable () {
 
     // Setup all the idt descriptors for both ISRs and IRQs
     for (uint8_t idx = 0; idx < ISR_COUNT + IRQ_COUNT; idx++) {
+        // note that IRQs are also interrupt gates, not trap.
         idtSetDesc(idx, idt_stub_table[idx], DEFAULT_FLAGS);
     }
 
