@@ -4,10 +4,11 @@ LFLAGS=-melf_i386 --build-id=none
 
 ASM_BOOT_SECT_SOURCE=./src/boot/boot_sect.asm
 ASM_OS_ENTRY_SOURCE=./src/boot/os_entry.asm
-ASM_IDT_SOURCE=./src/os/hard/except.asm
 
 BOOT_OBJ := boot.o
-OBJ_NAMES=src/os/main.o os_entry.o src/lib/video/VGA_text.o src/os/hard/idt.o idt_e.o src/os/hard/pic.o
+
+OBJ_NAMES := src/os/main.o os_entry.o src/lib/video/VGA_text.o \
+	src/os/hard/idt.o src/os/hard/except.o src/os/hard/pic.o
 
 .PHONY: clean qemu
 
@@ -19,21 +20,18 @@ mOS.bin: $(OBJ_NAMES) $(BOOT_OBJ)
 boot.o: $(ASM_BOOT_SECT_SOURCE)
 	nasm $^ -f bin -o $@ 
 
-idt_e.o: $(ASM_IDT_SOURCE)
-	nasm $^ -f elf32 -o $@
-
 os_entry.o: $(ASM_OS_ENTRY_SOURCE)
-	nasm $^ -f elf32 -o $@	
+	nasm $^ -f elf32 -o $@
 
 %.o: %.c
 	gcc -c $^ -o $@ $(CFLAGS)
 
-#%.o: %.asm
-#	nasm $^ -f elf32 -o $@
+%.o: %.asm
+	nasm $^ -f elf32 -o $@
 
 qemu: mOS.bin
 	qemu-system-i386 -boot c -hda $^ -no-reboot -no-shutdown
 
 clean:
 	rm -f mOS
-	rm -f *.o *.bin *.elf *.~ src/*~ src/boot/*~ docs/*~
+	rm -f *.o $(OBJ_NAMES) *.bin *.elf *.~ src/*~ src/boot/*~ docs/*~
