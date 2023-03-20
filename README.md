@@ -21,13 +21,6 @@ The major goal of this project is to recreate some of the functionality from a D
 ## Contributing
 For contributing _fork_ this repository and then make your changes in the form of Pull Requests to the main repository
 
-### Adding a new section to `/lib`
-* Edit these sections in the `Makefile` 
-  * Add a `<new lib>_SOURCE=./src/lib/<path to new lib>` variable
-  * Add the object files to the `OBJ_NAMES` and `LINK_OBJ_NAMES` variables
-  * Add a rule for your object file, just follow the format of the other lib  rules.
-
-
 ## Building and running
 ### Dependencies
  * make
