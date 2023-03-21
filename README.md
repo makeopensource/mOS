@@ -57,3 +57,8 @@ WARNING: Image format was not specified for 'mOS.bin' and probing guessed raw.
 
 ```
 This warning is normal
+
+* When you run `make` and you get an error along the lines of 
+  `/usr/bin/ld: cannot find crt1.o: No such file or directory`
+  you likely only have the gcc for your current architecture that is 64bit. You need the 32bit support files. For that you can install them on debian based machines with `sudo apt install gcc-multilib`
+
