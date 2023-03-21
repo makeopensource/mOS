@@ -25,3 +25,30 @@
 |0x42| Channel 2 data (Read and Write)|
 |0x43| Command Register (Write Only) |
 
+- Channels:
+	- These are used to set the 16 bit reload value or read a channels count.
+
+- Command Register:
+	- This is used to describe how a channel operates
+| Bits    | Usage            |
+|---------|------------------|
+| 6 and 7 | Select Channel:  |
+|         | 0 0 = Channel 0  |
+|         | 0 1 = Channel 1  |
+|         | 1 0 = Channel 2  |
+|         | 1 1 = Read-Back command |
+|         |                  |
+| 4 and 5 | Access Mode:     |
+|         | 0 0 = Latch count value command |
+|         | 0 1 = Access Mode: lobyte only |
+|         | 1 0 = Access Mode: hibyte only |
+|         | 1 1 = Access Mode: lobyte/hibyte |
+| 1 to 3  | Operating Mode: |
+|         | 0 0 0 = Mode 0 (interrupt on terminal count) |
+|         | 0 0 1 = Mode 1 (Hardware re-triggerable one-shot |
+|         | 0 1 1 = Mode 2 (rate generator) |
+|         | 1 0 0 = Mode 4 (software triggered strobe) |
+| 0       | BCD/Binary Mode: |
+|         | 0 = 16-bit binary |
+|         | 1 = four-digit BCD | 
+
