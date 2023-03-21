@@ -17,3 +17,11 @@
 		
 ## IO Ports
 - There are four ports, Three for reading and writing to the channels and one as a write only command register
+
+|Port|Usage|
+|----|-----|
+|0x40| Channel 0 data (Read and Write)|
+|0x41| Channel 1 data (Read and Write)|
+|0x42| Channel 2 data (Read and Write)|
+|0x43| Command Register (Write Only) |
+
