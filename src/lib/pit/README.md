@@ -25,10 +25,10 @@
 |0x42| Channel 2 data (Read and Write)|
 |0x43| Command Register (Write Only) |
 
-- Channels:
+### Channels:
 	- These are used to set the 16 bit reload value or read a channels count.
 
-- Command Register:
+### Command Register:
 	- Takes 8 bits and is used to describe how a channel operates
 	- The following table shows what each bit is used for.
 	
@@ -57,9 +57,9 @@
 |         | 1 = four-digit BCD | 
 
 
-- Operating Modes:
+### Operating Modes:
 	- The mode we use for our timer is the square wave generator
 		we could've used the rate generator but the wiki reccomends the 
 		square wave generator instead
-	- The sqaure wave generator essentially acts as a frequenct divider
+	- The square wave generator essentially acts as a frequency divider
 		where the output signal is a square wave
