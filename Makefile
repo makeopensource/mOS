@@ -12,9 +12,11 @@ C_PIC_SOURCE=./src/os/hard/pic.c
 C_MAIN_SOURCE=./src/os/main.c
 
 VGA_TEXT_SOURCE=./src/lib/video/VGA_text.c
+PIT_SOURCE=./src/lib/pit/pit.c
 
-OBJ_NAMES=boot.o main.o os_entry.o VGA_text.o idt.o idt_e.o pic.o
-LINK_OBJ_NAMES=main.o os_entry.o VGA_text.o idt_e.o idt.o pic.o
+
+OBJ_NAMES=boot.o main.o os_entry.o VGA_text.o idt.o idt_e.o pic.o pit.o
+LINK_OBJ_NAMES=main.o os_entry.o VGA_text.o idt_e.o idt.o pic.o pit.o
 
 .PHONY: clean qemu
 
@@ -27,6 +29,9 @@ main.o: $(C_MAIN_SOURCE)
 	gcc -c $^ -o $@ $(CFLAGS)
 
 VGA_text.o: $(VGA_TEXT_SOURCE)
+	gcc -c $^ -o $@ $(CFLAGS)
+
+pit.o: $(PIT_SOURCE)
 	gcc -c $^ -o $@ $(CFLAGS)
 
 idt.o: $(C_IDT_SOURCE)
