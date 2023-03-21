@@ -26,11 +26,11 @@
 |0x43| Command Register (Write Only) |
 
 ### Channels:
-	- These are used to set the 16 bit reload value or read a channels count.
+- These are used to set the 16 bit reload value or read a channels count.
 
 ### Command Register:
-	- Takes 8 bits and is used to describe how a channel operates
-	- The following table shows what each bit is used for.
+- Takes 8 bits and is used to describe how a channel operates
+- The following table shows what each bit is used for.
 	
 	
 | Bits    | Usage            |
@@ -40,7 +40,6 @@
 |         | 0 1 = Channel 1  |
 |         | 1 0 = Channel 2  |
 |         | 1 1 = Read-Back command |
-|         |                  |
 | 4 and 5 | Access Mode:     |
 |         | 0 0 = Latch count value command |
 |         | 0 1 = Access Mode: lobyte only |
@@ -58,8 +57,8 @@
 
 
 ### Operating Modes:
-	- The mode we use for our timer is the square wave generator
+- The mode we use for our timer is the square wave generator
 		we could've used the rate generator but the wiki reccomends the 
 		square wave generator instead
-	- The square wave generator essentially acts as a frequency divider
+- The square wave generator essentially acts as a frequency divider
 		where the output signal is a square wave
