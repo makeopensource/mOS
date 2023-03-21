@@ -17,9 +17,9 @@ int os_main(){
     const char *string = "Hello, World!";
     println(string, colour);
 
-		 println("Timer Start", red);
-		sleep(100);
-		println("Timer End", red);
+		//	 println("Timer Start", red);
+		 //		sleep(100);
+		//		println("Timer End", red);
 
     while (1==1)
         ;
