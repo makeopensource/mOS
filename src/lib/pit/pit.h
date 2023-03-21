@@ -2,16 +2,11 @@
 #define PIT_H
 
 #include "../../os/hard/port_io.h"
-#include "../../os/hard/idt.h"
 #include <stdint.h>
 
 #define OSCILLATIONS 1193180 // The PIT oscillates this many HZ
 #define CHAN_0_PORT 0x40
 #define CMD_REG_PORT 0x43
-/***
- *  Handles the timer
- */
-static void timer_handler(isr_registers_t *regs);
 
 /***
  *	Sets up the system clock by installing the
@@ -20,7 +15,9 @@ static void timer_handler(isr_registers_t *regs);
 void init_pit();
 
 /***
- *	Setting the freqency for the timer
+ *	Setting the freqency for the timer.
+ *  Parameter: hz
+ *		Integer value that gets  divided by the amount of Oscillations
  */
 void init_timer(int hz);
 

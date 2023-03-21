@@ -20,8 +20,8 @@ int os_main(){
     VGA_Color colour = light_cyan;
     const char *string = "Hello, World!";
     println(string, colour);
-    
-    while (1 + 1 == 2)
+
+		while (1 + 1 == 2)
         ;
         
     return 0;

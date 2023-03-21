@@ -1,4 +1,5 @@
 #include "pit.h"
+#include "../../os/hard/idt.h"
 #include <stdint.h>
 
 uint32_t timer_ticks = 0;
@@ -7,7 +8,7 @@ uint32_t get_ticks() {
 	return timer_ticks;
 }
 
-void timer_handler(isr_registers_t *regs) {
+static void timer_handler(isr_registers_t *regs) {
 	/* Increment 'Tick count' */
 	timer_ticks++;
 }
