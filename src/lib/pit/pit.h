@@ -30,5 +30,4 @@ void init_timer(int hz);
  */
 void sleep(uint32_t dur);
 
-
 #endif
