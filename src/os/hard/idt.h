@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define IDT_ENTRIES 256
+#define ISR_COUNT 32
+#define IRQ_COUNT 16
+
 typedef struct {
     uint16_t low;
     uint16_t selector;
@@ -39,5 +43,8 @@ typedef void (*int_handler_t)(isr_registers_t*);
 // note that IRQ0 is actually interrupt 32 (see init_pic)
 void isrSetHandler(uint8_t isr_vec, int_handler_t handler);
 void irqSetHandler(uint8_t irq_vec, int_handler_t handler);
+
+void disableInterrupts(void);
+void enableInterrupts(void);
 
 #endif
