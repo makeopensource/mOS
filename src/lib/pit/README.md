@@ -30,6 +30,8 @@
 
 - Command Register:
 	- This is used to describe how a channel operates
+	
+	
 | Bits    | Usage            |
 |---------|------------------|
 | 6 and 7 | Select Channel:  |
