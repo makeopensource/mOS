@@ -29,7 +29,8 @@
 	- These are used to set the 16 bit reload value or read a channels count.
 
 - Command Register:
-	- This is used to describe how a channel operates
+	- Takes 8 bits and is used to describe how a channel operates
+	- The following table shows what each bit is used for.
 	
 	
 | Bits    | Usage            |
@@ -48,9 +49,17 @@
 | 1 to 3  | Operating Mode: |
 |         | 0 0 0 = Mode 0 (interrupt on terminal count) |
 |         | 0 0 1 = Mode 1 (Hardware re-triggerable one-shot |
-|         | 0 1 1 = Mode 2 (rate generator) |
+|         | 0 1 0 = Mode 2 (rate generator) |
+|         | 0 1 1 = Mode 3 (square wave generator ) |
 |         | 1 0 0 = Mode 4 (software triggered strobe) |
 | 0       | BCD/Binary Mode: |
 |         | 0 = 16-bit binary |
 |         | 1 = four-digit BCD | 
 
+
+- Operating Modes:
+	- The mode we use for our timer is the square wave generator
+		we could've used the rate generator but the wiki reccomends the 
+		square wave generator instead
+	- The sqaure wave generator essentially acts as a frequenct divider
+		where the output signal is a square wave
