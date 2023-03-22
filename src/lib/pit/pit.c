@@ -15,18 +15,18 @@ static void timer_handler(isr_registers_t *regs) {
 
 
 void init_pit(){
+	disableInterrupts();
 	irqSetHandler(0, timer_handler);
 	init_timer(100);	// 100 hz is just a good general frequency according to the wiki
+	enableInterrupts();
 }
 
 
 void init_timer(int hz) {
-	disableInterrupts();
 	int divisor = OSCILLATIONS / hz;	/* divisor */
 	outb(CMD_REG_PORT, 0x36);	                /* Write 0b00110110 to the command register */
 	outb(CHAN_0_PORT, divisor & 0xFF);       /* Set low byte of divisor */
 	outb(CHAN_0_PORT, divisor >> 8);	        /* Set high byte of divisor */
-	enableInterrupts();
 }
 
 
