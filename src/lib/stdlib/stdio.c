@@ -1,48 +1,59 @@
 #include "stdio.h"
-#define MAX_SNPRINTF_STRING 1000
+#include "string.h"
+#include "stdlib.h"
 
-int snprintf( char *restrict buffer, size_t bufsz,
-        const char *restrict format, ... ) {
+#define MAX_SNPRINTF_STRING 100
+
+
+// Inspired by chapter 7.3 of The C Programming Language
+int sn_printf( char *restrict buffer, size_t bufsz,
+        char *format, ... ) {
     va_list ap;
     char *p;
 
     // valid types
     char c;     // printf("%c\n", 'c');
     char *s;    // printf("%s\n", "hello, world!");
-    int i;      // printf("%i\n", 42);
-    double f;   // printf("%f\n", 42.0);
+    // int i;      // printf("%i\n", 42);
+    // double f;   // printf("%f\n", 42.0);
 
     va_start(ap, format);
     int n = 0;
-    for (p = format; *p && n < bufsz - 1; n++, p++) {
-        if (*p != "%") {
-            *buffer = *format;
+    for (p = format; *p != '\0' && n < bufsz - 1; n++, p++) {
+        if (*p != '%') {
+            *buffer = *p;
             buffer++;
-            format++;
         }
         else {
-            switch(*(format++)) {
+            p++;
+            char fmtchar = *p;
+            switch(fmtchar) {
                 case 's':
                     s = va_arg(ap, char *);
                     size_t strlen = strnlen_s(s, MAX_SNPRINTF_STRING);
-                    memcpy(buffer, s, MAX_SNPRINTF_STRING);
+                    memcpy(buffer, s, strlen);
                     buffer += strlen;
+                    break;
                 case 'c':
-                    c = va_arg(ap, char);
-                    memcpy(buffer, s, sizeof(char));
+                    c = (char) va_arg(ap, int);
+                    memcpy(buffer, &c, sizeof(char));
                     buffer++;
-                case 'i':
-                    i = va_arg(ap, int);
-                    memcpy(buffer, s, sizeof(int));
-                    buffer += sizeof(int);
-                case 'f':
-                    f = va_arg(ap, double);
-                    memcpy(buffer, s, sizeof(double));
-                    buffer += sizeof(double);
+                    break;
+                // case 'i':
+                //     i = va_arg(ap, int);
+                //     s = atoi(i);
+                //     int strlen = strnlen_s(s, MAX_SNPRINTF_STRING);
+                //     memcpy(buffer, s, strlen);
+                //     buffer += sizeof(int);
+                // case 'f':
+                //     f = va_arg(ap, double);
+                //     memcpy(buffer, s, sizeof(double));
+                //     buffer += sizeof(double);
             }
         }
     }
-    
+    va_end(ap);
+
     if (bufsz != 0) {
         *buffer = '\0';
     }

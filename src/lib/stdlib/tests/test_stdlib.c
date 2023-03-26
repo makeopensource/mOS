@@ -88,7 +88,8 @@ int main() {
     failed += test_atoi();
 
     if (failed == 0) {
-        puts("all tests passed!");
+        puts("all stdlib tests passed!");
+	puts("========================");
         return 0;
     }
 

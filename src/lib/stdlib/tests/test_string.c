@@ -91,16 +91,28 @@ int test_memcpy() {
 int test_strncmp() {
     char *a;
     char *b;
+
+    // test general input
     a = "more text";
     b = "more texts";
     if (strncmp(a, b, 20) == 0) {
         puts("invalid string comparison 1");
         return 1;
     }
+    // test strncmp n stops appropriately
     else if (strncmp(a, b, 9) != 0) {
         puts("invalid string comparison 2");
         return 1;
     }
+
+    // test that strncmp catches null delimiter in string
+    a = "makeopensource\0abcd";
+    b = "makeopensource\0efgh";
+    if (strncmp(a, b, 20) != 0) {
+        puts("invalid string comparison 3");
+        return 1;
+    }
+
     return 0;
 }
 
@@ -152,7 +164,8 @@ int main() {
     failed += test_strncmp();
 
     if (failed == 0) {
-        puts("all tests passed!");
+        puts("all string tests passed!");
+	puts("========================");
         return 0;
     }
 
