@@ -50,10 +50,6 @@ int test_strlen_s() {
     return 0;
 }
 
-// int test_sn_printf() {
-// 	return 0;
-// }
-
 int test_atoi() {
     char *str;
     int exp;
@@ -172,20 +168,58 @@ int test_memcpy() {
     return 0;
 }
 
+int test_strncmp() {
+    char *a;
+    char *b;
+    a = "more text";
+    b = "more texts";
+    if (strncmp(a, b, 20) == 0) {
+        puts("invalid string comparison 1");
+        return 1;
+    }
+    else if (strncmp(a, b, 9) != 0) {
+        puts("invalid string comparison 2");
+        return 1;
+    }
+    return 0;
+}
+
 int test_strcpy_s() {
     char *status;
+    size_t buf_len;
 
+    // testing overwriting text
     char buf_a[] = "some text";
     char buf_b[] = "more text";
-    size_t buf_len = 10;
+    buf_len = 10;
 
     status = strcpy_s(buf_b, buf_len, buf_a);
-    if (!strncmp(buf_a, buf_b, buf_len) || status == NULL) {
+    if (!strncmp(buf_a, buf_b, buf_len) == 0 || status == NULL) {
         puts("invalid string copy");
         return 1;
     }
 
-    puts("all strncmp tests passed!");
+    // testing copying into an empty array
+    char buf_c[] = "some text";
+    char buf_d[buf_len + 10];
+
+    status = strcpy_s(buf_d, buf_len, buf_c);
+    if (!strncmp(buf_c, buf_d, buf_len) == 0 || status == NULL) {
+        puts("invalid string copy 1");
+        return 1;
+    }
+
+    if (buf_d[buf_len - 1] != '\0') {
+        puts("invalid string copy 2");
+        return 1;
+    }
+
+    if (strnlen_s(buf_d, 100) != buf_len - 1) {
+        puts("invalid string copy 3");
+        return 1;
+    }
+
+    puts("all strncpy tests passed!");
     return 0;
 }
 
@@ -195,6 +229,8 @@ int main() {
     // failed += test_sn_printf();
     failed += test_memcpy();
     failed += test_atoi();
+    failed += test_strcpy_s();
+    failed += test_strncmp();
 
     if (failed == 0) {
         puts("all tests passed!");

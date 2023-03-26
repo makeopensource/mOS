@@ -18,8 +18,13 @@ size_t strnlen_s( const char *str, size_t strsz ) {
     return i;
 }
 
+// compares
 int strncmp( const char *s1, const char *s2, size_t n ) {
-    return strnlen_s(s1, n) == strnlen_s(s2, n);
+    for (int i = 0; i < n; i++, s1++, s2++) {
+        if (*s1 != *s2)
+            return -1;
+    }
+    return 0;
 }
 
 // We cannot have the exact definition as in C11, since we do not
@@ -30,11 +35,10 @@ char *strcpy_s( char *restrict dest, size_t destsz, const char *restrict src ) {
         return NULL;
     }
     else if (destsz <= strnlen_s(src, destsz)) {
-        
         return NULL;
     }
-    for (int i = 0; i < destsz - 1; i++, dest++, src++) {
-        *dest = *src;
+    for (int i = 0; i < destsz - 1; i++) {
+        dest[i] = src[i];
     }
     dest[destsz-1] = '\0';
     return dest;
