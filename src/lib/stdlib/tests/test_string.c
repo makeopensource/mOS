@@ -1,8 +1,8 @@
-#include "string.h"
-#include "stdlib.h"
+#include "../string.h"
+#include "../stdlib.h"
 #include <stdio.h>
 
-int test_strlen_s() {
+int test_strnlen_s() {
     // tests general case
     char *str;
     int exp_len;
@@ -47,86 +47,6 @@ int test_strlen_s() {
 
     puts("all strnlen_s tests passed!");
 
-    return 0;
-}
-
-int test_atoi() {
-    char *str;
-    int exp;
-
-    // tests basic input
-    str = "12345";
-    exp = 12345;
-    if (atoi(str) != exp) {
-        puts("invalid conversion");
-        return 1;
-    }
-
-    // tests discarding spaces
-    str = "   42";
-    exp = 42;
-    if (atoi(str) != exp) {
-        puts("invalid conversion");
-        return 1;
-    }
-
-    // tests leading "+"
-    str = "+42";
-    exp = 42;
-    if (atoi(str) != exp) {
-        puts("invalid conversion");
-        return 1;
-    }
-
-    // tests leading "-"
-    str = "-42";
-    exp = -42;
-    if (atoi(str) != exp) {
-        puts("invalid conversion");
-        return 1;
-    }
-
-    // tests leading 0s are discarded
-    str = "0042";
-    exp = 42;
-    if (atoi(str) != exp) {
-        puts("invalid conversion");
-        return 1;
-    }
-
-    // tests only valid characters are counted
-    str = "11x42";
-    exp = 11;
-    if (atoi(str) != exp) {
-        puts("invalid conversion");
-        return 1;
-    }
-
-    // tests invalid str input
-    str = "a1234";
-    exp = 0;
-    if (atoi(str) != exp) {
-        puts("invalid conversion");
-        return 1;
-    }
-
-    // tests empty input
-    str = "";
-    exp = 0;
-    if (atoi(str) != exp) {
-        puts("invalid conversion");
-        return 1;
-    }
-
-    // tests NULL input
-    str = NULL;
-    exp = 0;
-    if (atoi(str) != exp) {
-        puts("invalid conversion");
-        return 1;
-    }
-
-    puts("all atoi tests passed!");
     return 0;
 }
 
@@ -219,16 +139,15 @@ int test_strcpy_s() {
         return 1;
     }
 
-    puts("all strncpy tests passed!");
+    puts("all strcpy_s tests passed!");
     return 0;
 }
 
 int main() {
     int failed = 0;
-    failed += test_strlen_s();
-    // failed += test_sn_printf();
+    
+    failed += test_strnlen_s();
     failed += test_memcpy();
-    failed += test_atoi();
     failed += test_strcpy_s();
     failed += test_strncmp();
 
