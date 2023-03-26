@@ -89,7 +89,7 @@ int main() {
 
     if (failed == 0) {
         puts("all stdlib tests passed!");
-	puts("========================");
+	    puts("========================");
         return 0;
     }
 

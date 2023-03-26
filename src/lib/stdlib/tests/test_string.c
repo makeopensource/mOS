@@ -93,14 +93,14 @@ int test_strncmp() {
     char *b;
 
     // test general input
-    a = "more text";
-    b = "more texts";
-    if (strncmp(a, b, 20) == 0) {
+    a = "Hello World!";
+    b = "Hello";
+    if (strncmp(a, b, 20) <= 0) {
         puts("invalid string comparison 1");
         return 1;
     }
     // test strncmp n stops appropriately
-    else if (strncmp(a, b, 9) != 0) {
+    else if (strncmp(a, b, 5) != 0) {
         puts("invalid string comparison 2");
         return 1;
     }
@@ -110,6 +110,13 @@ int test_strncmp() {
     b = "makeopensource\0efgh";
     if (strncmp(a, b, 20) != 0) {
         puts("invalid string comparison 3");
+        return 1;
+    }
+
+    a = "Hello World!";
+    b = "Hello there";
+    if (strncmp(a, b, 20) >= 0) {
+        puts("invalid string comparison 4");
         return 1;
     }
 

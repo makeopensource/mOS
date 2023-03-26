@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -g -Wall -Werror
+CFLAGS := -g -Wall -Werror 
 
 # To add a test, place the name of the executable file 
 # you want to run here:

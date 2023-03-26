@@ -14,7 +14,7 @@ standard library equivilents in C99.
 | strncmp	| string.h	| Compare the contents of two strings		|
 | memcpy	| string.h	| Copy bytes from one buffer to another		|
 
-\* Note that the "s" stands for "safe," many of these functions have security
+\* Note that the "_s" stands for "_safe," many of these functions have security
 vulnerabilities that can allow them to overwrite buffers. These functions include
 an additional parameter to restrict the maximum read and write to the size of the
 buffer.
