@@ -95,6 +95,16 @@ int test_itoa() {
         puts("invalid itoa");
         return 1;
     }
+
+    input = -1523;
+    exp = "-1523";
+    itoa(input, buf);
+    if (strncmp(exp, buf, 10) != 0) {
+        printf("%s\n", buf);
+        puts("invalid itoa");
+        return 1;
+    }
+
     return 0;
 }
 

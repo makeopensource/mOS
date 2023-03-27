@@ -64,10 +64,12 @@ int sn_printf( char *restrict buffer, size_t bufsz,
 
             case 'i':
                 i = va_arg(ap, int);
-                int digits = 0;
-                for (int temp = i; temp >= 1; temp = temp / 10, digits++)
+                int bufSize = 0;
+                for (int temp = i; temp >= 1; temp = temp / 10, bufSize++)
                             ;
-                char temp_buffer[digits];
+                if (i < 0)
+                    bufSize++;
+                char temp_buffer[bufSize];
                 itoa(i, temp_buffer);
                 strlen = strnlen_s(temp_buffer, MAX_SNPRINTF_STRING);
 

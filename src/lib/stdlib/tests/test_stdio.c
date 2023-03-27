@@ -39,11 +39,27 @@ int test_sn_printf() {
         return 1;
     }
 
+    // testing numbers
     expected = "numbers: 12, 34";
     sn_printf(buffer, bufsize, "numbers: %i, %i", 12, 34);
     if (strncmp(buffer, expected, bufsize) != 0) {
         puts("invalid sn_printf 4");
-        printf("%s\n", buffer);
+        return 1;
+    }
+
+    // testing %% input
+    expected = "We are up 112%!";
+    sn_printf(buffer, bufsize, "We are up 112%%!");
+    if (strncmp(buffer, expected, bufsize) != 0) {
+        puts("invalid sn_printf 5");
+        return 1;
+    }
+
+    // testing negative numbers
+    expected = "numbers: -12, -34";
+    sn_printf(buffer, bufsize, "numbers: %i, %i", -12, -34);
+    if (strncmp(buffer, expected, bufsize) != 0) {
+        puts("invalid sn_printf 4");
         return 1;
     }
 
