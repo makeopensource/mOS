@@ -1,4 +1,5 @@
 #include "../stdlib.h"
+#include "../string.h"
 #include <stdio.h>
 
 
@@ -82,10 +83,26 @@ int test_atoi() {
     return 0;
 }
 
+int test_itoa() {
+    int input;
+    char *exp;
+    char buf[10];
+
+    input = 1523;
+    exp = "1523";
+    itoa(input, buf);
+    if (strncmp(exp, buf, 10) != 0) {
+        puts("invalid itoa");
+        return 1;
+    }
+    return 0;
+}
+
 int main() {
     int failed = 0;
     
     failed += test_atoi();
+    failed += test_itoa();
 
     if (failed == 0) {
         puts("all stdlib tests passed!");

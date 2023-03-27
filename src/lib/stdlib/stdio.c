@@ -12,10 +12,10 @@ int sn_printf( char *restrict buffer, size_t bufsz,
     char *p;
 
     // valid types
-    unsigned char c;     // printf("%c\n", 'c');
-    char *s;    // printf("%s\n", "hello, world!");
-    // int i;      // printf("%i\n", 42);
-    // double f;   // printf("%f\n", 42.0);
+    unsigned char c;    // printf("%c\n", 'c');
+    char *s;            // printf("%s\n", "hello, world!");
+    int i;              // printf("%i\n", 42);
+    // double f;        // printf("%f\n", 42.0);
 
     va_start(ap, format);
     int n = 0;
@@ -27,11 +27,17 @@ int sn_printf( char *restrict buffer, size_t bufsz,
         else {
             p++;
             char fmtchar = *p;
+            size_t strlen;
             switch(fmtchar) {
+                // print "%"
+                case '%':
+                    *buffer = *p;
+                    buffer++;
+
                 // string formatting
                 case 's':
                     s = va_arg(ap, char *);
-                    size_t strlen = strnlen_s(s, MAX_SNPRINTF_STRING);
+                    strlen = strnlen_s(s, MAX_SNPRINTF_STRING);
 
                     // checks if there is space for the entire string
                     // plus the null-terminating byte
@@ -46,22 +52,33 @@ int sn_printf( char *restrict buffer, size_t bufsz,
 
                 // character formatting
                 case 'c':
-                    c = (char) va_arg(ap, unsigned int);
+                    c = (char) va_arg(ap, int);
                     memcpy(buffer, &c, sizeof(char));
                     buffer++;
                     break;
 
-                // integer formatting
-                // case 'i':
-                //     i = va_arg(ap, int);
-                //     s = atoi(i);
-                //     int strlen = strnlen_s(s, MAX_SNPRINTF_STRING);
-                //     memcpy(buffer, s, strlen);
-                //     buffer += sizeof(int);
+                case 'i':
+                    i = va_arg(ap, int);
+                    int digits = 0;
+                    for (int temp = i; temp >= 1; temp *= 0.1, digits++)
+		                ;
+                    char temp_buffer[digits];
+                    itoa(i, temp_buffer);
+                    strlen = strnlen_s(temp_buffer, MAX_SNPRINTF_STRING);
+
+                    // checks if there is space for the entire string
+                    // plus the null-terminating byte
+                    if (strlen + n + 1 < bufsz) {
+                        memcpy(buffer, temp_buffer, strlen);
+                        buffer += strlen;
+                    } else {
+                        return n;
+                    }
                 // case 'f':
                 //     f = va_arg(ap, double);
-                //     memcpy(buffer, s, sizeof(double));
-                //     buffer += sizeof(double);
+                // default:
+                //     *buffer = *p;
+                //     buffer++;
             }
         }
     }
