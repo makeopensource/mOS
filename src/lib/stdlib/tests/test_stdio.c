@@ -35,7 +35,7 @@ int test_sn_printf() {
     expected = "charA: a, charB: b";
     sn_printf(buffer, bufsize, "charA: %c, charB: %c", 'a', 'b');
     if (strncmp(buffer, expected, bufsize) != 0) {
-        puts("invalid sn_printf 3");
+        puts("invalid sn_printf 4");
         return 1;
     }
 
@@ -43,7 +43,7 @@ int test_sn_printf() {
     expected = "numbers: 12, 34";
     sn_printf(buffer, bufsize, "numbers: %i, %i", 12, 34);
     if (strncmp(buffer, expected, bufsize) != 0) {
-        puts("invalid sn_printf 4");
+        puts("invalid sn_printf 5");
         return 1;
     }
 
@@ -51,7 +51,7 @@ int test_sn_printf() {
     expected = "We are up 112%!";
     sn_printf(buffer, bufsize, "We are up 112%%!");
     if (strncmp(buffer, expected, bufsize) != 0) {
-        puts("invalid sn_printf 5");
+        puts("invalid sn_printf 6");
         return 1;
     }
 
@@ -59,7 +59,7 @@ int test_sn_printf() {
     expected = "numbers: -12, -34";
     sn_printf(buffer, bufsize, "numbers: %i, %i", -12, -34);
     if (strncmp(buffer, expected, bufsize) != 0) {
-        puts("invalid sn_printf 4");
+        puts("invalid sn_printf 7");
         return 1;
     }
 
@@ -73,7 +73,7 @@ int main() {
 
     if (failed == 0) {
         puts("all stdio tests passed!");
-	puts("========================");
+	    puts("========================");
         return 0;
     }
 

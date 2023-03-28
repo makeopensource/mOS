@@ -86,12 +86,13 @@ int test_atoi() {
 int test_itoa() {
     int input;
     char *exp;
-    char buf[10];
+    int bufsz = 10;
+    char buf[bufsz];
 
     input = 1523;
     exp = "1523";
     itoa(input, buf);
-    if (strncmp(exp, buf, 10) != 0) {
+    if (strncmp(exp, buf, bufsz) != 0) {
         puts("invalid itoa");
         return 1;
     }
@@ -99,11 +100,13 @@ int test_itoa() {
     input = -1523;
     exp = "-1523";
     itoa(input, buf);
-    if (strncmp(exp, buf, 10) != 0) {
+    if (strncmp(exp, buf, bufsz) != 0) {
         printf("%s\n", buf);
         puts("invalid itoa");
         return 1;
     }
+
+    puts("all itoa tests pass!");
 
     return 0;
 }

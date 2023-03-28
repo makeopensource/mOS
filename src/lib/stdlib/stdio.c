@@ -61,23 +61,24 @@ int sn_printf( char *restrict buffer, size_t bufsz,
             default:
                 *buffer = *p;
                 buffer++;
+                break;
 
             case 'i':
                 i = va_arg(ap, int);
+                int temp = i;
                 int bufSize = 0;
-                for (int temp = i; temp >= 1; temp = temp / 10, bufSize++)
-                            ;
-                if (i < 0)
+                if (i < 0) {
                     bufSize++;
-                char temp_buffer[bufSize];
-                itoa(i, temp_buffer);
-                strlen = strnlen_s(temp_buffer, MAX_SNPRINTF_STRING);
+                    temp *= -1;
+                }
+                for (; temp >= 1; temp = temp / 10, bufSize++)
+                    ;
 
                 // checks if there is space for the entire string
                 // plus the null-terminating byte
-                if (strlen + n + 1 < bufsz) {
-                    memcpy(buffer, temp_buffer, strlen);
-                    buffer += strlen;
+                if (bufSize + n + 1 < bufsz) {
+                    itoa(i, buffer);
+                    buffer += bufSize;
                 } else {
                     return n;
                 }
