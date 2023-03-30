@@ -32,7 +32,7 @@ os_entry.o: $(ASM_OS_ENTRY_SOURCE)
 	nasm $^ -f elf32 -o $@
 
 qemu: $(OS_BIN)
-	qemu-system-i386 -boot c -hda $^ -no-reboot -no-shutdown
+	qemu-system-i386 -boot c -drive format=raw,file=$^ -no-reboot -no-shutdown
 
 test: $(OS_BIN)
 	cd tests && $(MAKE) test

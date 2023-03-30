@@ -6,12 +6,14 @@ C_FILES := $(shell find ./src/ -name '*.c')
 BIN_NAMES := $(C_FILES:%.c=%.bin)
 OBJ_NAMES := $(C_FILES:%.c=%.o) 
 
+MOS_ELF :=./../mOS.elf
+
 .PHONY: clean
 
-all: $(BIN_NAMES)
+all: $(MOS_ELF) $(BIN_NAMES)
 
 %.bin: %.o test_entry.o
-	ld -o $@.elf $(LFLAGS) -T link.ld $^ --just-symbols=./../mOS.elf
+	ld -o $@.elf $(LFLAGS) -T link.ld $^ --just-symbols=$(MOS_ELF)
 	objcopy -O binary $@.elf $@
 	rm $@.elf
 
@@ -20,6 +22,9 @@ all: $(BIN_NAMES)
 
 test_entry.o: test_entry.asm
 	nasm $^ -f elf32 -o $@
+
+$(MOS_ELF):
+	cd ./../ && $(MAKE)
 
 test: all
 	python3 test.py
