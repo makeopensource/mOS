@@ -11,14 +11,19 @@ MAX_PORT = 1100
 
 MAX_INSTANCES = 20
 
-TEST_BINARY_PATH = "./bin/"
+TEST_BINARY_PATH = "./src/"
 EXPECTED_PATH = "./expected/"
 
 LOCALHOST = "127.0.0.1"
-DATA_DELAY = 1
+DATA_DELAY = 0.25
+SLICE_SIZE = 128
 
 
-QEMU_ARGS = ["qemu-system-i386", "-boot", "c", "-hda", "./../mOS.bin", "-no-reboot", "-no-shutdown", "-nographic", "-serial"]
+if (os.name == "nt"):
+    QEMU_ARGS = ["qemu-system-i386", "-boot", "c", "-hda", "./../mOS.bin", "-no-reboot", "-no-shutdown", "-nographic", "-serial"]
+else:
+    QEMU_ARGS = ["sudo", "qemu-system-i386", "-boot", "c", "-hda", "./../mOS.bin", "-no-reboot", "-no-shutdown", "-nographic", "-serial"]
+
 QEMU_SERIAL_DEV = "tcp:localhost:{port},server"
 
 #60 seconds is the limit!
@@ -56,7 +61,7 @@ def get_all_files(dir):
 
     return out
 
-def get_expected(expecteds, equivalent: str):
+def get_expected(expecteds, equivalent):
     for expected in expecteds:
         if (expected[1] == equivalent):
             return expected
@@ -64,49 +69,76 @@ def get_expected(expecteds, equivalent: str):
     return ("", "")
 
 def test(port, bin_path, expected_path, qemu):
+    global active_instances, instance_mutex
+    global used_ports, current_port, port_mutex
+    global results, result_mutex
     
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
+            
             s.connect((LOCALHOST, port))
+
+            time.sleep(1)
 
             # we have connected to the OS, begin sending data
             # we breakup the binary to send it over multiple packets
             s.send(b"test\0")
+
+            data = s.recv(1)
+
+            while (len(data) < 10 or data[-10:].decode("utf-8") != "begin test"):
+                data += s.recv(1)
             
             with open(bin_path, "rb") as binary:
                 bin = binary.read()
 
                 s.send(len(bin).to_bytes(4, "little"))
 
-                for chunk in bin[::128]:
+                chunks = int(len(bin) / SLICE_SIZE)
+
+                for i in range(0, chunks):
+                    chunk = bin[i*SLICE_SIZE:(i+1)*SLICE_SIZE]
                     s.send(chunk)
                     time.sleep(DATA_DELAY)
+                
+                last = bin[chunks * SLICE_SIZE:]
+                if (len(last) > 0):
+                    s.send(last)
 
             with open(expected_path, "r") as expected:
                 expect = expected.read()
 
-                for chr in expect:
-                    got = s.recv(1)
-                    if (chr != got):
-                        with result_mutex:
-                            results.append((bin_path, False))
+                if (len(expect) == 0):
+                    with result_mutex:
+                        results.append((bin_path, True))
 
-                        with port_mutex:
-                            used_ports.remove(port)
+                else:
+                    with open(expected_path.path + ".got", "w") as gotF:
+                        for chr in expect:
+                            got = s.recv(1).decode("utf-8")
+                            gotF.write(got)
+                            if (chr != got):
+                                with result_mutex:
+                                    results.append((bin_path, False))
 
-                        with instance_mutex:
-                            active_instances -= 1
+                                with port_mutex:
+                                    used_ports.remove(port)
 
-                        return
+                                with instance_mutex:
+                                    active_instances -= 1
 
-                with result_mutex:
-                    results.append((bin_path, True))
+                                return
+
+                    with result_mutex:
+                        results.append((bin_path, True))
 
         except socket.timeout:
             with result_mutex:
                 results.append((bin_path, False))
                 print("failed to connect")
+
         except socket.error as e:
+            
             if (e.errno == errno.EADDRINUSE):
                 qemu.join()
 
@@ -117,6 +149,7 @@ def test(port, bin_path, expected_path, qemu):
                 return
             else:
                 with result_mutex:
+                    print("Error occured " + e.strerror)
                     results.append((bin_path, False))
 
         
@@ -129,17 +162,23 @@ def test(port, bin_path, expected_path, qemu):
         active_instances -= 1
 
 def qemu(port, bin_path):
-    command = QEMU_ARGS
-    command.append(QEMU_SERIAL_DEV.format(port))
+    command = QEMU_ARGS.copy()
+    command.append(QEMU_SERIAL_DEV.format(port=port))
 
     try:
-        if (subprocess.run(command, timeout=TEST_TIMEOUT) != 0):
-            print("QEMU exited with nonzero result for " + bin_path)
+        ret = subprocess.run(command, timeout=TEST_TIMEOUT)
+        print(command)
+        if (ret.returncode < 0):
+            print("QEMU exited with " + str(ret.returncode) + " for " + str(bin_path))
+ 
     except subprocess.TimeoutExpired:
-        print("Test for " + bin_path + " timed out")
+        print("Test for " + str(bin_path) + " timed out")
 
 def create_instance(bin_path, expected_path):
-    
+    global active_instances, instance_mutex
+    global used_ports, current_port, port_mutex
+    global results, result_mutex
+
     port_to_use = 0
 
     with port_mutex:
@@ -160,9 +199,6 @@ def create_instance(bin_path, expected_path):
         current_port += 1
         if (current_port > MAX_PORT):
                 current_port = BASE_PORT
-
-    command = QEMU_ARGS
-    command.append(QEMU_SERIAL_DEV.format(port = port_to_use))
 
     with instance_mutex:
         active_instances += 1
@@ -194,6 +230,9 @@ def do_tests():
         if (expect[1] == ""):
             print("No expected found for test ${binary[1]}")
         else:
+            while (active_instances > MAX_INSTANCES):
+                time.sleep(1)
+
             create_instance(binary[0], expect[0])
 
     
@@ -206,7 +245,7 @@ def do_tests():
     # this should acquire immediatly since all the threads are done
     with result_mutex:
         for result in results:
-            print(result[0] + " : " + str(result[1]))
+            print(str(result[0]) + " : " + str(result[1]))
 
 
 if __name__ == "__main__":

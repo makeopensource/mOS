@@ -4,7 +4,9 @@
 
 #include "device/serial.h"
 
-int os_main(){
+#include "test.h"
+
+int os_main() {
     makeInterruptTable();
     serialInit();
 
@@ -15,14 +17,24 @@ int os_main(){
 
     println("It booted!!!", green);
 
-    serialWrite(COM1, (uint8_t*)("Hello, Serial!"), sizeof("Hello, Serial!"));
-
     VGA_Color colour = light_cyan;
     const char *string = "Hello, World!";
     println(string, colour);
     
-    while (1 + 1 == 2)
-        ;
+    uint8_t buf[256];
+
+    while (1 + 1 == 2) {
+        
+        size_t read = serialReadReady(COM1);
+        if (read > 256) read = 256;
+
+        serialRead(COM1, buf, read);
+
+        if (buf[0] == 't' && buf[1] == 'e' && buf[2] == 's' && buf[3] == 't' && buf[4] == '\0') {
+            enterTesting();
+        }
+    }
+    
         
     return 0;
 }
