@@ -38,6 +38,6 @@ test: $(OS_BIN)
 	cd tests && $(MAKE) test
 
 clean:
-	rm -f mOS mOS.a
+	rm -f mOS
 	rm -f *.o $(OBJ_NAMES) *.bin *.elf *.~ src/*~ src/boot/*~ docs/*~
 	cd tests && $(MAKE) clean

@@ -32,3 +32,4 @@ test: all
 clean:
 	rm -f test_entry.o
 	rm -f $(BIN_NAMES) $(OBJ_NAMES) 
+	rm -rf *.got

@@ -12,7 +12,7 @@
 #define ASSERT(condition)\
 if (!(condition)) {\
     while (!serialWriteReady(COM1));\
-    char errmsg[] = AS_STR(condition) " failed in " __FILE__ STR_LINE;\
+    char errmsg[] = AS_STR(condition) " failed in " __FILE__ ":" STR_LINE "\n";\
     serialWrite(COM1, (uint8_t*)(errmsg), sizeof(errmsg) - 1);\
 }
 
