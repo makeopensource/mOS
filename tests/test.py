@@ -20,9 +20,6 @@ SLICE_SIZE = 128
 
 QEMU_ARGS = ["qemu-system-i386", "-boot", "c", "-drive", "format=raw,file=./../mOS.bin", "-no-reboot", "-no-shutdown", "-nographic", "-serial"]
 
-if (os.name != "nt"):
-    QEMU_ARGS = ["sudo"] + QEMU_ARGS
-
 QEMU_SERIAL_DEV = "tcp:localhost:{port},server"
 
 TEST_TIMEOUT = 5
@@ -64,6 +61,9 @@ def get_expected(expecteds, equivalent):
 def get_port():
     global current_port
 
+    #if (os.name != "nt"):
+    #    return 0
+
     with port_mutex:
         if (len(used_ports) > MAX_PORT - BASE_PORT):
             # this should not ever happen.
@@ -94,12 +94,15 @@ class TestInstance:
         self._qemuLock = Lock()
         self._qemu = None
         self.test = None
+        self._ready = False
 
     def beginQemu(self):
         command = QEMU_ARGS.copy()
         command.append(QEMU_SERIAL_DEV.format(port=self.port))
 
-        self._qemu = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        with self._qemuLock:
+            self._qemu = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            self._ready = True
     
     def beginTest(self):
         self.test = Thread(target=test, args=[self])
@@ -127,6 +130,7 @@ class TestInstance:
                     self._qemu.kill()
 
                 self._qemu = None
+                self._ready = False
 
     def end(self):
         global used_ports, active_instances
@@ -153,6 +157,16 @@ class TestInstance:
         with self._resultLock:
             self._result = value
 
+    @property
+    def ready(self):
+        with self._qemuLock:
+            return self._ready
+
+    @ready.setter
+    def ready(self, value: bool):
+        with self._qemuLock:
+            self._ready = value
+
 # normal test exit
 def test_end_stub(instance: TestInstance, result: bool):
     global active_instances, instance_mutex
@@ -166,7 +180,8 @@ def test_end_stub(instance: TestInstance, result: bool):
     instance.endQemu()
 
     with port_mutex:
-        used_ports.remove(instance.port)
+        if (instance.port in used_ports):
+                used_ports.remove(instance.port)
 
 
 def test(instance: TestInstance):
@@ -176,6 +191,9 @@ def test(instance: TestInstance):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
             
+            while (not instance.ready):
+                time.sleep(1)
+
             s.settimeout(TEST_TIMEOUT)
             s.connect((LOCALHOST, instance.port))
             
@@ -233,7 +251,7 @@ def test(instance: TestInstance):
             print("failed to connect")
 
         except socket.error as e:
-            
+        
             if (e.errno == errno.EADDRINUSE):
                 # port already in use, get a new one
                 instance.endQemu()
