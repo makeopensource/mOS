@@ -225,25 +225,25 @@ def test(instance: TestInstance):
             with open(instance.expected_path, "r") as expected:
                 expect = expected.read()
 
-                if (len(expect) == 0):
-                    return test_end_stub(instance, True)
-
-                with open(instance.expected_path.path + ".got", "w") as gotF:
-                    for chr in expect:
-                        got = s.recv(1).decode("utf-8")
-                        gotF.write(got)
-                        if (chr != got):
-                            # get as TEST_TIMEOUT worth of data before ending
-                            try:
-                                start = time.time()
-                                while(time.time() - start < TEST_TIMEOUT):
-                                    gotF.write(s.recv(1).decode("utf-8"))
-                            except:
-                                pass
-
-                            return test_end_stub(instance, False)
-
+            if (len(expect) == 0):
                 return test_end_stub(instance, True)
+
+            with open(instance.expected_path.path + ".got", "w") as gotF:
+                for chr in expect:
+                    got = s.recv(1).decode("utf-8")
+                    gotF.write(got)
+                    if (chr != got):
+                        # get as TEST_TIMEOUT worth of data before ending
+                        try:
+                            start = time.time()
+                            while(time.time() - start < TEST_TIMEOUT):
+                                gotF.write(s.recv(1).decode("utf-8"))
+                        except:
+                            pass
+
+                        return test_end_stub(instance, False)
+
+            return test_end_stub(instance, True)
 
         except socket.timeout:
             print("failed to connect")
