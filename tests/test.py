@@ -6,8 +6,8 @@ import socket
 import errno
 
 
-BASE_PORT = 1000
-MAX_PORT = 1100
+BASE_PORT = 1111
+MAX_PORT = 1234
 
 MAX_INSTANCES = 20
 
@@ -61,9 +61,6 @@ def get_expected(expecteds, equivalent):
 def get_port():
     global current_port
 
-    #if (os.name != "nt"):
-    #    return 0
-
     with port_mutex:
         if (len(used_ports) > MAX_PORT - BASE_PORT):
             # this should not ever happen.
@@ -102,6 +99,7 @@ class TestInstance:
 
         with self._qemuLock:
             self._qemu = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            time.sleep(1) #give qemu some time to open
             self._ready = True
     
     def beginTest(self):
@@ -252,7 +250,7 @@ def test(instance: TestInstance):
 
         except socket.error as e:
         
-            if (e.errno == errno.EADDRINUSE):
+            if (e.errno == errno.EADDRINUSE or e.errno == errno.ECONNREFUSED):
                 # port already in use, get a new one
                 instance.endQemu()
                 instance.port = get_port()
