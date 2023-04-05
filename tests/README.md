@@ -17,7 +17,7 @@ or directly through running `test.py` (don't forget to build).
 
 ## Creating Tests
 
-Creating tests requires creating at least two new files; A `.c` file anywhere in `tests/src` and a `.expect` of the same name (without the .c) anwhere in the `tests/expected`.  
+Creating tests requires creating at least two new files; A `.c` file anywhere in `tests/src` and a `.expect` of the same name (without the .c) anywhere in the `tests/expected`.  
   
 The `.c` file can include any OS header and `tests/src/test_helper.h` is recommended. `ASSERT(condition)` in the helper will produce no output on success but will write to serial on failure. The `.c` must have some serial output to compare against the expected.  
   
