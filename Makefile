@@ -12,7 +12,7 @@ OBJ_NAMES := src/os/main.o src/os/test.o os_entry.o src/lib/video/VGA_text.o \
 	src/os/hard/idt.o src/os/hard/except.o src/os/hard/pic.o \
 	src/lib/device/serial.o src/lib/container/ring_buffer.o \
 
-.PHONY: clean qemu
+.PHONY: clean qemu test
 
 $(OS_BIN): $(OBJ_NAMES) $(BOOT_OBJ)
 	ld $(LFLAGS) -T link.ld $(OBJ_NAMES) -o mOS.elf

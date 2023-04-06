@@ -8,7 +8,7 @@ OBJ_NAMES := $(C_FILES:%.c=%.o)
 
 MOS_ELF :=./../mOS.elf
 
-.PHONY: clean
+.PHONY: clean test
 
 all: $(MOS_ELF) $(BIN_NAMES)
 
