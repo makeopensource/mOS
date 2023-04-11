@@ -49,7 +49,13 @@ void itoa( int i, char *buf ) {
 	int digit;	// int value at digit
 	char c;		// character of d_val
 
-	
+	// handles edge case if i is 0
+	if (i == 0) {
+		buf[0] = '0';
+		buf[1] = '\0';
+		return;
+	}
+
 	digits = 0;
 
 	// adds "-" sign to the buffer
