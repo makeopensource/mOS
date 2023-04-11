@@ -22,7 +22,7 @@ Make sure you add the file you are testing for the the main Makefile as a `.o` d
   
 The `.c` file can include any OS header and `tests/src/test_helper.h` is recommended. `ASSERT(condition)` in the helper will produce no output on success but will write to serial on failure. The `.c` must have some serial output to compare against the expected. The `.c` file MUST have `void test_main` instead of `int main`.  
   
-The `.expect` file consists of all the output the `.c` file will produce when everything works as expected. Output is always in the form of serial output.
+The `.expect` file consists of all the output the `.c` file will produce when everything works as expected. Output is always in the form of serial output. `.got` files will be produced next to the `.expect`. `.got` files contain what the OS sent back to the testing environment.  
 
 ## Dependencies
 
