@@ -202,10 +202,10 @@ def test(instance: TestInstance):
             s.send(b"test\0")
 
             data = s.recv(1)
-            
+
             while (len(data) < 10 or data[-10:].decode("utf-8") != "begin test"):
                 data += s.recv(1)
-            
+
             with open(instance.bin_path, "rb") as binary:
                 bin = binary.read()
 
@@ -246,7 +246,7 @@ def test(instance: TestInstance):
             return test_end_stub(instance, True)
 
         except socket.timeout:
-            print("failed to connect")
+            print("test timed out")
 
         except socket.error as e:
         
@@ -322,7 +322,8 @@ def do_tests():
             total_fail += 1
             print(instance.bin_path.name + " FAILED")
 
-    print("Summary: PASSED-" + str(total_pass) + ", FAILED-" + str(total_fail) + ", TOTAL-" + str(len(instances)))
+    print("Summary: PASSED-{}, FAILED-{}, TOTAL-{}"
+        .format(total_pass, total_fail, len(instances)))
     print("See .got files for more details")
 
 if __name__ == "__main__":

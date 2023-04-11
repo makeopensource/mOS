@@ -10,7 +10,8 @@ uint8_t* current = (uint8_t*)(MEMORY_BEGIN);
 
 void enterTesting(void) {
 
-    serialWrite(COM1, (uint8_t*)("begin test"), 10);
+    static const char begin_str[] = "begin test";
+    serialWrite(COM1, (uint8_t*)(begin_str), sizeof(begin_str) - 1);
 
     current = (uint8_t*)(MEMORY_BEGIN);
 

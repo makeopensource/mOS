@@ -35,6 +35,7 @@ qemu: $(OS_BIN)
 	qemu-system-i386 -boot c -drive format=raw,file=$^ -no-reboot -no-shutdown
 
 test: $(OS_BIN)
+	cd tests && $(MAKE) clean
 	cd tests && $(MAKE) test
 
 clean:

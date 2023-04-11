@@ -21,17 +21,21 @@ int os_main() {
     const char *string = "Hello, World!";
     println(string, colour);
     
-    uint8_t buf[256];
+   
+    static const char test_str[] = "test";
+    size_t test_idx = 0;
 
-    while (1 + 1 == 2) {
+    while (1 + 2 == 3) {
         
-        size_t read = serialReadReady(COM1);
-        if (read > 256) read = 256;
+        uint8_t chr = serialReadByteBlocking(COM1);
 
-        serialRead(COM1, buf, read);
+        if (chr == test_str[test_idx]) {
+            ++test_idx;
 
-        if (buf[0] == 't' && buf[1] == 'e' && buf[2] == 's' && buf[3] == 't' && buf[4] == '\0') {
-            enterTesting();
+            if (test_idx >= sizeof(test_str))
+                enterTesting();
+        } else {
+            test_idx = 0;
         }
     }
     

@@ -12,8 +12,7 @@ or directly through `make` in the `tests` directory.
 
 ## Running
 
-Running can be done in two ways. Indirectly through `make test`,  
-or directly through running `test.py` (don't forget to build).
+Running can be done through `make test`.
 
 ## Creating Tests
 
