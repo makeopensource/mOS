@@ -4,6 +4,7 @@ import subprocess
 import time
 import socket
 import errno
+import shutil
 
 
 BASE_PORT = 1111
@@ -18,9 +19,10 @@ LOCALHOST = "127.0.0.1"
 DATA_DELAY = 0.1
 SLICE_SIZE = 128
 
-QEMU_ARGS = ["qemu-system-i386", "-boot", "c", "-drive", "format=raw,file=./../mOS.bin", "-no-reboot", "-no-shutdown", "-nographic", "-serial"]
+QEMU_ARGS = ["qemu-system-i386", "-boot", "c", "-no-reboot", "-no-shutdown", "-nographic"]
 
 QEMU_SERIAL_DEV = "tcp:localhost:{port},server"
+QEMU_DRIVE = "format=raw,file=./../mOS.bin{copy_num}"
 
 TEST_TIMEOUT = 5
 
@@ -92,12 +94,20 @@ class TestInstance:
         self._qemu = None
         self.test = None
         self._ready = False
+        self._qemu_file = ""
 
     def beginQemu(self):
+        
+
         command = QEMU_ARGS.copy()
+        command.append("-drive")
+        command.append(QEMU_DRIVE.format(copy_num=self.port))
+        command.append("-serial")
         command.append(QEMU_SERIAL_DEV.format(port=self.port))
 
         with self._qemuLock:
+            self._qemu_file = "./../mOS.bin{copy_num}".format(copy_num=self.port)
+            shutil.copyfile("./../mOS.bin", self._qemu_file)
             self._qemu = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             time.sleep(1) #give qemu some time to open
             self._ready = True
@@ -129,6 +139,7 @@ class TestInstance:
 
                 self._qemu = None
                 self._ready = False
+                os.remove(self._qemu_file)
 
     def end(self):
         global used_ports, active_instances
@@ -224,6 +235,7 @@ def test(instance: TestInstance):
 
             with open(instance.expected_path, "r") as expected:
                 expect = expected.read()
+
 
             if (len(expect) == 0):
                 return test_end_stub(instance, True)
