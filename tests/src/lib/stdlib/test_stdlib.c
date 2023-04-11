@@ -5,12 +5,14 @@
 
 int test_atoi(char *in, int exp) {
     ASSERT (atoi(in) == exp);
+    return -1;
 }
 
 int test_itoa(int in, char *exp) {
     int bufsz = 10;
     char buf[bufsz];
     ASSERT (strncmp(exp, buf, bufsz) == 0);
+    return 0;
 }
 
 void test_main() {
