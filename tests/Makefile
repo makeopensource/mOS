@@ -27,7 +27,11 @@ $(MOS_ELF):
 	cd ./../ && $(MAKE)
 
 test: all
+ifdef TESTS
+	python3 test.py $(TESTS)
+else
 	python3 test.py
+endif
 
 clean:
 	rm -f test_entry.o

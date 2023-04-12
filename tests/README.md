@@ -12,7 +12,14 @@ or directly through `make` in the `tests` directory.
 
 ## Running
 
-Running can be done through `make test`.
+Running can be done through `make test`.  
+  
+There is also an option to only run selected tests.
+To do so run `make test TESTS="..."` replacing `...` with `.bin` files.  
+For example: `make test TESTS="ring_buffer.bin example.bin"`  
+Alternatively: `make test TESTS=ring_buffer.bin`  
+The default behavior without TESTS is to test all the files.  
+This can be invoked from either makefile.
 
 ## Creating Tests
 
