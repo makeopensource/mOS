@@ -5,6 +5,7 @@ import time
 import socket
 import errno
 import shutil
+import sys
 
 
 BASE_PORT = 1111
@@ -288,6 +289,22 @@ def create_instance(bin_path, expected_path):
 def do_tests():
     expected = get_all_files(EXPECTED_PATH)
     binaries = get_all_files(TEST_BINARY_PATH)
+   
+    argc = len(sys.argv)
+    if (argc > 1):
+        tested_binaries = []
+        for i in range(1, argc):
+            count = len(tested_binaries)
+            for file in binaries:
+                if (sys.argv[i] == file[1]):
+                    tested_binaries.append(file)
+                    break
+            
+            if (len(tested_binaries) == count):
+                print(f"Failed to find {sys.argv[i]}")
+
+        binaries = tested_binaries
+
 
     start = time.time()
 
@@ -306,7 +323,7 @@ def do_tests():
         expect = get_expected(expected, equivalent)
 
         if (expect[1] == ""):
-            print("No expected found for test ${binary[1]}")
+            print(f"No expected found for test {binary[1]}")
         else:
             instances.append(create_instance(binary[0], expect[0]))
 
