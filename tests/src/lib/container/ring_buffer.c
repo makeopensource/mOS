@@ -43,7 +43,7 @@ void test_overflow(ring_buffer_t* buf) {
     ASSERT(ring_buffer_full(buf));
     ASSERT(ring_buffer_top(buf) == 1);
 
-    char done[] = "test_overflow done\n";
+    char done[] = "test_overflow done";
     serialWrite(COM1,  (uint8_t*)(done), sizeof(done) - 1);
 }
 
