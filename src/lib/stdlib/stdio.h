@@ -2,5 +2,8 @@
 #include <stdarg.h>
 #include "string.h"
 
-int sn_printf( char *restrict buffer, size_t bufsz, 
+int snprintf( char *restrict buffer, size_t bufsz, 
 	char *format, ... );
+
+int vsnprintf( char *restrict buffer, size_t bufsz, 
+	char *format, va_list ap );

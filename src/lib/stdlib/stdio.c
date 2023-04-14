@@ -4,11 +4,21 @@
 
 #define MAX_SNPRINTF_STRING 100
 
+int snprintf( char *restrict buffer, size_t bufsz, char *format, ... );
+int vsnprintf( char *restrict buffer, size_t bufsz, char *format, va_list ap );
 
 // Inspired by chapter 7.3 of The C Programming Language
-int sn_printf( char *restrict buffer, size_t bufsz,
-        char *format, ... ) {
+int snprintf( char *restrict buffer, size_t bufsz, char *format, ... ) {
     va_list ap;
+    int retval;
+    va_start(ap, format);
+    retval = vsnprintf(buffer, bufsz, format, ap);
+    va_end(ap);
+
+    return retval;
+}
+
+int vsnprintf( char *restrict buffer, size_t bufsz, char *format, va_list ap ) {
     char *p;
 
     // valid types
@@ -16,7 +26,6 @@ int sn_printf( char *restrict buffer, size_t bufsz,
     char *s;            // printf("%s\n", "hello, world!");
     int i;              // printf("%i\n", 42);
 
-    va_start(ap, format);
     int n = 0;
     for (p = format; *p != '\0' && n < bufsz - 1; n++, p++) {
         if (*p != '%') {
@@ -86,12 +95,9 @@ int sn_printf( char *restrict buffer, size_t bufsz,
             }
         }
     }
-    va_end(ap);
 
     if (bufsz != 0) {
         *buffer = '\0';
     }
     return n;
 }
-
-
