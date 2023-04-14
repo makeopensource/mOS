@@ -8,13 +8,13 @@ int test_atoi(char *in, int exp) {
     return -1;
 }
 
-int test_itoa(int in, char *exp, int sz) {
+// expsz is the last argument because it is the size of the second argument
+int test_itoa(int in, char *exp, int expsz) {
     int bufsz = 100;
     char buf[bufsz];
     itoa(in, buf);
 
-    // serialWrite(COM1, (uint8_t*)(buf), sz);
-    ASSERT (strncmp(exp, buf, sz) == 0);
+    ASSERT (strncmp(exp, buf, expsz) == 0);
     return 0;
 }
 
