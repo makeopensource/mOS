@@ -6,7 +6,7 @@
 #define BUFSZ 100 // size of total buffer declared
 
 // "expected" is the first argument because variable args need to be the last argument
-void test_snprintf(char *expected, char *buffer, size_t bufsz, char *fmt, int argn, ...) {
+void test_vsnprintf(char *expected, char *buffer, size_t bufsz, char *fmt, int argn, ...) {
 
     int n;
     memset(buffer, '#', BUFSZ);
@@ -26,13 +26,13 @@ void test_main() {
     char buffer[BUFSZ+1];
     buffer[BUFSZ] = '\0';
 
-    test_snprintf("Hello!\n", buffer, BUFSZ, "%s\n", 1, "Hello!");
-    test_snprintf("i=5\n", buffer, BUFSZ, "i=%i\n", 1, 5);
-    test_snprintf("i=42\n", buffer, BUFSZ, "i=%i\n", 1, 42);
-    test_snprintf("i=-42\n", buffer, BUFSZ, "i=%i\n", 1, -42);
-    test_snprintf("just a regular string\n", buffer, BUFSZ, "just a regular string\n", 0);
-    test_snprintf("i=-42%\n", buffer, BUFSZ, "i=%i%%\n", 1, 42);
-    test_snprintf("1, 2, 3, 4, 5\n", buffer, BUFSZ, "%i, %i, %i, %i, %i\n", 5, 
+    test_vsnprintf("Hello!\n", buffer, BUFSZ, "%s\n", 1, "Hello!");
+    test_vsnprintf("i=5\n", buffer, BUFSZ, "i=%i\n", 1, 5);
+    test_vsnprintf("i=42\n", buffer, BUFSZ, "i=%i\n", 1, 42);
+    test_vsnprintf("i=-42\n", buffer, BUFSZ, "i=%i\n", 1, -42);
+    test_vsnprintf("just a regular string\n", buffer, BUFSZ, "just a regular string\n", 0);
+    test_vsnprintf("i=-42%\n", buffer, BUFSZ, "i=%i%%\n", 1, 42);
+    test_vsnprintf("1, 2, 3, 4, 5\n", buffer, BUFSZ, "%i, %i, %i, %i, %i\n", 5, 
     1, 2, 3, 4, 5);
 
     char done[] = "test_stdio done\n";

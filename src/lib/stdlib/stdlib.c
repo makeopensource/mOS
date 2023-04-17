@@ -1,4 +1,5 @@
 #include "stdlib.h"
+#include "string.h"
 
 int atoi( const char *str ) {
 
@@ -42,41 +43,51 @@ int atoi( const char *str ) {
 //       523 % 10 = 3
 //	     523 % 100 = 23; 23 - 3 = 20; 20 / 10 = 2
 //       523 % 1000 = 523; 523 - 23 = 500; 500 / 10 = 5
-void itoa( int i, char *buf ) {
+void itoa_s( int in, char *buf, int bufsz ) {
 	int digits;	// number of digits in i
 	int idx;	// index to insert into buffer
 	int mod;	// result of mod operation
 	int digit;	// int value at digit
 	char c;		// character of d_val
 
-	// handles edge case if i is 0
-	if (i == 0) {
-		buf[0] = '0';
-		buf[1] = '\0';
-		return;
-	}
-
 	digits = 0;
 
-	// adds "-" sign to the buffer
-	if ( i < 0 ) {
+	if (bufsz == 0 || bufsz == 1) {
+		return;
+	}
+	
+	if (in == 0) {
+		digits++;
+	} 
+	
+	else if ( in < 0 ) {
 		*buf = '-';
 		buf++;
-		i *= -1;
+		bufsz--;
+		in *= -1;
 	}
 
 	// finds the number of digits in the integer value
-	for (int temp = i; temp >= 1; temp = temp / 10, digits++)
+	for (int i = in; i >= 1; i /= 10, digits++)
 		;
 
-	int acc, modv, prev;
-	for (acc = 0, modv = 10, prev = 0; acc < digits; acc++, modv *= 10) {
-		idx = digits - acc - 1;					// start at last idx and work backwards
-		mod = (i % modv);						// take the mod of i
+	int modv, prev;
+	modv = 10;
+	prev = 0;
+
+	char temp[digits+1];
+
+	for (int i = 0; i < digits; i++, modv *= 10) {
+		idx = digits - i - 1;					// start at last idx and work backwards
+		mod = (in % modv);						// take the mod of in
 		digit = (mod - prev) / (modv / 10);		// get the digit from mod computation
 		c = digit + '0';						// convert digit to character
-		buf[idx] = c; 							// store character in buffer
+		temp[idx] = c; 							// store character in buffer
 		prev = mod;								// store the mod for next digit computation
 	}
-	buf[acc] = '\0';
+
+	if (bufsz != 0)
+		temp[digits] = '\0';
+
+	strcpy_s(buf, bufsz, temp);
 }

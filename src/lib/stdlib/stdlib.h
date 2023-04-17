@@ -1,4 +1,4 @@
 #include <stddef.h>
 
 int atoi( const char *str );
-void itoa( int i, char *buf );
+void itoa_s( int i, char *buf, int bufsz );

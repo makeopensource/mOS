@@ -16,5 +16,5 @@ if (!(condition)) {\
     serialWrite(COM1, (uint8_t*)(errmsg), sizeof(errmsg) - 1);\
 }
 
-
 #endif
+

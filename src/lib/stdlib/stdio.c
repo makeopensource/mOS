@@ -47,7 +47,7 @@ int vsnprintf( char *restrict buffer, size_t bufsz, char *format, va_list ap ) {
             // string formatting
             case 's':
                 s = va_arg(ap, char *);
-                strlen = strnlen_s(s, MAX_SNPRINTF_STRING);
+                strlen = strnlen_s(s, MAX_SNPRINTF_STRING - n);
 
                 // checks if there is space for the entire string
                 // plus the null-terminating byte
@@ -86,7 +86,7 @@ int vsnprintf( char *restrict buffer, size_t bufsz, char *format, va_list ap ) {
                 // checks if there is space for the entire string
                 // plus the null-terminating byte
                 if (bufSize + n + 1 < bufsz) {
-                    itoa(i, buffer);
+                    itoa_s(i, buffer, MAX_SNPRINTF_STRING - n);
                     buffer += bufSize;
                 } else {
                     return n;

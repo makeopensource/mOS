@@ -5,22 +5,22 @@ standard library equivilents in C99.
 
 ## Functions
 
-| Name		| File		| Usage						|
+| Name		| File		| Usage	    |
 |---------------|---------------|-----------------------------------------------|
-| \*sn\_printf	| stdio.h 	| Print formatted strings to output buffer	|
+| snprintf	| stdio.h 	| Print formatted strings to output buffer	|
+| vsnprintf | stdio.h   | Print formatted strings to output buffer (inputs va_list)
 | atoi		| stdlib.h	| Convert strings to integers			|
+| \*itoa\_s	| stdlib.h	| Convert integers to strings			|
 | \*strnlen\_s	| string.h	| Find length of a string			|
 | \*strcpy\_s	| string.h	| Copy a string from one pointer to another	|
 | strncmp	| string.h	| Compare the contents of two strings		|
 | memcpy	| string.h	| Copy bytes from one buffer to another		|
+| memset    | string.h  | Sets n bytes to character c               |
 
 \* Note that the "_s" stands for "_safe," many of these functions have security
 vulnerabilities that can allow them to overwrite buffers. These functions include
 an additional parameter to restrict the maximum read and write to the size of the
 buffer.
-
-Also, note that `sn_printf` is a deviation from the name `snprintf` in C99, this was
-done so that tests could use the standard implementation of printf.
 
 ## Tests
 
