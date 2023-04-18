@@ -48,7 +48,10 @@ void itoa_s( int in, char *buf, int bufsz ) {
 
 	if (bufsz == 0 || bufsz == 1) return;
 	
-	if (in == 0) digits++;
+	if (in == 0) {
+		strcpy_s(buf, bufsz, "0"); 
+		return;
+	}
 
 	if ( in < 0 ) {
 		*buf = '-';
@@ -63,14 +66,14 @@ void itoa_s( int in, char *buf, int bufsz ) {
 		;
 	modv /= 10;
 
-
-	for (int i = 0, prev = in; i < digits && i < bufsz; i++, modv /= 10) {
-		int mod = (prev % modv);				// take the mod of in
+	int i = 0;
+	for (int prev = in; i < digits && i < bufsz - 1; i++, modv /= 10) {
+		int mod = (prev % modv);			// take the mod of in
 		int digit = (prev - mod) / modv;	// get the digit from mod computation
 		buf[i] = digit + '0'; 				// store character in buffer
 		prev = mod;							// store the mod for next digit computation
 	}
 
 	if (bufsz != 0)
-		buf[digits] = '\0';
+		buf[i] = '\0';
 }

@@ -43,11 +43,11 @@ void test_main() {
     test_atoi(" ab3", 0);
 
     test_itoa_s(1523, "1523\0", 100, 5);
-    // test_itoa_s(-1523, "-1523\0", 100, 6);
-    // test_itoa_s(0, "0\0", 100, 2);
-    // test_itoa_s(-0, "0\0", 100, 2);
-    // test_itoa_s(142, "", 0, 0);
-    // test_itoa_s(12345678, "123\0", 4, 4);
+    test_itoa_s(-1523, "-1523\0", 100, 6);
+    test_itoa_s(0, "0\0", 100, 2);
+    test_itoa_s(-0, "0\0", 100, 2);
+    test_itoa_s(142, "", 0, 0);
+    test_itoa_s(12345678, "123\0", 4, 4);
 
     char done[] = "test_stdlib done\n";
     serialWrite(COM1,  (uint8_t*)(done), sizeof(done) - 1);
