@@ -256,7 +256,17 @@ def test(instance: TestInstance):
 
                         return test_end_stub(instance, False)
 
-            return test_end_stub(instance, True)
+                passed = True
+                try:
+                    start = time.time()
+                    s.settimeout(1);
+                    while(time.time() - start < 1.0):
+                        gotF.write(s.recv(1).decode("utf-8"))
+                        passed = False
+                except:
+                    pass
+
+            return test_end_stub(instance, passed)
 
         except socket.timeout:
             print("test timed out")
