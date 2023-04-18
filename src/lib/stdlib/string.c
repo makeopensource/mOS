@@ -31,7 +31,12 @@ int strncmp( const char *s1, const char *s2, size_t n ) {
 // have access to <errno.h>. Return value defaults to dest ptr,
 // used in C99 strcpy.
 char *strcpy_s( char *restrict dest, size_t destsz, const char *restrict src ) {
-    if (destsz <= 0) return dest;
+
+    if (src == NULL || dest == NULL)
+        return NULL;
+
+    if (destsz <= 0) 
+        return dest;
 
     int i;
     for (i = 0; i < destsz - 1 && src[i] != '\0'; i++) {
@@ -45,13 +50,14 @@ char *strcpy_s( char *restrict dest, size_t destsz, const char *restrict src ) {
 
 void *memcpy( void *restrict dest, void *restrict src, size_t n ) {
     for (int i = 0; i < n; i++) {
-        ((char *)dest)[i] = ((char *)src)[i];
+
+        ((uint8_t *)dest)[i] = ((uint8_t *)src)[i];
     }
     return dest;
 }
 
 void memset(void *restrict dest, uint8_t c, size_t n) {
     for (int i = 0; i < n; i++) {
-        ((char *)dest)[i] = c;
+        ((uint8_t *)dest)[i] = c;
     }
 }

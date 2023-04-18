@@ -35,7 +35,7 @@ int vsnprintf( char *restrict buffer, size_t bufsz, char *format, va_list ap ) {
         else {
             p++;
             char fmtchar = *p;
-            size_t strlen;
+            size_t len;
             switch(fmtchar) {
             
             // print "%"
@@ -47,13 +47,13 @@ int vsnprintf( char *restrict buffer, size_t bufsz, char *format, va_list ap ) {
             // string formatting
             case 's':
                 s = va_arg(ap, char *);
-                strlen = strnlen_s(s, MAX_SNPRINTF_STRING - n);
+                len = strnlen_s(s, MAX_SNPRINTF_STRING - n);
 
                 // checks if there is space for the entire string
                 // plus the null-terminating byte
-                if (strlen + n + 1 < bufsz) {
-                    memcpy(buffer, s, strlen);
-                    buffer += strlen;
+                if (len + n + 1 < bufsz) {
+                    memcpy(buffer, s, len);
+                    buffer += len;
                 } else {
                     return n;
                 }

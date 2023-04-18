@@ -36,6 +36,6 @@ void test_main() {
     1, 2, 3, 4, 5);
 
     char done[] = "test_stdio done\n";
-    serialWrite(COM1,  (uint8_t*)(done), sizeof(done));
+    serialWrite(COM1,  (uint8_t*)(done), sizeof(done) - 1);
 }
 

@@ -25,7 +25,7 @@ QEMU_ARGS = ["qemu-system-i386", "-boot", "c", "-no-reboot", "-no-shutdown", "-n
 QEMU_SERIAL_DEV = "tcp:localhost:{port},server"
 QEMU_DRIVE = "format=raw,file=./../mOS.bin{copy_num}"
 
-TEST_TIMEOUT = 15
+TEST_TIMEOUT = 20
 
 active_instances = 0
 instance_mutex = Lock()

@@ -44,23 +44,13 @@ int atoi( const char *str ) {
 //	     523 % 100 = 23; 23 - 3 = 20; 20 / 10 = 2
 //       523 % 1000 = 523; 523 - 23 = 500; 500 / 10 = 5
 void itoa_s( int in, char *buf, int bufsz ) {
-	int digits;	// number of digits in i
-	int idx;	// index to insert into buffer
-	int mod;	// result of mod operation
-	int digit;	// int value at digit
-	char c;		// character of d_val
+	int digits = 0;
 
-	digits = 0;
+	if (bufsz == 0 || bufsz == 1) return;
+	
+	if (in == 0) digits++;
 
-	if (bufsz == 0 || bufsz == 1) {
-		return;
-	}
-	
-	if (in == 0) {
-		digits++;
-	} 
-	
-	else if ( in < 0 ) {
+	if ( in < 0 ) {
 		*buf = '-';
 		buf++;
 		bufsz--;
@@ -68,26 +58,19 @@ void itoa_s( int in, char *buf, int bufsz ) {
 	}
 
 	// finds the number of digits in the integer value
-	for (int i = in; i >= 1; i /= 10, digits++)
+	int modv = 1;
+	for (int i = in; i >= 1; i /= 10, digits++, modv *= 10)
 		;
+	modv /= 10;
 
-	int modv, prev;
-	modv = 10;
-	prev = 0;
 
-	char temp[digits+1];
-
-	for (int i = 0; i < digits; i++, modv *= 10) {
-		idx = digits - i - 1;					// start at last idx and work backwards
-		mod = (in % modv);						// take the mod of in
-		digit = (mod - prev) / (modv / 10);		// get the digit from mod computation
-		c = digit + '0';						// convert digit to character
-		temp[idx] = c; 							// store character in buffer
-		prev = mod;								// store the mod for next digit computation
+	for (int i = 0, prev = in; i < digits && i < bufsz; i++, modv /= 10) {
+		int mod = (prev % modv);				// take the mod of in
+		int digit = (prev - mod) / modv;	// get the digit from mod computation
+		buf[i] = digit + '0'; 				// store character in buffer
+		prev = mod;							// store the mod for next digit computation
 	}
 
 	if (bufsz != 0)
-		temp[digits] = '\0';
-
-	strcpy_s(buf, bufsz, temp);
+		buf[digits] = '\0';
 }

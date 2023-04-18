@@ -91,13 +91,13 @@ int test_main() {
     test_strncmp("Hello\0something", "Hello\0different", 100, 'o' - 'o');
     test_strncmp("Hello world", "Hello There!", 100, 'w' - 'T');
 
-    // test_strcpy_s("\0", 100, 1);
-    // test_strcpy_s("copy\0", 100, 5);
-    // test_strcpy_s("makeopensource\0", 8, 8);
+    test_strcpy_s("\0", 100, 1);
+    test_strcpy_s("copy\0", 100, 5);
+    test_strcpy_s("makeopensource\0", 8, 8);
     test_strcpy_s("don't copy me", 0, 0);
 
     char done[] = "test_string done\n";
-    serialWrite(COM1, (uint8_t*)(done), 17);
+    serialWrite(COM1, (uint8_t*)(done), sizeof(done) - 1);
 
     return 0;
 }
