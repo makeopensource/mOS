@@ -1,6 +1,8 @@
 #include "pit.h"
 #include "../../os/hard/idt.h"
 #include <stdint.h>
+#include "../../os/hard/port_io.h"
+
 
 uint32_t timer_ticks = 0;
 
@@ -24,7 +26,11 @@ void init_pit(){
 
 void init_timer(int hz) {
 	int divisor = OSCILLATIONS / hz;	/* divisor */
-	outb(CMD_REG_PORT, 0x36);	                /* Write 0b00110110 to the command register */
+	uint8_t channel = 0b00000000;
+	uint8_t access_mode = 0b00110000;
+	uint8_t op_mode = 0b00000110;
+	uint8_t bcd_mode = 0b00000000;
+	outb(CMD_REG_PORT, channel | access_mode | op_mode | bcd_mode); /* Write 0b00110110 to the command register */
 	outb(CHAN_0_PORT, divisor & 0xFF);       /* Set low byte of divisor */
 	outb(CHAN_0_PORT, divisor >> 8);	        /* Set high byte of divisor */
 }

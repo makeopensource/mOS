@@ -1,7 +1,6 @@
 #ifndef PIT_H
 #define PIT_H
 
-#include "../../os/hard/port_io.h"
 #include <stdint.h>
 
 #define OSCILLATIONS 1193180 // The PIT oscillates this many HZ
