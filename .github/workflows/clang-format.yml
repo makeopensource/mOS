@@ -1,0 +1,12 @@
+name: clang-format
+run-name: ${{ github.actor }}
+on: [push, pull_request]
+jobs:
+  format-code:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: install clang-format
+        run: sudo apt update && sudo apt install -y clang-format
+      - name: check formatting
+        run: chmod +x check_format.sh && ./check_format.sh
