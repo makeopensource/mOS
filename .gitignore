@@ -3,7 +3,10 @@
 *.o
 *.bin
 *.elf
+*.a
 mOS
+
+*.got
 
 # Emacs
 *.~

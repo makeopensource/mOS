@@ -1,28 +1,44 @@
 #include "hard/idt.h"
 
 #include "video/VGA_text.h"
+#include "pit/pit.h"
 
 #include "device/serial.h"
 
-int os_main(){
+#include "test.h"
+
+int os_main() {
     makeInterruptTable();
+		init_pit();
     serialInit();
-
-
     clearScreen(black);
 
     writeText("Welcome To mOS!", (80 - 15)/2, 5, red);
 
-    println("It booted!!!", green);
-
-    serialWrite(COM1, (uint8_t*)("Hello, Serial!"), sizeof("Hello, Serial!"));
+		println("It booted!!!", green);
 
     VGA_Color colour = light_cyan;
     const char *string = "Hello, World!";
     println(string, colour);
     
-    while (1 + 1 == 2)
-        ;
+   
+    static const char test_str[] = "test";
+    size_t test_idx = 0;
+
+    while (1 + 2 == 3) {
+        
+        uint8_t chr = serialReadByteBlocking(COM1);
+
+        if (chr == test_str[test_idx]) {
+            ++test_idx;
+
+            if (test_idx >= sizeof(test_str))
+                enterTesting();
+        } else {
+            test_idx = 0;
+        }
+    }
+    
         
     return 0;
 }
