@@ -1,7 +1,7 @@
 # The mOS C Standard Library
 
-The mOS standard library is a library of C functions modelled off their C 
-standard library equivilents in C99.
+The mOS standard library is a library of C functions modelled off C11 
+standard library equivilents.
 
 ## Functions
 
@@ -24,16 +24,6 @@ buffer.
 
 ## Tests
 
-Tests are written in the `tests/` directory. Each test is simply a C file with a
-main function. To add a test to an existing test file, consult the file for 
-more details.
-
-To run all tests, use the command `$ make test`.
-
-To add a new test file, first add the name of the test file to the TESTS variable.
-
-To add a new stdlib file, add the `.c` file to STD\_LIB.
-
-To remove all object files and executables, run `$ make clean`.
+Tests are written in the `tests/` directory. For directions on testing, consult the [README](../../../tests/README.md) in the tests directory.
 
 *See Makefile for more details.*
