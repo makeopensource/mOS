@@ -366,8 +366,4 @@ def do_tests():
     print("See .got files for more details")
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     do_tests()
-=======
-    do_tests()
->>>>>>> 2e5229979d8d9097f8b750b6fc7912a2656eb404
