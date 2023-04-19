@@ -25,7 +25,7 @@ QEMU_ARGS = ["qemu-system-i386", "-boot", "c", "-no-reboot", "-no-shutdown", "-n
 QEMU_SERIAL_DEV = "tcp:localhost:{port},server"
 QEMU_DRIVE = "format=raw,file=./../mOS.bin{copy_num}"
 
-TEST_TIMEOUT = 20
+TEST_TIMEOUT = 5
 
 active_instances = 0
 instance_mutex = Lock()
@@ -366,4 +366,8 @@ def do_tests():
     print("See .got files for more details")
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     do_tests()
+=======
+    do_tests()
+>>>>>>> 2e5229979d8d9097f8b750b6fc7912a2656eb404
