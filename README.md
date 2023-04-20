@@ -35,6 +35,10 @@ For contributing _fork_ this repository and then make your changes in the form o
 ### Running
  * run `make qemu` in the root directory of the project
 
+### Formatting
+ * run `make format` in the root directory of the project to format the code
+   according to the formatter in .clang-format
+
 ## General behavior
 boot and immediately drop to a prompt.
 programs can be executed from the prompt.
