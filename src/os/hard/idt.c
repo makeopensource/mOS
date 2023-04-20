@@ -1,8 +1,9 @@
-#include <stdint.h>
-#include <stdbool.h>
 #include "idt.h"
 
 #include "pic.h"
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #define GATE_MASK 0b00001111
 #define PRIVILEGE_MASK 0b01100000
@@ -25,35 +26,31 @@
 // see GDT for details
 #define CODE_SEGMENT 0x8
 
-
-uint32_t getOffset (IdtEntry entry) {
+uint32_t getOffset(IdtEntry entry) {
     // reconstruct the address
     return (((uint32_t)(entry.high) << 16) | (uint32_t)(entry.low));
 }
 
-uint8_t getGateType (IdtEntry entry) {
-    return entry.flags & GATE_MASK;
-}
+uint8_t getGateType(IdtEntry entry) { return entry.flags & GATE_MASK; }
 
-uint8_t getPrivilegeLevels (IdtEntry entry) {
+uint8_t getPrivilegeLevels(IdtEntry entry) {
     // mask the privilege bits then shift them to be 0 based
     return (entry.flags & PRIVILEGE_MASK) >> 5;
 }
 
-bool isValid (IdtEntry entry) {
-    return ((entry.flags & PRESENT_MASK) != 0);
-}
+bool isValid(IdtEntry entry) { return ((entry.flags & PRESENT_MASK) != 0); }
 
-extern void* idt_stub_table[];
+extern void *idt_stub_table[];
 static IdtEntry idt[IDT_ENTRIES];
 static idtr_t idtr;
 
-void makeInterruptTable () {
+void makeInterruptTable() {
 
     idtr.base = (uint32_t)(&idt);
-    
+
     // used to calculate the end of the IDT, idtr.base + idtr.limit
-    // this result is the address of the last byte of the IDT. Without -1 it would be the byte after the IDT
+    // this result is the address of the last byte of the IDT. Without -1 it
+    // would be the byte after the IDT
     idtr.limit = sizeof(idt) - 1;
 
     // Setup all the idt descriptors for both ISRs and IRQs
@@ -66,29 +63,29 @@ void makeInterruptTable () {
     initPIC(ISR_COUNT);
 
     // load the IDT and then enable interrupts
-    __asm__ volatile ("lidt [%0]" : : "r"(&idtr));
+    __asm__ volatile("lidt [%0]" : : "r"(&idtr));
     enableInterrupts();
 }
 
-void idtSetDesc (uint8_t idx, void* isr, uint8_t flags) {
+void idtSetDesc(uint8_t idx, void *isr, uint8_t flags) {
     IdtEntry *desc = &idt[idx];
 
-    //set offset
+    // set offset
     desc->low = (uint32_t)isr & 0xFFFF; // lowest 2 bytes of the address
-    desc->high = ((uint32_t)(isr) >> 16) & 0xFFFF; // upper 2 bytes of the address
+    desc->high =
+        ((uint32_t)(isr) >> 16) & 0xFFFF; // upper 2 bytes of the address
 
-    //set segment selector
+    // set segment selector
     desc->selector = CODE_SEGMENT;
 
     desc->zero = 0;
 
-    //set flags
+    // set flags
     desc->flags = flags;
 }
 
 static int_handler_t isrHandlers[ISR_COUNT] = {};
 static int_handler_t irqHandlers[IRQ_COUNT] = {};
-
 
 void isrSetHandler(uint8_t isr_vec, int_handler_t handler) {
     isrHandlers[isr_vec] = handler;
@@ -98,15 +95,15 @@ void irqSetHandler(uint8_t irq_vec, int_handler_t handler) {
     irqHandlers[irq_vec] = handler;
 }
 
-void isrHandler(isr_registers_t* state) {
+void isrHandler(isr_registers_t *state) {
 
     int_handler_t handler = isrHandlers[state->vec_idx];
     if (handler != 0) {
         handler(state);
     }
-} 
+}
 
-void irqHandler(isr_registers_t* state) {
+void irqHandler(isr_registers_t *state) {
 
     int_handler_t handler = irqHandlers[state->vec_idx];
     if (handler != 0) {
@@ -117,10 +114,6 @@ void irqHandler(isr_registers_t* state) {
     ackPIC(state->vec_idx);
 }
 
-void disableInterrupts(void) {
-    __asm__ volatile ("cli");
-}
+void disableInterrupts(void) { __asm__ volatile("cli"); }
 
-void enableInterrupts(void) {
-    __asm__ volatile ("sti");
-}
+void enableInterrupts(void) { __asm__ volatile("sti"); }
