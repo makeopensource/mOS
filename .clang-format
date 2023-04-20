@@ -1,0 +1,10 @@
+---
+BasedOnStyle: LLVM
+ColumnLimit: '80'
+IncludeBlocks: Regroup
+IndentWidth: '4'
+Language: Cpp
+SortIncludes: 'true'
+UseTab: Never
+
+...
