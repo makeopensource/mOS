@@ -23,7 +23,8 @@ void init_timer(int hz);
 /***
  *
  *	Sleep function to halt for dur.
- *  note that how long it sleeps for dur dpeends on what freq the timer is set at
+ *  note that how long it sleeps for dur dpeends on what freq the timer is set
+ *at
  */
 void sleep(uint32_t dur);
 

@@ -2,8 +2,8 @@
 #define SERIAL_H
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define SERIAL_BUFFER_SIZE 256
 
@@ -44,26 +44,25 @@ uint8_t serialReadByte(uint16_t port);
 uint8_t serialReadByteBlocking(uint16_t port);
 
 // reads n bytes into buffer, blocking until n recieved
-void serialRead(uint16_t port, uint8_t* buffer, size_t n);
+void serialRead(uint16_t port, uint8_t *buffer, size_t n);
 
 // returns the amount of bytes ready to be read in the buffer
 size_t serialReadReady(uint16_t port);
 
 bool serialEmpty(uint16_t port);
 
-
-// IMPORTANT!!! calling any send function before serialSend has finished is undefined behavior,
-// you have been warned.
+// IMPORTANT!!! calling any send function before serialSend has finished is
+// undefined behavior, you have been warned.
 
 // sends a byte over serial, blocking
 void serialWriteByte(uint16_t port, uint8_t data);
 
 // sends n bytes over serial, blocking
-void serialWriteBlocking(uint16_t port, uint8_t* data, size_t n);
+void serialWriteBlocking(uint16_t port, uint8_t *data, size_t n);
 
 // sends n bytes over serial, non-blocking
 // WARNING, WILL ENABLE INTERRUPTS
-void serialWrite(uint16_t port, uint8_t* data, size_t n);
+void serialWrite(uint16_t port, uint8_t *data, size_t n);
 
 // returns true if the async serial send has finished
 bool serialWriteReady(uint16_t port);

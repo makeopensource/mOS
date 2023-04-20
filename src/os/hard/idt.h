@@ -1,8 +1,8 @@
 #ifndef IDT_H
 #define IDT_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #define IDT_ENTRIES 256
 #define ISR_COUNT 32
@@ -24,20 +24,21 @@ typedef struct {
 typedef struct {
     uint32_t edi, esi, ebp, useless, ebx, edx, ecx, eax; // pushed by pushad
     uint32_t gs, fs, es, ds; // pushed segment selectors
-    uint32_t vec_idx, err_code; // isr index and error code (0 when error is not applicable)
+    uint32_t vec_idx,
+        err_code; // isr index and error code (0 when error is not applicable)
     uint32_t eip, cs, eflags, esp, ss; // pushed by CPU during interrupt
 } isr_registers_t;
 
 // upper half of upper (16-31), lower half of lower (0-15)
-uint32_t getOffset(IdtEntry entry); //addr of entry point of ISR
-uint8_t getGateType(IdtEntry entry); //bits 0-3 of flags
-uint8_t getPrivilegeLevels (IdtEntry entry); //bits 5-6 of flags
-bool isValid(IdtEntry entry); //check present bit (flags 7th bit)
+uint32_t getOffset(IdtEntry entry);         // addr of entry point of ISR
+uint8_t getGateType(IdtEntry entry);        // bits 0-3 of flags
+uint8_t getPrivilegeLevels(IdtEntry entry); // bits 5-6 of flags
+bool isValid(IdtEntry entry);               // check present bit (flags 7th bit)
 
-void makeInterruptTable ();
-void idtSetDesc (uint8_t idx, void* isr, uint8_t flags); 
+void makeInterruptTable();
+void idtSetDesc(uint8_t idx, void *isr, uint8_t flags);
 
-typedef void (*int_handler_t)(isr_registers_t*);
+typedef void (*int_handler_t)(isr_registers_t *);
 
 // sets handlers for ISRs and IRQs, 0 <= isr_vec < 32, 0 <= irq_vec < 16.
 // note that IRQ0 is actually interrupt 32 (see init_pic)
