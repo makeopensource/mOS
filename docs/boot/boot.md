@@ -37,3 +37,9 @@ Since we only load `42` sectors, if our kernel grows larger this will have to ch
 - `0x90000`: location of stack at kernel entry.
 
 ![Memory Layout Diagram](boot_memory_diagram.png)
+
+#### Further Reading
+
+[BIOS](https://wiki.osdev.org/BIOS)
+[GDT](https://wiki.osdev.org/Global_Descriptor_Table)
+[Bootloader Guide](https://wiki.osdev.org/Rolling_Your_Own_Bootloader)
