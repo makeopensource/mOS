@@ -40,6 +40,7 @@ Since we only load `42` sectors, if our kernel grows larger this will have to ch
 
 #### Further Reading
 
-[BIOS](https://wiki.osdev.org/BIOS)
-[GDT](https://wiki.osdev.org/Global_Descriptor_Table)
-[Bootloader Guide](https://wiki.osdev.org/Rolling_Your_Own_Bootloader)
+[BIOS](https://wiki.osdev.org/BIOS)  
+[GDT](https://wiki.osdev.org/Global_Descriptor_Table)  
+[Bootloader Guide](https://wiki.osdev.org/Rolling_Your_Own_Bootloader)  
+[BIOS int 0x13](https://wiki.osdev.org/Disk_access_using_the_BIOS_(INT_13h))
