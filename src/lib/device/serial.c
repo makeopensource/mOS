@@ -1,8 +1,7 @@
 #include "serial.h"
 
-#include "../../os/hard/port_io.h"
 #include "../../os/hard/idt.h"
-
+#include "../../os/hard/port_io.h"
 #include "container/ring_buffer.h"
 
 typedef ring_buffer(SERIAL_BUFFER_SIZE) serial_buffer_t;
@@ -12,16 +11,17 @@ serial_buffer_t inCOM1;
 serial_buffer_t inCOM2;
 
 // output buffers
-uint8_t* outCOM1 = NULL;
+uint8_t *outCOM1 = NULL;
 size_t remainCOM1 = 0;
 
-uint8_t* outCOM2 = NULL;
+uint8_t *outCOM2 = NULL;
 size_t remainCOM2 = 0;
 
 #define DATA_READY_MASK 0b1
 #define TRANSMIT_READY_MASK 0b100000
 
-void handlerStub(uint16_t port, serial_buffer_t* inBuf, uint8_t** outBuf, size_t* remainOut) {
+void handlerStub(uint16_t port, serial_buffer_t *inBuf, uint8_t **outBuf,
+                 size_t *remainOut) {
     inb(port + 2); // what caused the interrupt, we dont really care
 
     uint8_t status;
@@ -37,14 +37,15 @@ void handlerStub(uint16_t port, serial_buffer_t* inBuf, uint8_t** outBuf, size_t
             --(*remainOut);
         }
 
-    } while ((status & DATA_READY_MASK) || ((status & TRANSMIT_READY_MASK) && *remainOut > 0));
+    } while ((status & DATA_READY_MASK) ||
+             ((status & TRANSMIT_READY_MASK) && *remainOut > 0));
 }
 
-void serialHandler1(isr_registers_t* regs) {
+void serialHandler1(isr_registers_t *regs) {
     handlerStub(COM1, &inCOM1, &outCOM1, &remainCOM1);
 }
 
-void serialHandler2(isr_registers_t* regs) {
+void serialHandler2(isr_registers_t *regs) {
     handlerStub(COM2, &inCOM2, &outCOM2, &remainCOM2);
 }
 
@@ -57,7 +58,7 @@ void serialInit() {
 
     irqSetHandler(COM1_IRQ, serialHandler1);
     irqSetHandler(COM2_IRQ, serialHandler2);
-    
+
     serialSetBaud(COM1, DEFAULT_BAUD);
     serialSetBaud(COM2, DEFAULT_BAUD);
 }
@@ -66,13 +67,15 @@ void serialInit() {
 #define STOP1 0b000
 #define PARITY_NONE 0b000000
 
-// Since there is lacking internet sources of the FIFO control register, here's some data
-// bit 0: enable
-// bit 1: clear receiver FIFO
-// bit 2: clear transmitter FIFO
-// bit 3: DMA mode
-// bits 6-7: trigger for DR interrupt,
-// 0b00 = 1byte, 0b01 = 4 bytes, then 8, then 14
+/* Since there is lacking internet sources of the FIFO control register, here's
+ * some data
+ * bit 0: enable
+ * bit 1: clear receiver FIFO
+ * bit 2: clear transmitter FIFO
+ * bit 3: DMA mode
+ * bits 6-7: trigger for DR interrupt,
+ * 0b00 = 1byte, 0b01 = 4 bytes, then 8, then 14
+ */
 
 #define FIFO_ENABLE 0b1
 #define FIFO_CLEAR_RECV 0b10
@@ -99,15 +102,20 @@ void serialSetBaud(uint16_t port, uint16_t baud) {
     outb(port + 1, 0); // disable serial IRQs
 
     outb(port + 3, DLAB); // set DLAB to 1 (DLAB is 7th bit of port + 3)
-    outb(port + 0, (uint8_t)(baud & 0x00ff)); // set baud divisor, low byte in port + 0
+    outb(port + 0,
+         (uint8_t)(baud & 0x00ff)); // set baud divisor, low byte in port + 0
     outb(port + 1, (uint8_t)((baud & 0xff00) >> 8)); // high byte in port + 1
 
-    outb(port + 3, DATA8b | STOP1 | PARITY_NONE); // set data flags (also sets DLAB to 0)
-    outb(port + 2, FIFO_ENABLE | FIFO_CLEAR | FIFO_DATA_READY_INT); // enable fifo and clear buffers and enable dr interrupt
+    outb(port + 3,
+         DATA8b | STOP1 | PARITY_NONE); // set data flags (also sets DLAB to 0)
+    outb(port + 2, FIFO_ENABLE | FIFO_CLEAR |
+                       FIFO_DATA_READY_INT); // enable fifo and clear buffers
+                                             // and enable dr interrupt
 
     outb(port + 4, HARD_HANDSHAKE); // enable hardware handshaking, kinda
 
-    outb(port + 1, DR_INT | THRE_INT); // enable Data Ready (DR) and Transmit Empty (THRE) interrupts
+    outb(port + 1, DR_INT | THRE_INT); // enable Data Ready (DR) and Transmit
+                                       // Empty (THRE) interrupts
 }
 
 /* read related functions */
@@ -124,12 +132,13 @@ uint8_t serialReadByte(uint16_t port) {
     return out;
 }
 uint8_t serialReadByteBlocking(uint16_t port) {
-    while (serialEmpty(port));
+    while (serialEmpty(port))
+        ;
 
     return serialReadByte(port);
 }
 
-void serialRead(uint16_t port, uint8_t* buffer, size_t n) {
+void serialRead(uint16_t port, uint8_t *buffer, size_t n) {
     for (int i = 0; i < n; ++i) {
         buffer[i] = serialReadByteBlocking(port);
     }
@@ -151,29 +160,30 @@ bool serialEmpty(uint16_t port) {
     }
 }
 
-
 /* Write related functions */
 
 bool transmitReady(uint16_t port) {
-    return inb(port + 5) & TRANSMIT_READY_MASK; // check is transmission buffer is empty
+    return inb(port + 5) &
+           TRANSMIT_READY_MASK; // check is transmission buffer is empty
 }
 
 void serialWriteByte(uint16_t port, uint8_t data) {
-    while (!transmitReady(port));
+    while (!transmitReady(port))
+        ;
 
     outb(port, data);
 }
 
 // sends n bytes over serial, blocking
-void serialWriteBlocking(uint16_t port, uint8_t* data, size_t n) {
+void serialWriteBlocking(uint16_t port, uint8_t *data, size_t n) {
     for (int i = 0; i < n; ++i) {
         serialWriteByte(port, data[i]);
     }
 }
 
 // sends n bytes over serial, non-blocking
-void serialWrite(uint16_t port, uint8_t* data, size_t n) {
-    disableInterrupts(); // disable cpu interrupts
+void serialWrite(uint16_t port, uint8_t *data, size_t n) {
+    disableInterrupts();  // disable cpu interrupts
     outb(port + 1, 0b00); // disable serial interrupts
 
     if (port == COM1) {

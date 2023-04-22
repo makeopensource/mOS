@@ -1,19 +1,20 @@
 #include "../../test_helper.h"
 #include "stdlib/string.h"
 
-#define BUFSZ 100 // the size of string compare buffers (to detect buffer overflow)
+#define BUFSZ                                                                  \
+    100 // the size of string compare buffers (to detect buffer overflow)
 
 void test_strnlen_s(char *in, int sz, int exp) {
-    ASSERT (sz <= BUFSZ);
-    ASSERT (strnlen_s(in, sz) == exp);
+    ASSERT(sz <= BUFSZ);
+    ASSERT(strnlen_s(in, sz) == exp);
 }
 
 // memcpy from void *in to char buf[]
 void test_memcpy(void *in, int sz) {
 
-    ASSERT (sz <= BUFSZ);
+    ASSERT(sz <= BUFSZ);
 
-    char buf[BUFSZ+1];
+    char buf[BUFSZ + 1];
     memset(buf, '#', BUFSZ);
     buf[BUFSZ] = '\0';
 
@@ -23,27 +24,27 @@ void test_memcpy(void *in, int sz) {
 
     // check that copied memory is copied correctly
     for (i = 0; i < sz; i++) {
-        ASSERT (((char *)in)[i] == ((char *)buf)[i]);
+        ASSERT(((char *)in)[i] == ((char *)buf)[i]);
     }
 
     // check that memory copies up to sz (NO buffer overflow)
     for (i = sz; i < BUFSZ; i++) {
-        ASSERT (((char *)buf)[i] == '#');
+        ASSERT(((char *)buf)[i] == '#');
     }
 }
 
 void test_strncmp(char *s1, char *s2, int sz, int exp) {
-    ASSERT (sz <= BUFSZ);
-    ASSERT (strncmp(s1, s2, sz) == exp);
+    ASSERT(sz <= BUFSZ);
+    ASSERT(strncmp(s1, s2, sz) == exp);
 }
 
 // first two arguments are direct arguments to strcpy_s
-// cmpsz is the expected size (if sz is larger than the 
+// cmpsz is the expected size (if sz is larger than the
 // actual strlen)
 void test_strcpy_s(void *in, int sz, int cmpsz) {
-    ASSERT (sz <= BUFSZ && cmpsz <= sz);
+    ASSERT(sz <= BUFSZ && cmpsz <= sz);
 
-    char buf[BUFSZ+1];
+    char buf[BUFSZ + 1];
     memset(buf, '#', BUFSZ);
     buf[BUFSZ] = '\n';
 
@@ -52,18 +53,18 @@ void test_strcpy_s(void *in, int sz, int cmpsz) {
     int i;
     // tests that memory is copied appropriately
     for (i = 0; i < cmpsz - 1; i++) {
-        ASSERT (((char *)in)[i] == ((char *)buf)[i]);
+        ASSERT(((char *)in)[i] == ((char *)buf)[i]);
     }
 
     // test that last byte is `\0` IF it fits in sz
     if (cmpsz != 0) {
-        ASSERT (((char *)buf)[i] == '\0');
+        ASSERT(((char *)buf)[i] == '\0');
         i++;
     }
 
     // tests that bytes *after* '\0' are not overwritten
     for (; i < BUFSZ; i++) {
-        ASSERT (buf[i] == '#');
+        ASSERT(buf[i] == '#');
     }
 }
 
@@ -97,7 +98,7 @@ int test_main() {
     test_strcpy_s("don't copy me", 0, 0);
 
     char done[] = "test_string done\n";
-    serialWrite(COM1, (uint8_t*)(done), sizeof(done) - 1);
+    serialWrite(COM1, (uint8_t *)(done), sizeof(done) - 1);
 
     return 0;
 }
