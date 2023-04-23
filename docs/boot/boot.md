@@ -9,7 +9,7 @@ Finally, we get to the OS, BIOS will load the first sector (512 bytes) of the di
 
 ## Boot Sector
 
-The boot sector (see [boot_sect.asm](../../src/boot/boot_sect.asm)) is the very first code that we write that gets executed. It is important to keep in mind at this point we only have 512 bytes of code/data loaded! That's not very much! In addition we also need the "magic word" 0xaa55 as the last word in the sector to signify that this is a bootable sector. `times 509 - ($ - $$) db 0` is a neat assembly trick that gets our binary to exactly 512 bytes.  
+The boot sector (see [boot_sect.asm](../../src/boot/boot_sect.asm)) is the very first code that we write that gets executed. It is important to keep in mind at this point we only have 512 bytes of code/data loaded, which is not much. In addition we also need the "magic word" 0xaa55 as the last word in the sector to signify that this is a bootable sector. `times 509 - ($ - $$) db 0` is a neat assembly trick that gets our binary to exactly 512 bytes.  
 You may have noticed `[bits 16]` in the assembly, this is because BIOS starts us out in "real mode" which is fancy for 16-bit. Real mode uses segmentation heavily, but discussing segmentation is outside of the scope of this document since we don't have to deal with it.  
 First we store the boot drive in a defined place in memory. BIOS puts the boot drive in `dl` on boot. Next we set the stack to be at 0x9000 (`bp` and `sp` are the 16-bit stack registers). Our next step is to load the rest of the kernel. BIOS uses Cylinder Head Sector (CHS) addressing for disk access, here are some important details:
 
