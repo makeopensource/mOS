@@ -3,7 +3,7 @@
 ## Preliminaries
 
 Before booting the OS, the Basic Input/Output System (BIOS) does a lot of stuff to prepare.  
-The actual workings of the BIOS differ from motherboard to motherboard but they share common interfaces that we can use. These interfaces are accessed similarly to how you would on a 32-bit x86 Linux system, via the `int` instruction! Although, syscalls and BIOS calls are very different.  
+The actual workings of the BIOS differ from motherboard to motherboard, but they share common interfaces that we can use. These interfaces are accessed similarly to how you would access them on a 32-bit x86 Linux system, via the `int` instruction.
 The BIOS does a lot of work behind the scenes; It creates and maintains the Interrupt Vector Table (IVT) and has the ability to interface with hardware, most importantly, the disk.  
 Finally, we get to the OS, BIOS will load the first sector (512 bytes) of the disk into main memory at 0x7c00 for us (as long as we say the magic word)!
 
