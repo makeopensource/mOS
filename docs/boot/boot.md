@@ -19,7 +19,7 @@ First we store the boot drive in a defined place in memory. BIOS puts the boot d
 
 Since we want the second sector (first is the boot sector) onwards, we only need the very first cylinder and head. Now we want to tell the BIOS to execute a read operation.
 We move `2` into `ah` to signify we want to read. Then `42` into `al` to signify we want to read 42 sectors (512 * 42 = 21504 bytes). Then `cl` gets 2 for the sector, `ch` and `dh` get 0 for cylinder and head respectively. Then `OS_OFFSET` (0x1000) is put in `bx`, this tells BIOS where we want the result of our read to be stored in memory. Finally, we do `int 0x13` which is the disk interrupt for BIOS.  
-Now that we have the OS loaded, we need to get into 32-bit (also known as protected mode, long mode is 64-bit). Now we switch over to [enter_pm.asm](../../src/boot/enter_pm.asm), and open [gdt.asm](../../src/boot/gdt.asm) while you're at it.  
+Now that we have the OS loaded, we need to get into 32-bit mode (also known as protected mode, long mode is 64-bit). Now we switch over to [enter_pm.asm](../../src/boot/enter_pm.asm) and [gdt.asm](../../src/boot/gdt.asm).  
 
 ### Protected Mode
 
