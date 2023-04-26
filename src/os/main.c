@@ -1,4 +1,5 @@
 #include "device/serial.h"
+#include "device/ps2.h"
 #include "hard/idt.h"
 #include "pit/pit.h"
 #include "test.h"
@@ -7,6 +8,7 @@
 int os_main() {
     makeInterruptTable();
     init_pit();
+    ps2Init();
     serialInit();
     clearScreen(black);
 
