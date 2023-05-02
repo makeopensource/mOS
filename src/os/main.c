@@ -8,9 +8,10 @@
 int os_main() {
     makeInterruptTable();
     init_pit();
-    ps2Init();
     serialInit();
     clearScreen(black);
+
+    ps2Init();
 
     writeText("Welcome To mOS!", (80 - 15) / 2, 5, red);
 

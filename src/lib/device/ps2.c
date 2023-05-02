@@ -4,6 +4,8 @@
 
 #include "container/ring_buffer.h"
 
+#include "video/VGA_text.h"
+
 typedef ring_buffer(64) ps2_buffer_t;
 
 ps2_buffer_t PS2Port1;
@@ -12,6 +14,19 @@ ps2_buffer_t PS2Port2;
 struct PS2Device dev1;
 struct PS2Device dev2;
 
+void ps2HandlerPort1(isr_registers_t* regs) {
+    uint8_t b = inb(PS2_DATA);
+
+    char buf[2] = " ";
+    buf[0] = b;
+    print(buf, red);
+
+    ring_buffer_push(&PS2Port1, b);
+}
+void ps2HandlerPort2(isr_registers_t* regs) {
+    uint8_t b = inb(PS2_DATA);
+    ring_buffer_push(&PS2Port2, b);
+}
 
 enum DeviceType translateDeviceType(uint8_t b) {
     switch (b) {
@@ -30,11 +45,114 @@ enum DeviceType translateDeviceType(uint8_t b) {
     }
 }
 
+
+
+uint8_t readStat(void) {
+    return inb(PS2_STAT_CMD);
+}
+
+void sendCMD(uint8_t b) {
+    // await ready
+    while (readStat() & 0b10) ;
+
+    outb(PS2_STAT_CMD, b);
+}
+
+bool dataReady(void) {
+    uint8_t status = readStat();
+    return status & 1;
+}
+
+uint8_t readData(void) {
+    // await ready
+    while (!dataReady()) ;
+
+    return inb(PS2_DATA);
+}
+
+void sendData(uint8_t b) {
+    while (readStat() & 0b10) ;
+
+    outb(PS2_DATA, b);
+}
+
+void ps2Disable(void) {
+    sendCMD(0xAD);
+    sendCMD(0xA7);
+}
+
+// ps2 should be disabled when this is called
+void ps2Flush(void) {
+    while (dataReady()) {
+        // discard all data
+        inb(PS2_DATA);
+    }
+}
+
 int ps2Init() {
     ring_buffer_init(&PS2Port1, 64);
     ring_buffer_init(&PS2Port2, 64);
-    irqSetHandler(1, ps2HandlerPort1);
-    irqSetHandler(12, ps2HandlerPort2);
+
+    ps2Disable();
+    ps2Flush();
+
+    sendCMD(0x20);
+    uint8_t conf = readData();
+    uint8_t newconf = conf & ~(0b01000011); // disable IRQs
+
+    // see if 2nd port is potentially present
+    bool port2present = conf & 0b00100000;
+
+    sendCMD(0x60);
+    sendData(newconf); // set config
+
+    sendCMD(0xAA);
+    uint8_t ctest = readData();
+
+    // controller test failed!
+    if (ctest == 0xFC) return -1;
+
+    sendCMD(0x60);
+    sendData(newconf); // set config again
+
+    if (port2present) {
+        sendCMD(0xA8); //enable port2
+        sendCMD(0x20); //get config again
+        uint8_t conf = readData();
+        if (conf & 0b00100000) {
+            port2present = false;
+        }
+        else {
+            sendCMD(0xA7); //disable port2
+        }
+    }
+
+    sendCMD(0xAB);
+    uint8_t res1 = readData();
+    bool port1works = res1 == 0;
+
+    bool port2works = false;
+    if (port2present) {
+        sendCMD(0xA9);
+        uint8_t res2 = readData();
+        port2works = res2 == 0;
+    }
+
+    if (port1works) {
+        irqSetHandler(1, ps2HandlerPort1);
+        sendCMD(0xAE);
+    }
+
+    if (port2works) {
+        irqSetHandler(12, ps2HandlerPort2);
+        sendCMD(0xA8);
+    }
+   
+    sendCMD(0x20);
+    newconf = readData();
+    newconf |= 0b01000011; //enable IRQs
+    sendCMD(0x60);
+    sendData(newconf); // set config
 
     return 0;
 }
