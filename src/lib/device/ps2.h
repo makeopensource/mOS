@@ -27,11 +27,11 @@ enum DeviceType {
     //after 0xAC
     SunKey = 0xA1,
 
-    Unknown,
+    Ps2Unknown,
 };
 
 enum PS2KeyboardScanCode {
-    None,
+    Ps2None,
     SC1, //unimplimented
     SC2,
     SC3, //unimplimented

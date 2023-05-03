@@ -43,7 +43,7 @@ enum DeviceType translateDeviceType(uint8_t b) {
     case SunKey:
         return (enum DeviceType)(b);
     default:
-        return Unknown;
+        return Ps2Unknown;
     }
 }
 
@@ -101,6 +101,69 @@ void setConf(uint8_t newconf) {
     sendData(newconf);
 }
 
+void sendPort2(uint8_t b) {
+    sendCMD(0xD4); // want 2nd port
+    sendData(b);
+}
+
+struct PS2Device detectDeviceType(uint8_t port) {
+    static const struct PS2Device errDev = {Ps2Unknown, false, Ps2None};
+    if (port != 1 && port != 2) return errDev;
+
+    void (*send)(uint8_t);
+
+    if (port == 1) {
+        sendCMD(0xAE); // enable dev1
+        sendCMD(0xA7); // disable dev2
+        send = sendData;
+    }
+    else {
+        sendCMD(0xA8); // enable dev2
+        sendCMD(0xAD); // disable dev1
+        send = sendPort2;
+    }
+
+    // disable scanning
+    send(0xF5);
+
+    if (readData() != 0xFA) return errDev;
+
+    // identify command
+    send(0xF2);
+    if (readData() != 0xFA) return errDev;
+
+    struct PS2Device outDev;
+    switch (readData()) {
+    case StandardMouse:
+        outDev.type = StandardMouse;
+        outDev.isKeyboard = false;
+        outDev.scancode = Ps2None;
+        break;
+    case ScrollMouse:
+        outDev.type = ScrollMouse;
+        outDev.isKeyboard = false;
+        outDev.scancode = Ps2None;
+        break;
+    case QuintMouse:
+        outDev.type = QuintMouse;
+        outDev.isKeyboard = false;
+        outDev.scancode = Ps2None;
+        break;
+    case 0xAB: case 0xAC:
+        outDev.type = translateDeviceType(readData());
+        outDev.isKeyboard = true;
+        outDev.scancode = SC2;
+        break;
+    default:
+        return errDev;
+    }
+
+    // enable scanning
+    send(0xF4);
+
+    return outDev;
+}
+
 int ps2Init() {
     ring_buffer_init(&PS2Port1, PS2_BUF_SIZE);
     ring_buffer_init(&PS2Port2, PS2_BUF_SIZE);
@@ -108,7 +171,7 @@ int ps2Init() {
     ps2Disable();
     ps2Flush();
 
-    uint8_t conf = readConf();
+    uint8_t conf = getConf();
 
     // see if 2nd port is potentially present
     bool port2present = conf & 0b00100000;
@@ -122,13 +185,13 @@ int ps2Init() {
     // controller test failed! PS2 broken!
     if (ctest == 0xFC) return ERR_PS2_BROKEN;
 
-    setConf(readConf() & ~(0b01000011)); // set config again
+    setConf(getConf() & ~(0b01000011)); // set config again
 
     if (port2present) {
         sendCMD(0xA8); //enable port2
 
         //check configuration to see if port2 exists
-        if (readConf() & 0b00100000) {
+        if (getConf() & 0b00100000) {
             port2present = false;
         }
         else {
@@ -152,15 +215,21 @@ int ps2Init() {
     // set handlers and enable
     if (port1works) {
         irqSetHandler(1, ps2HandlerPort1);
-        sendCMD(0xAE);
+        
+        dev1 = detectDeviceType(1);
     }
 
     if (port2works) {
         irqSetHandler(12, ps2HandlerPort2);
-        sendCMD(0xA8);
+        
+        dev2 = detectDeviceType(2);
+
+        // the detect disables dev1, so enable it
+        if (port1works)
+            sendCMD(0xAE);
     }
    
-    setConf(readConf() | 0b01000011); //enable IRQs
+    setConf(getConf() | 0b01000011); //enable IRQs
 
     return 0;
 }
