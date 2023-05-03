@@ -6,7 +6,9 @@
 
 #include "video/VGA_text.h"
 
-typedef ring_buffer(64) ps2_buffer_t;
+#define PS2_BUF_SIZE 64
+
+typedef ring_buffer(PS2_BUF_SIZE) ps2_buffer_t;
 
 ps2_buffer_t PS2Port1;
 ps2_buffer_t PS2Port2;
@@ -89,37 +91,44 @@ void ps2Flush(void) {
     }
 }
 
+uint8_t getConf(void) {
+    sendCMD(0x20);
+    return readData();
+}
+
+void setConf(uint8_t newconf) {
+    sendCMD(0x60);
+    sendData(newconf);
+}
+
 int ps2Init() {
-    ring_buffer_init(&PS2Port1, 64);
-    ring_buffer_init(&PS2Port2, 64);
+    ring_buffer_init(&PS2Port1, PS2_BUF_SIZE);
+    ring_buffer_init(&PS2Port2, PS2_BUF_SIZE);
 
     ps2Disable();
     ps2Flush();
 
-    sendCMD(0x20);
-    uint8_t conf = readData();
-    uint8_t newconf = conf & ~(0b01000011); // disable IRQs
+    uint8_t conf = readConf();
 
     // see if 2nd port is potentially present
     bool port2present = conf & 0b00100000;
 
-    sendCMD(0x60);
-    sendData(newconf); // set config
+    setConf(conf & ~(0b01000011)); // disable IRQs
 
+    // test controller
     sendCMD(0xAA);
     uint8_t ctest = readData();
 
-    // controller test failed!
-    if (ctest == 0xFC) return -1;
+    // controller test failed! PS2 broken!
+    if (ctest == 0xFC) return ERR_PS2_BROKEN;
 
-    sendCMD(0x60);
-    sendData(newconf); // set config again
+    setConf(readConf() & ~(0b01000011)); // set config again
 
     if (port2present) {
         sendCMD(0xA8); //enable port2
-        sendCMD(0x20); //get config again
-        uint8_t conf = readData();
-        if (conf & 0b00100000) {
+
+        //check configuration to see if port2 exists
+        if (readConf() & 0b00100000) {
             port2present = false;
         }
         else {
@@ -127,10 +136,12 @@ int ps2Init() {
         }
     }
 
+    // test port 1
     sendCMD(0xAB);
     uint8_t res1 = readData();
     bool port1works = res1 == 0;
 
+    // test port 2
     bool port2works = false;
     if (port2present) {
         sendCMD(0xA9);
@@ -138,6 +149,7 @@ int ps2Init() {
         port2works = res2 == 0;
     }
 
+    // set handlers and enable
     if (port1works) {
         irqSetHandler(1, ps2HandlerPort1);
         sendCMD(0xAE);
@@ -148,11 +160,7 @@ int ps2Init() {
         sendCMD(0xA8);
     }
    
-    sendCMD(0x20);
-    newconf = readData();
-    newconf |= 0b01000011; //enable IRQs
-    sendCMD(0x60);
-    sendData(newconf); // set config
+    setConf(readConf() | 0b01000011); //enable IRQs
 
     return 0;
 }

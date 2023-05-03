@@ -7,6 +7,8 @@
 
 #define PS2_TIMEOUT 60000
 
+#define ERR_PS2_BROKEN -1
+
 enum DeviceType {
     StandardMouse = 0x00,
     ScrollMouse = 0x03,
