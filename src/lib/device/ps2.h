@@ -5,8 +5,6 @@
 #define PS2_DATA 0x60
 #define PS2_STAT_CMD 0x64
 
-#define PS2_TIMEOUT 60000
-
 #define ERR_PS2_BROKEN -1
 
 enum DeviceType {
@@ -44,4 +42,4 @@ struct PS2Device {
 };
 
 int ps2Init();
-struct PS2Device *getPortType(int portnum);
+const struct PS2Device *getPortType(int portnum);

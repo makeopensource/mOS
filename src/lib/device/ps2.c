@@ -7,6 +7,7 @@
 #include "video/VGA_text.h"
 
 #define PS2_BUF_SIZE 64
+#define PS2_TIMEOUT 100000
 
 typedef ring_buffer(PS2_BUF_SIZE) ps2_buffer_t;
 
@@ -15,6 +16,19 @@ ps2_buffer_t PS2Port2;
 
 struct PS2Device dev1;
 struct PS2Device dev2;
+
+const struct PS2Device* getPortType(int portnum) {
+    
+    if (portnum == 1) {
+        return &dev1;
+    }
+    else if (portnum == 2) {
+        return &dev2;
+    }
+
+    return NULL;
+}
+
 
 void ps2HandlerPort1(isr_registers_t* regs) {
     uint8_t b = inb(PS2_DATA);
@@ -47,17 +61,19 @@ enum DeviceType translateDeviceType(uint8_t b) {
     }
 }
 
-
-
 uint8_t readStat(void) {
     return inb(PS2_STAT_CMD);
 }
 
-void sendCMD(uint8_t b) {
+bool sendCMD(uint8_t b) {
     // await ready
-    while (readStat() & 0b10) ;
-
+    int i = 0;
+    while (readStat() & 0b10) {
+        if (i++ >= PS2_TIMEOUT) return false;
+    }
+    
     outb(PS2_STAT_CMD, b);
+    return true;
 }
 
 bool dataReady(void) {
@@ -67,15 +83,22 @@ bool dataReady(void) {
 
 uint8_t readData(void) {
     // await ready
-    while (!dataReady()) ;
+    int i = 0;
+    while (!dataReady()) {
+        if (i++ >= PS2_TIMEOUT) return -1;
+    }
 
     return inb(PS2_DATA);
 }
 
-void sendData(uint8_t b) {
-    while (readStat() & 0b10) ;
+bool sendData(uint8_t b) {
+    int i = 0;
+    while (readStat() & 0b10) {
+        if (i++ >= PS2_TIMEOUT) return false;
+    }
 
     outb(PS2_DATA, b);
+    return true;
 }
 
 void ps2Disable(void) {
@@ -101,16 +124,16 @@ void setConf(uint8_t newconf) {
     sendData(newconf);
 }
 
-void sendPort2(uint8_t b) {
-    sendCMD(0xD4); // want 2nd port
-    sendData(b);
+bool sendPort2(uint8_t b) {
+    // note that short circuit eval will happen
+    return sendCMD(0xD4) && sendData(b);
 }
 
 struct PS2Device detectDeviceType(uint8_t port) {
     static const struct PS2Device errDev = {Ps2Unknown, false, Ps2None};
     if (port != 1 && port != 2) return errDev;
 
-    void (*send)(uint8_t);
+    bool (*send)(uint8_t);
 
     if (port == 1) {
         sendCMD(0xAE); // enable dev1
