@@ -1,6 +1,11 @@
+#ifndef PS2_H
+#define PS2_H
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+
+#include "keyboard.h"
 
 #define PS2_DATA 0x60
 #define PS2_STAT_CMD 0x64
@@ -30,16 +35,46 @@ enum DeviceType {
 
 enum PS2KeyboardScanCode {
     Ps2None,
-    SC1, //unimplimented
-    SC2,
-    SC3, //unimplimented
+    SC1, 
+    SC2, // unimplemented
+    SC3, // unimplemented
+};
+
+enum PS2KeyState {
+    Ps2Released,
+    Ps2Pressed,
+    Ps2Toggled, // used for keys such as caps lock
+};
+
+struct PS2KeyboardState {
+    enum PS2KeyboardScanCode scancodeSet;
+    bool extended; // for use in multi-byte scancodes
+    enum PS2KeyState keystates[(unsigned)(Key_Code_Count)];
+    uint8_t (*translate)(struct PS2KeyboardState*);
+};
+
+struct PS2MouseState {
+    // unimplemented
 };
 
 struct PS2Device {
     enum DeviceType type;
     bool isKeyboard;
-    enum PS2KeyboardScanCode scancode;
+
+    union {
+        struct PS2KeyboardState kbState;
+        struct PS2MouseState msState;
+        void* unknownState; // NULL pointer
+    };
+
+    
 };
 
 int ps2Init();
 const struct PS2Device *getPortType(int portnum);
+
+bool ps2Present(void);
+bool ps2Port1Present(void);
+bool ps2Port2Present(void);
+
+#endif

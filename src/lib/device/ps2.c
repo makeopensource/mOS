@@ -130,7 +130,11 @@ bool sendPort2(uint8_t b) {
 }
 
 struct PS2Device detectDeviceType(uint8_t port) {
-    static const struct PS2Device errDev = {Ps2Unknown, false, Ps2None};
+    struct PS2Device errDev;
+    errDev.type = Ps2Unknown;
+    errDev.isKeyboard = false;
+    errDev.unknownState = NULL;
+
     if (port != 1 && port != 2) return errDev;
 
     bool (*send)(uint8_t);
@@ -160,22 +164,24 @@ struct PS2Device detectDeviceType(uint8_t port) {
     case StandardMouse:
         outDev.type = StandardMouse;
         outDev.isKeyboard = false;
-        outDev.scancode = Ps2None;
+
         break;
     case ScrollMouse:
         outDev.type = ScrollMouse;
         outDev.isKeyboard = false;
-        outDev.scancode = Ps2None;
+
         break;
     case QuintMouse:
         outDev.type = QuintMouse;
         outDev.isKeyboard = false;
-        outDev.scancode = Ps2None;
+        
         break;
-    case 0xAB: case 0xAC:
+    case 0xAB: case 0xAC: // keyboard first bytes
         outDev.type = translateDeviceType(readData());
         outDev.isKeyboard = true;
-        outDev.scancode = SC2;
+        outDev.kbState.scancodeSet = SC2;
+        outDev.kbState.extended = false;
+        
         break;
     default:
         return errDev;
@@ -186,6 +192,14 @@ struct PS2Device detectDeviceType(uint8_t port) {
 
     return outDev;
 }
+
+bool ps2works = false;
+bool port1works = false;
+bool port2works = false;
+
+bool ps2Present(void) { return ps2works; }
+bool ps2Port1Present(void) { return port1works; }
+bool ps2Port2Present(void) { return port2works; }
 
 int ps2Init() {
     ring_buffer_init(&PS2Port1, PS2_BUF_SIZE);
@@ -206,7 +220,12 @@ int ps2Init() {
     uint8_t ctest = readData();
 
     // controller test failed! PS2 broken!
-    if (ctest == 0xFC) return ERR_PS2_BROKEN;
+    if (ctest == 0xFC) {
+        ps2works = false;
+        return ERR_PS2_BROKEN;
+    }
+
+    ps2works = true;
 
     setConf(getConf() & ~(0b01000011)); // set config again
 
@@ -225,10 +244,10 @@ int ps2Init() {
     // test port 1
     sendCMD(0xAB);
     uint8_t res1 = readData();
-    bool port1works = res1 == 0;
+    port1works = res1 == 0;
 
     // test port 2
-    bool port2works = false;
+    port2works = false;
     if (port2present) {
         sendCMD(0xA9);
         uint8_t res2 = readData();
