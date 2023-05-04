@@ -79,4 +79,10 @@ bool ps2Present(void);
 bool ps2Port1Present(void);
 bool ps2Port2Present(void);
 
+struct PS2Buf_t peekDev1(void);
+struct PS2Buf_t popDev1(void);
+
+struct PS2Buf_t peekDev2(void);
+struct PS2Buf_t popDev2(void);
+
 #endif

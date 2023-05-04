@@ -14,6 +14,50 @@ typedef ring_buffer_g(PS2_BUF_SIZE, struct PS2Buf_t) ps2_buffer_t;
 ps2_buffer_t PS2Port1;
 ps2_buffer_t PS2Port2;
 
+static struct PS2Buf_t initPS2BufVal;
+
+struct PS2Buf_t peekDev(const ps2_buffer_t* dev) {
+    struct PS2Buf_t out;
+    disableInterrupts();
+    if (ring_buffer_empty(dev)) {
+        out = initPS2BufVal;
+    }
+    else {
+        out = ring_buffer_top_g(dev);
+    }
+    enableInterrupts();
+    return out;
+}
+
+struct PS2Buf_t popDev(ps2_buffer_t* dev) {
+    struct PS2Buf_t out;
+    disableInterrupts();
+    if (ring_buffer_empty(dev)) {
+        out = initPS2BufVal;
+    }
+    else {
+        ring_buffer_pop_g(dev, out);
+    }
+    enableInterrupts();
+    return out;
+}
+
+struct PS2Buf_t peekDev1(void) {
+    return peekDev(&PS2Port1);
+}
+
+struct PS2Buf_t popDev1(void) {
+    return popDev(&PS2Port1);
+}
+
+struct PS2Buf_t peekDev2(void) {
+    return peekDev(&PS2Port2);
+}
+
+struct PS2Buf_t popDev2(void) {
+    return popDev(&PS2Port2);
+}
+
 struct PS2Device dev1;
 struct PS2Device dev2;
 
@@ -221,7 +265,6 @@ bool ps2Port1Present(void) { return port1works; }
 bool ps2Port2Present(void) { return port2works; }
 
 int ps2Init() {
-    static struct PS2Buf_t initPS2BufVal;
     initPS2BufVal.type = PS2_NONE_EVENT;
     initPS2BufVal.noneEvent = NULL;
 
