@@ -73,6 +73,11 @@ bool ps2Present(void);
 bool ps2Port1Present(void);
 bool ps2Port2Present(void);
 
+// send a command directly to one of the ports.
+// response cannot be checked/retrived, beware.
+bool sendPort1(uint8_t byte);
+bool sendPort2(uint8_t byte);
+
 struct PS2Buf_t peekDev1(void);
 struct PS2Buf_t popDev1(void);
 

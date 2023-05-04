@@ -54,6 +54,10 @@ struct TestTriple {
     const struct TestTriple *c;
 };
 
+bool TestTripleEqual(struct TestTriple a, struct TestTriple b) {
+    return (a.a == b.a) && (a.b == b.b) && (a.c == b.c);
+}
+
 static const struct TestTriple TestTripleInitVal = {0, '\0', NULL};
 
 typedef ring_buffer_g(RB_SIZE, struct TestTriple) ring_buffer_triple_t;
@@ -72,9 +76,7 @@ void test_type(void) {
     ring_buffer_push_g(&buf, tst);
 
     ASSERT(!ring_buffer_empty(&buf));
-    ASSERT(ring_buffer_top_g(&buf).a == tst.a);
-    ASSERT(ring_buffer_top_g(&buf).b == tst.b);
-    ASSERT(ring_buffer_top_g(&buf).c == tst.c);
+    ASSERT(TestTripleEqual(ring_buffer_top_g(&buf), tst));
 
     struct TestTriple tst2;
     tst2.a = 0xdeadbeef;
@@ -83,22 +85,16 @@ void test_type(void) {
 
     ring_buffer_push_g(&buf, tst2);
     ASSERT(!ring_buffer_empty(&buf));
-    ASSERT(tst.a == ring_buffer_top_g(&buf).a);
-    ASSERT(tst.b == ring_buffer_top_g(&buf).b);
-    ASSERT(tst.c == ring_buffer_top_g(&buf).c);
+    ASSERT(TestTripleEqual(tst, ring_buffer_top_g(&buf)));
 
     struct TestTriple dest;
     ring_buffer_pop_g(&buf, dest);
 
-    ASSERT(dest.a == tst.a);
-    ASSERT(dest.b == tst.b);
-    ASSERT(dest.c == tst.c);
+    ASSERT(TestTripleEqual(dest, tst));
 
     ring_buffer_pop_g(&buf, dest);
 
-    ASSERT(dest.a == tst2.a);
-    ASSERT(dest.b == tst2.b);
-    ASSERT(dest.c == tst2.c);
+    ASSERT(TestTripleEqual(dest, tst2));
     ASSERT(ring_buffer_empty(&buf));
 
     char done[] = "test_type done\n";

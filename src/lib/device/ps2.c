@@ -180,6 +180,9 @@ void setConf(uint8_t newconf) {
     sendData(newconf);
 }
 
+// public alias of sendData
+bool sendPort1(uint8_t b) { return sendData(b); }
+
 bool sendPort2(uint8_t b) {
     // note that short circuit eval will happen
     return sendCMD(0xD4) && sendData(b);

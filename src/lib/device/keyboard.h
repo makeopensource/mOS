@@ -191,6 +191,9 @@ struct KeyboardState {
     codePointFunc *translation;
 };
 
+// returns the modifiers of the current state
+uint8_t getActiveModifiers(const struct KeyboardState *state);
+
 // returns 0 (NUL) when the press has no ASCII equivalent
 char keyPressToASCII(KeyPress press);
 
