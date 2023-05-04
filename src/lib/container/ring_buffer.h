@@ -56,7 +56,7 @@ void _ring_buffer_push_stub(void *ringbuf);
 void ring_buffer_push(void *ringbuf, uint8_t elem);
 
 // returns the top element of the buffer. DOES NOT CHECK FOR EMPTY
-#define ring_buffer_top_g(ringbuf) (ringbuf)->buffer[(ringbuf)->start];
+#define ring_buffer_top_g(ringbuf) ((ringbuf)->buffer[(ringbuf)->start])
 
 // returns the top element of the buffer, 0 if empty
 uint8_t ring_buffer_top(const void *ringbuf);
