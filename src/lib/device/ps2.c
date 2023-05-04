@@ -33,9 +33,18 @@ const struct PS2Device* getPortType(int portnum) {
 void ps2HandlerPort1(isr_registers_t* regs) {
     uint8_t b = inb(PS2_DATA);
 
-    char buf[2] = " ";
-    buf[0] = b;
-    print(buf, red);
+    if (dev1.isKeyboard) {
+        
+        KeyPress action = dev1.kbState.translation(&dev1.kbState, b); 
+
+        if (action.code != Key_none) {
+            char buf[2] = " ";
+            buf[0] = keyPressToASCII(action);
+            print(buf, red);
+        }
+    }
+
+    
 
     ring_buffer_push(&PS2Port1, b);
 }
@@ -179,7 +188,7 @@ struct PS2Device detectDeviceType(uint8_t port) {
     case 0xAB: case 0xAC: // keyboard first bytes
         outDev.type = translateDeviceType(readData());
         outDev.isKeyboard = true;
-        outDev.kbState.translation = codePointDiscard;
+        outDev.kbState.translation = codePointPS2SC1;
         outDev.kbState.extended = false;
         
         break;

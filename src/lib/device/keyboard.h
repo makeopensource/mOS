@@ -151,26 +151,11 @@ enum KeyCode {
     Key_Code_Count // very important that this is the last and there is no higher value
 };
 
-
-/*
-* Code point functions should return Key_none when a key is released or no translation occurs,
-* When a key is pressed, they should return that KeyCode.
-* It is recommended that they also update keystates and extended.
-*/
-
-struct KeyboardState; //forward declaration for typedef
-typedef enum KeyCode(codePointFunc)(struct KeyboardState*, uint8_t); 
-
+// note: toggleable keys == KeyToggled when toggled, otherwise could be either
 enum KeyState {
     KeyReleased,
     KeyPressed,
     KeyToggled, // used for keys such as caps lock
-};
-
-struct KeyboardState {
-    bool extended; // for use in multi-byte scancodes
-    enum KeyState keystates[(unsigned)(Key_Code_Count)];
-    codePointFunc* translation;
 };
 
 
@@ -180,6 +165,8 @@ struct KeyboardState {
 #define KEY_MOD_CTRL 4
 #define KEY_MOD_NUMLOCK 8
 #define KEY_MOD_SCRLOCK 16
+#define KEY_MOD_ALT 32
+#define KEY_MOD_CMD 64
 
 typedef struct {
     uint32_t time; // time of press, taken from PIT
@@ -188,10 +175,29 @@ typedef struct {
     uint8_t modifiers;
 } KeyPress;
 
+/*
+* Code point functions should return Key_none when no translation occurs,
+* When a key is pressed, the event should reflect such
+* It is recommended that they also update keystates and extended.
+*/
+
+struct KeyboardState; //forward declaration for typedef
+typedef KeyPress(codePointFunc)(struct KeyboardState*, uint8_t); 
+
+struct KeyboardState {
+    uint8_t extended; // for use in multi-byte scancodes
+    enum KeyState keystates[(unsigned)(Key_Code_Count)];
+    codePointFunc* translation;
+};
+
+
 // returns 0 (NUL) when the press has no ASCII equivalent
 char keyPressToASCII(KeyPress press);
 
 // the default translation function, discards ALL input.
-enum KeyCode codePointDiscard(struct KeyboardState*, uint8_t);
+KeyPress codePointDiscard(struct KeyboardState*, uint8_t);
+
+// translation for ps2 scancode set 1
+KeyPress codePointPS2SC1(struct KeyboardState*, uint8_t);
 
 #endif
