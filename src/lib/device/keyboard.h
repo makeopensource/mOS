@@ -1,8 +1,11 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
+#include <stdint.h>
+#include <stdbool.h>
+
 // scancodes get translated into keycodes
-enum KeyCodes {
+enum KeyCode {
     Key_none,
 
     // row 1
@@ -114,14 +117,81 @@ enum KeyCodes {
     Key_up,
     Key_right,
 
-    // numpad only
-    Key_numLock,
+    /* numpad */
 
-    // NOTE: numpad keys do not get unique keycodes, also multimedia is NOT supported
+    // row 1
+    Key_numLock,
+    Key_numDiv,
+    Key_numMult,
+    Key_numSub,
+
+    // row 2
+    Key_num7,
+    Key_num8,
+    Key_num9,
+    Key_numAdd,
+
+    // row 3
+    Key_num4,
+    Key_num5,
+    Key_num6,
+
+    // row 4
+    Key_num1,
+    Key_num2,
+    Key_num3,
+    Key_numEnter,
+
+    // row 5
+    Key_num0,
+    Key_numDecimal,
+
+    // NOTE: multimedia is NOT supported
 
     Key_Code_Count // very important that this is the last and there is no higher value
 };
 
 
+/*
+* Code point functions should return Key_none when a key is released or no translation occurs,
+* When a key is pressed, they should return that KeyCode.
+* It is recommended that they also update keystates and extended.
+*/
+
+struct KeyboardState; //forward declaration for typedef
+typedef enum KeyCode(codePointFunc)(struct KeyboardState*, uint8_t); 
+
+enum KeyState {
+    KeyReleased,
+    KeyPressed,
+    KeyToggled, // used for keys such as caps lock
+};
+
+struct KeyboardState {
+    bool extended; // for use in multi-byte scancodes
+    enum KeyState keystates[(unsigned)(Key_Code_Count)];
+    codePointFunc* translation;
+};
+
+
+// Flags for modifiers
+#define KEY_MOD_CAPS 1
+#define KEY_MOD_SHIFT 2
+#define KEY_MOD_CTRL 4
+#define KEY_MOD_NUMLOCK 8
+#define KEY_MOD_SCRLOCK 16
+
+typedef struct {
+    uint32_t time; // time of press, taken from PIT
+    enum KeyCode code;
+    enum KeyState event; // programs may want to monitor when any key event occurs
+    uint8_t modifiers;
+} KeyPress;
+
+// returns 0 (NUL) when the press has no ASCII equivalent
+char keyPressToASCII(KeyPress press);
+
+// the default translation function, discards ALL input.
+enum KeyCode codePointDiscard(struct KeyboardState*, uint8_t);
 
 #endif

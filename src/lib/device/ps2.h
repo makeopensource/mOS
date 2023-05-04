@@ -40,19 +40,6 @@ enum PS2KeyboardScanCode {
     SC3, // unimplemented
 };
 
-enum PS2KeyState {
-    Ps2Released,
-    Ps2Pressed,
-    Ps2Toggled, // used for keys such as caps lock
-};
-
-struct PS2KeyboardState {
-    enum PS2KeyboardScanCode scancodeSet;
-    bool extended; // for use in multi-byte scancodes
-    enum PS2KeyState keystates[(unsigned)(Key_Code_Count)];
-    uint8_t (*translate)(struct PS2KeyboardState*);
-};
-
 struct PS2MouseState {
     // unimplemented
 };
@@ -62,7 +49,7 @@ struct PS2Device {
     bool isKeyboard;
 
     union {
-        struct PS2KeyboardState kbState;
+        struct KeyboardState kbState;
         struct PS2MouseState msState;
         void* unknownState; // NULL pointer
     };

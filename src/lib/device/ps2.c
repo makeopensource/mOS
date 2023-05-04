@@ -179,7 +179,7 @@ struct PS2Device detectDeviceType(uint8_t port) {
     case 0xAB: case 0xAC: // keyboard first bytes
         outDev.type = translateDeviceType(readData());
         outDev.isKeyboard = true;
-        outDev.kbState.scancodeSet = SC2;
+        outDev.kbState.translation = codePointDiscard;
         outDev.kbState.extended = false;
         
         break;
