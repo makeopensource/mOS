@@ -1,11 +1,11 @@
 #ifndef PS2_H
 #define PS2_H
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stddef.h>
-
 #include "keyboard.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #define PS2_DATA 0x60
 #define PS2_STAT_CMD 0x64
@@ -17,7 +17,7 @@ enum DeviceType {
     ScrollMouse = 0x03,
     QuintMouse = 0x04,
 
-    //after 0xAB
+    // after 0xAB
     MF2Key1 = 0x83,
     MF2Key2 = 0xC1,
     IBMShortKey = 0x84,
@@ -27,7 +27,7 @@ enum DeviceType {
     JPNPKey,
     JPNAKey,
 
-    //after 0xAC
+    // after 0xAC
     SunKey = 0xA1,
 
     Ps2Unknown,
@@ -35,7 +35,7 @@ enum DeviceType {
 
 enum PS2KeyboardScanCode {
     Ps2None,
-    SC1, 
+    SC1,
     SC2, // unimplemented
     SC3, // unimplemented
 };
@@ -51,24 +51,18 @@ struct PS2Device {
     union {
         struct KeyboardState kbState;
         struct PS2MouseState msState;
-        void* unknownState; // NULL pointer
+        void *unknownState; // NULL pointer
     };
-
-    
 };
 
-enum PS2Buffer_Type {
-    PS2_KEY_EVENT,
-    PS2_MOUSE_EVENT,
-    PS2_NONE_EVENT
-};
+enum PS2Buffer_Type { PS2_KEY_EVENT, PS2_MOUSE_EVENT, PS2_NONE_EVENT };
 
 struct PS2Buf_t {
     enum PS2Buffer_Type type;
     union {
         KeyPress keyEvent;
         // unimplemented mouse event
-        void* noneEvent; // NULL pointer
+        void *noneEvent; // NULL pointer
     };
 };
 

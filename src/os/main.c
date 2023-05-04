@@ -1,5 +1,5 @@
-#include "device/serial.h"
 #include "device/ps2.h"
+#include "device/serial.h"
 #include "hard/idt.h"
 #include "pit/pit.h"
 #include "test.h"

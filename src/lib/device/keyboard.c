@@ -1,23 +1,24 @@
 #include "keyboard.h"
 
 #include "../pit/pit.h"
-
 #include "stddef.h"
 
 #define CAP_DELTA ('a' - 'A')
 
-uint8_t getActiveModifiers(const struct KeyboardState* state) {
+uint8_t getActiveModifiers(const struct KeyboardState *state) {
     uint8_t mods = 0;
 
     if (state->keystates[(unsigned)(Key_capsLock)] == KeyToggled) {
         mods |= KEY_MOD_CAPS;
     }
 
-    if (state->keystates[(unsigned)(Key_LShift)] == KeyPressed || state->keystates[(unsigned)(Key_RShift)] == KeyPressed) {
+    if (state->keystates[(unsigned)(Key_LShift)] == KeyPressed ||
+        state->keystates[(unsigned)(Key_RShift)] == KeyPressed) {
         mods |= KEY_MOD_SHIFT;
     }
 
-    if (state->keystates[(unsigned)(Key_Lctrl)] == KeyPressed || state->keystates[(unsigned)(Key_Rctrl)] == KeyPressed) {
+    if (state->keystates[(unsigned)(Key_Lctrl)] == KeyPressed ||
+        state->keystates[(unsigned)(Key_Rctrl)] == KeyPressed) {
         mods |= KEY_MOD_CTRL;
     }
 
@@ -29,11 +30,13 @@ uint8_t getActiveModifiers(const struct KeyboardState* state) {
         mods |= KEY_MOD_SCRLOCK;
     }
 
-    if (state->keystates[(unsigned)(Key_Lalt)] == KeyPressed || state->keystates[(unsigned)(Key_Ralt)] == KeyPressed) {
+    if (state->keystates[(unsigned)(Key_Lalt)] == KeyPressed ||
+        state->keystates[(unsigned)(Key_Ralt)] == KeyPressed) {
         mods |= KEY_MOD_ALT;
     }
 
-    if (state->keystates[(unsigned)(Key_Lcmd)] == KeyPressed || state->keystates[(unsigned)(Key_Rcmd)] == KeyPressed) {
+    if (state->keystates[(unsigned)(Key_Lcmd)] == KeyPressed ||
+        state->keystates[(unsigned)(Key_Rcmd)] == KeyPressed) {
         mods |= KEY_MOD_CMD;
     }
 
@@ -52,7 +55,7 @@ char keyPressToASCII(KeyPress press) {
     case Key_grave:
         if (shifted)
             return '~';
-        
+
         return '`';
     case Key_1:
         if (shifted)
@@ -62,7 +65,7 @@ char keyPressToASCII(KeyPress press) {
     case Key_2:
         if (shifted)
             return '@';
-        
+
         return '2';
     case Key_3:
         if (shifted)
@@ -72,7 +75,7 @@ char keyPressToASCII(KeyPress press) {
     case Key_4:
         if (shifted)
             return '$';
-        
+
         return '4';
     case Key_5:
         if (shifted)
@@ -112,7 +115,7 @@ char keyPressToASCII(KeyPress press) {
     case Key_equal:
         if (shifted)
             return '+';
-        
+
         return '=';
     case Key_backspace:
         return 8; // yes, backspace has an ascii char
@@ -216,7 +219,7 @@ char keyPressToASCII(KeyPress press) {
         return ' ';
     case Key_esc:
         return 27; // did you know esacpe has an ascii code?
-    
+
     case Key_numDiv:
         return '/';
     case Key_numMult:
@@ -233,67 +236,65 @@ char keyPressToASCII(KeyPress press) {
     case Key_num7:
         if (numLock)
             return '7';
-        
+
         return '\0';
     case Key_num8:
         if (numLock)
             return '8';
-        
+
         return '\0';
     case Key_num9:
         if (numLock)
             return '9';
-        
+
         return '\0';
     case Key_num4:
         if (numLock)
             return '4';
-        
+
         return '\0';
     case Key_num5:
         if (numLock)
             return '5';
-        
+
         return '\0';
     case Key_num6:
         if (numLock)
             return '6';
-        
+
         return '\0';
     case Key_num1:
         if (numLock)
             return '1';
-        
+
         return '\0';
     case Key_num2:
         if (numLock)
             return '2';
-        
+
         return '\0';
     case Key_num3:
         if (numLock)
             return '3';
-        
+
         return '\0';
     case Key_num0:
         if (numLock)
             return '0';
-        
+
         return '\0';
     default:
         return '\0';
     }
 }
 
+static const KeyPress nonePress = {0, Key_none, KeyReleased, 0};
 
-static const KeyPress nonePress = { 0, Key_none, KeyReleased, 0 };
+KeyPress codePointDiscard(struct KeyboardState *, uint8_t) { return nonePress; }
 
-KeyPress codePointDiscard(struct KeyboardState*, uint8_t) {
-    return nonePress;
-}
-
-KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
-    if (state == NULL) return nonePress;
+KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
+    if (state == NULL)
+        return nonePress;
 
     if (code == 0xE0) {
         state->extended = 1;
@@ -306,7 +307,7 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
     }
 
     bool released = code & 0b10000000; // highest bit is set on release
-    KeyPress out = {get_ticks(), Key_none, KeyReleased, 0 };
+    KeyPress out = {get_ticks(), Key_none, KeyReleased, 0};
     if (!released)
         out.event = KeyPressed;
 
@@ -315,13 +316,11 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
     if (state->extended == 3) { // 1st extended byte of 0xE1
         state->extended = 2;
         return nonePress;
-    }
-    else if (state->extended == 2) { // 2nd extended byte of 0xE1
+    } else if (state->extended == 2) { // 2nd extended byte of 0xE1
         // we are ignoring the pause key since it is extremely different
         state->extended = 0;
         return nonePress;
-    }
-    else if (state->extended == 1) { // 0xE0 multibyte
+    } else if (state->extended == 1) { // 0xE0 multibyte
         switch (code & 0b01111111) {
         case 0x1C:
             out.code = Key_numEnter;
@@ -386,7 +385,8 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
         case 0xB8:
             out.code = Key_Ralt;
             break;
-        case 0x2A: // technically printscreen sends 4 bytes, but we can safely ignore some
+        case 0x2A: // technically printscreen sends 4 bytes, but we can safely
+                   // ignore some
             out.code = Key_printScreen;
             out.event = KeyPressed;
             break;
@@ -398,8 +398,7 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
             break;
         }
         state->extended = 0;
-    }
-    else if (state->extended == 0) {
+    } else if (state->extended == 0) {
         switch (code & 0b01111111) {
         case 0x1:
             out.code = Key_esc;
@@ -576,7 +575,8 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
             out.code = Key_capsLock;
 
             // toggle if not toggled, otherwise let it be released/pressed
-            if (!released && state->keystates[(unsigned)(Key_capsLock)] != KeyToggled) {
+            if (!released &&
+                state->keystates[(unsigned)(Key_capsLock)] != KeyToggled) {
                 out.event = KeyToggled;
             }
             break;
@@ -614,7 +614,8 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
             out.code = Key_numLock;
 
             // toggle if not toggled, otherwise let it be released/pressed
-            if (!released && state->keystates[(unsigned)(Key_numLock)] != KeyToggled) {
+            if (!released &&
+                state->keystates[(unsigned)(Key_numLock)] != KeyToggled) {
                 out.event = KeyToggled;
             }
             break;
@@ -622,15 +623,15 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
             out.code = Key_scrollLock;
 
             // toggle if not toggled, otherwise let it be released/pressed
-            if (!released && state->keystates[(unsigned)(Key_scrollLock)] != KeyToggled) {
+            if (!released &&
+                state->keystates[(unsigned)(Key_scrollLock)] != KeyToggled) {
                 out.event = KeyToggled;
             }
             break;
         case 0x47:
             if (numLock) {
                 out.code = Key_num7;
-            }
-            else {
+            } else {
                 out.code = Key_home;
             }
             break;
@@ -644,8 +645,7 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
         case 0x49:
             if (numLock) {
                 out.code = Key_num9;
-            }
-            else {
+            } else {
                 out.code = Key_pgUp;
             }
             break;
@@ -667,8 +667,7 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
         case 0x4D:
             if (numLock) {
                 out.code = Key_num6;
-            }
-            else {
+            } else {
                 out.code = Key_right;
             }
             break;
@@ -678,24 +677,21 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
         case 0x4F:
             if (numLock) {
                 out.code = Key_num1;
-            }
-            else {
+            } else {
                 out.code = Key_end;
             }
             break;
         case 0x50:
             if (numLock) {
                 out.code = Key_num2;
-            }
-            else {
+            } else {
                 out.code = Key_down;
             }
             break;
         case 0x51:
             if (numLock) {
                 out.code = Key_num3;
-            }
-            else {
+            } else {
                 out.code = Key_pgDown;
             }
             break;
@@ -716,21 +712,19 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
         default:
             break;
         }
-    }
-    else { // odd state
+    } else { // odd state
         state->extended = 0;
         return nonePress;
     }
 
     out.modifiers = getActiveModifiers(state);
-    
+
     state->keystates[(unsigned)(out.code)] = out.event;
 
     if (out.event == KeyToggled) {
         if (released) {
             out.event = KeyReleased;
-        }
-        else {
+        } else {
             out.event = KeyPressed;
         }
     }

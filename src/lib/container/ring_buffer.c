@@ -15,8 +15,7 @@ bool ring_buffer_empty(const void *ringbuf) {
     return rb->used == 0;
 }
 
-
-void _ring_buffer_push_stub(void* ringbuf) {
+void _ring_buffer_push_stub(void *ringbuf) {
     _ring_buffer_placeholder_t *rb = (_ring_buffer_placeholder_t *)(ringbuf);
 
     // update end
@@ -53,7 +52,7 @@ uint8_t ring_buffer_top(const void *ringbuf) {
     return ring_buffer_top_g(rb);
 }
 
-void _ring_buffer_pop_stub(void* ringbuf) {
+void _ring_buffer_pop_stub(void *ringbuf) {
     _ring_buffer_placeholder_t *rb = (_ring_buffer_placeholder_t *)(ringbuf);
 
     ++rb->start;

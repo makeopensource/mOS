@@ -1,8 +1,8 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 // scancodes get translated into keycodes
 enum KeyCode {
@@ -148,7 +148,8 @@ enum KeyCode {
 
     // NOTE: multimedia is NOT supported
 
-    Key_Code_Count // very important that this is the last and there is no higher value
+    Key_Code_Count // very important that this is the last and there is no
+                   // higher value
 };
 
 // note: toggleable keys == KeyToggled when toggled, otherwise could be either
@@ -157,7 +158,6 @@ enum KeyState {
     KeyPressed,
     KeyToggled, // used for keys such as caps lock
 };
-
 
 // Flags for modifiers
 #define KEY_MOD_CAPS 1
@@ -171,33 +171,33 @@ enum KeyState {
 typedef struct {
     uint32_t time; // time of press, taken from PIT
     enum KeyCode code;
-    enum KeyState event; // programs may want to monitor when any key event occurs
+    enum KeyState
+        event; // programs may want to monitor when any key event occurs
     uint8_t modifiers;
 } KeyPress;
 
 /*
-* Code point functions should return Key_none when no translation occurs,
-* When a key is pressed, the event should reflect such
-* It is recommended that they also update keystates and extended.
-*/
+ * Code point functions should return Key_none when no translation occurs,
+ * When a key is pressed, the event should reflect such
+ * It is recommended that they also update keystates and extended.
+ */
 
-struct KeyboardState; //forward declaration for typedef
-typedef KeyPress(codePointFunc)(struct KeyboardState*, uint8_t); 
+struct KeyboardState; // forward declaration for typedef
+typedef KeyPress(codePointFunc)(struct KeyboardState *, uint8_t);
 
 struct KeyboardState {
     uint8_t extended; // for use in multi-byte scancodes
     enum KeyState keystates[(unsigned)(Key_Code_Count)];
-    codePointFunc* translation;
+    codePointFunc *translation;
 };
-
 
 // returns 0 (NUL) when the press has no ASCII equivalent
 char keyPressToASCII(KeyPress press);
 
 // the default translation function, discards ALL input.
-KeyPress codePointDiscard(struct KeyboardState*, uint8_t);
+KeyPress codePointDiscard(struct KeyboardState *, uint8_t);
 
 // translation for ps2 scancode set 1
-KeyPress codePointPS2SC1(struct KeyboardState*, uint8_t);
+KeyPress codePointPS2SC1(struct KeyboardState *, uint8_t);
 
 #endif
