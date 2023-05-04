@@ -57,6 +57,21 @@ struct PS2Device {
     
 };
 
+enum PS2Buffer_Type {
+    PS2_KEY_EVENT,
+    PS2_MOUSE_EVENT,
+    PS2_NONE_EVENT
+};
+
+struct PS2Buf_t {
+    enum PS2Buffer_Type type;
+    union {
+        KeyPress keyEvent;
+        // unimplemented mouse event
+        void* noneEvent; // NULL pointer
+    };
+};
+
 int ps2Init();
 const struct PS2Device *getPortType(int portnum);
 

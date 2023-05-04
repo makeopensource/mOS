@@ -9,7 +9,7 @@
 #define PS2_BUF_SIZE 64
 #define PS2_TIMEOUT 100000
 
-typedef ring_buffer(PS2_BUF_SIZE) ps2_buffer_t;
+typedef ring_buffer_g(PS2_BUF_SIZE, struct PS2Buf_t) ps2_buffer_t;
 
 ps2_buffer_t PS2Port1;
 ps2_buffer_t PS2Port2;
@@ -35,22 +35,32 @@ void ps2HandlerPort1(isr_registers_t* regs) {
 
     if (dev1.isKeyboard) {
         
-        KeyPress action = dev1.kbState.translation(&dev1.kbState, b); 
+        struct PS2Buf_t out;
+        out.type = PS2_KEY_EVENT;
+        out.keyEvent = dev1.kbState.translation(&dev1.kbState, b); 
 
-        if (action.code != Key_none) {
+        if (out.keyEvent.code != Key_none)
+            ring_buffer_push_g(&PS2Port1, out);
+
+        if (out.keyEvent.code != Key_none && out.keyEvent.event == KeyPressed) {
             char buf[2] = " ";
-            buf[0] = keyPressToASCII(action);
+            buf[0] = keyPressToASCII(out.keyEvent);
             print(buf, red);
         }
     }
-
-    
-
-    ring_buffer_push(&PS2Port1, b);
 }
 void ps2HandlerPort2(isr_registers_t* regs) {
     uint8_t b = inb(PS2_DATA);
-    ring_buffer_push(&PS2Port2, b);
+
+    if (dev2.isKeyboard) {
+        
+        struct PS2Buf_t out;
+        out.type = PS2_KEY_EVENT;
+        out.keyEvent = dev2.kbState.translation(&dev2.kbState, b); 
+
+        if (out.keyEvent.code != Key_none)
+            ring_buffer_push_g(&PS2Port1, out);
+    }
 }
 
 enum DeviceType translateDeviceType(uint8_t b) {
@@ -211,8 +221,12 @@ bool ps2Port1Present(void) { return port1works; }
 bool ps2Port2Present(void) { return port2works; }
 
 int ps2Init() {
-    ring_buffer_init(&PS2Port1, PS2_BUF_SIZE);
-    ring_buffer_init(&PS2Port2, PS2_BUF_SIZE);
+    static struct PS2Buf_t initPS2BufVal;
+    initPS2BufVal.type = PS2_NONE_EVENT;
+    initPS2BufVal.noneEvent = NULL;
+
+    ring_buffer_init(&PS2Port1, initPS2BufVal);
+    ring_buffer_init(&PS2Port2, initPS2BufVal);
 
     ps2Disable();
     ps2Flush();

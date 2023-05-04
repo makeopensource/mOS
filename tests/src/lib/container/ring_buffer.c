@@ -50,7 +50,7 @@ void test_overflow(ring_buffer_t *buf) {
 
 void test_main() {
     ring_buffer_t buffer;
-    ring_buffer_init(&buffer, RB_SIZE);
+    ring_buffer_init(&buffer, 0);
 
     test_n(&buffer, 1);
     test_n(&buffer, 4);

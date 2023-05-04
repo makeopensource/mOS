@@ -317,6 +317,7 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
         return nonePress;
     }
     else if (state->extended == 2) { // 2nd extended byte of 0xE1
+        // we are ignoring the pause key since it is extremely different
         state->extended = 0;
         return nonePress;
     }
@@ -384,6 +385,14 @@ KeyPress codePointPS2SC1(struct KeyboardState* state, uint8_t code) {
             break;
         case 0xB8:
             out.code = Key_Ralt;
+            break;
+        case 0x2A: // technically printscreen sends 4 bytes, but we can safely ignore some
+            out.code = Key_printScreen;
+            out.event = KeyPressed;
+            break;
+        case 0xB7: // printscreen is the only bad key we handle
+            out.code = Key_printScreen;
+            out.event = KeyReleased;
             break;
         default: // multimedia or non-existant
             break;
