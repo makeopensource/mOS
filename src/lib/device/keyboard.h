@@ -125,11 +125,12 @@ enum KeyCode {
     Key_numMult,
     Key_numSub,
 
+    Key_numAdd, // wrong row but makes ascii easier
+
     // row 2
     Key_num7,
     Key_num8,
     Key_num9,
-    Key_numAdd,
 
     // row 3
     Key_num4,

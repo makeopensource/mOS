@@ -3,8 +3,6 @@
 #include "../pit/pit.h"
 #include "stddef.h"
 
-#define CAP_DELTA ('a' - 'A')
-
 uint8_t getActiveModifiers(const struct KeyboardState *state) {
     uint8_t mods = 0;
 
@@ -43,249 +41,102 @@ uint8_t getActiveModifiers(const struct KeyboardState *state) {
     return mods;
 }
 
+static const char asciiLUT[(unsigned)(Key_Code_Count)] = {
+    '\0', '`',  '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',  '0',
+    '-',  '=',  8,    '\t', 'q',  'w',  'e',  'r',  't',  'y',  'u',  'i',
+    'o',  'p',  '[',  ']',  '\\', '\0', 'a',  's',  'd',  'f',  'g',  'h',
+    'j',  'k',  'l',  ';',  '\'', '\n', '\0', 'z',  'x',  'c',  'v',  'b',
+    'n',  'm',  ',',  '.',  '/',  '\0', '\0', '\0', '\0', ' ',  '\0', '\0',
+    '\0', '\0', 27,   '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+    '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
+    '\0', '\0', '\0', '\0', '\0', '/',  '*',  '-',  '+',  '7',  '8',  '9',
+    '4',  '5',  '6',  '1',  '2',  '3',  '\n', '0',  '.'};
+
+#define CAP_DELTA ('a' - 'A')
+
 char keyPressToASCII(KeyPress press) {
-    bool shifted = press.modifiers & KEY_MOD_SHIFT;
-    bool capitalize = (bool)(press.modifiers & KEY_MOD_CAPS) ^ shifted;
+
+    // out of bounds somehow
+    if (press.code >= Key_Code_Count)
+        return '\0';
+
     bool numLock = press.modifiers & KEY_MOD_NUMLOCK;
+    bool numPadNum = press.code >= Key_num7 && press.code <= Key_num3;
 
-    // for branchless letters
-    char letter_offset = capitalize * CAP_DELTA;
-
-    switch (press.code) {
-    case Key_grave:
-        if (shifted)
-            return '~';
-
-        return '`';
-    case Key_1:
-        if (shifted)
-            return '!';
-
-        return '1';
-    case Key_2:
-        if (shifted)
-            return '@';
-
-        return '2';
-    case Key_3:
-        if (shifted)
-            return '#';
-
-        return '3';
-    case Key_4:
-        if (shifted)
-            return '$';
-
-        return '4';
-    case Key_5:
-        if (shifted)
-            return '%';
-
-        return '5';
-    case Key_6:
-        if (shifted)
-            return '^';
-
-        return '6';
-    case Key_7:
-        if (shifted)
-            return '&';
-
-        return '7';
-    case Key_8:
-        if (shifted)
-            return '*';
-
-        return '8';
-    case Key_9:
-        if (shifted)
-            return '(';
-
-        return '9';
-    case Key_0:
-        if (shifted)
-            return ')';
-
-        return '0';
-    case Key_minus:
-        if (shifted)
-            return '_';
-
-        return '-';
-    case Key_equal:
-        if (shifted)
-            return '+';
-
-        return '=';
-    case Key_backspace:
-        return 8; // yes, backspace has an ascii char
-    case Key_tab:
-        return '\t';
-    case Key_q: // using branchless since it's more compact
-        return 'q' - letter_offset;
-    case Key_w:
-        return 'w' - letter_offset;
-    case Key_e:
-        return 'e' - letter_offset;
-    case Key_r:
-        return 'r' - letter_offset;
-    case Key_t:
-        return 't' - letter_offset;
-    case Key_y:
-        return 'y' - letter_offset;
-    case Key_u:
-        return 'u' - letter_offset;
-    case Key_i:
-        return 'i' - letter_offset;
-    case Key_o:
-        return 'o' - letter_offset;
-    case Key_p:
-        return 'p' - letter_offset;
-    case Key_openSquare:
-        if (shifted)
-            return '{';
-
-        return '[';
-    case Key_closeSquare:
-        if (shifted)
-            return '}';
-
-        return ']';
-    case Key_backSlash:
-        if (shifted)
-            return '|';
-
-        return '\\';
-    case Key_a:
-        return 'a' - letter_offset;
-    case Key_s:
-        return 's' - letter_offset;
-    case Key_d:
-        return 'd' - letter_offset;
-    case Key_f:
-        return 'f' - letter_offset;
-    case Key_g:
-        return 'g' - letter_offset;
-    case Key_h:
-        return 'h' - letter_offset;
-    case Key_j:
-        return 'j' - letter_offset;
-    case Key_k:
-        return 'k' - letter_offset;
-    case Key_l:
-        return 'l' - letter_offset;
-    case Key_semicolon:
-        if (shifted)
-            return ':';
-
-        return ';';
-    case Key_apostrophe:
-        if (shifted)
-            return '"';
-
-        return '\'';
-    case Key_enter:
-        return '\n';
-    case Key_z:
-        return 'z' - letter_offset;
-    case Key_x:
-        return 'x' - letter_offset;
-    case Key_c:
-        return 'c' - letter_offset;
-    case Key_v:
-        return 'v' - letter_offset;
-    case Key_b:
-        return 'b' - letter_offset;
-    case Key_n:
-        return 'n' - letter_offset;
-    case Key_m:
-        return 'm' - letter_offset;
-    case Key_comma:
-        if (shifted)
-            return '<';
-
-        return ',';
-    case Key_period:
-        if (shifted)
-            return '>';
-
-        return '.';
-    case Key_slash:
-        if (shifted)
-            return '?';
-
-        return '/';
-    case Key_space:
-        return ' ';
-    case Key_esc:
-        return 27; // did you know esacpe has an ascii code?
-
-    case Key_numDiv:
-        return '/';
-    case Key_numMult:
-        return '*';
-    case Key_numAdd:
-        return '+';
-    case Key_numSub:
-        return '-';
-    case Key_numEnter:
-        return '\n';
-    case Key_numDecimal:
-        return '.';
-
-    case Key_num7:
-        if (numLock)
-            return '7';
-
+    // numpad but numlock off
+    if (!numLock && numPadNum)
         return '\0';
-    case Key_num8:
-        if (numLock)
-            return '8';
 
-        return '\0';
-    case Key_num9:
-        if (numLock)
-            return '9';
+    // lookup char
+    bool shifted = press.modifiers & KEY_MOD_SHIFT;
+    char LUTchr = asciiLUT[(unsigned)(press.code)];
 
-        return '\0';
-    case Key_num4:
-        if (numLock)
-            return '4';
-
-        return '\0';
-    case Key_num5:
-        if (numLock)
-            return '5';
-
-        return '\0';
-    case Key_num6:
-        if (numLock)
-            return '6';
-
-        return '\0';
-    case Key_num1:
-        if (numLock)
-            return '1';
-
-        return '\0';
-    case Key_num2:
-        if (numLock)
-            return '2';
-
-        return '\0';
-    case Key_num3:
-        if (numLock)
-            return '3';
-
-        return '\0';
-    case Key_num0:
-        if (numLock)
-            return '0';
-
-        return '\0';
-    default:
-        return '\0';
+    // letters
+    if (LUTchr >= 'a' && LUTchr <= 'z') {
+        bool capitalize = (bool)(press.modifiers & KEY_MOD_CAPS) ^ shifted;
+        if (capitalize) {
+            return LUTchr - CAP_DELTA;
+        }
+        return LUTchr;
     }
+
+    // non-letter
+    if (shifted) {
+        // numpad shifteds aren't ASCII
+        if (numPadNum)
+            return '\0';
+
+        // LUT difficult for symbols
+        switch (LUTchr) {
+        case '`':
+            return '~';
+        case '1':
+            return '!';
+        case '2':
+            return '@';
+        case '3':
+            return '#';
+        case '4':
+            return '$';
+        case '5':
+            return '%';
+        case '6':
+            return '^';
+        case '7':
+            return '&';
+        case '8':
+            return '*';
+        case '9':
+            return '(';
+        case '0':
+            return ')';
+        case '-':
+            return '_';
+        case '=':
+            return '+';
+        case '[':
+            return '{';
+        case ']':
+            return '}';
+        case '\\':
+            return '|';
+        case ';':
+            return ':';
+        case '\'':
+            return '"';
+        case ',':
+            return '<';
+        case '.':
+            return '>';
+        case '/':
+            return '?';
+        default:
+            return LUTchr;
+        }
+    }
+
+    // not special, return it
+    return LUTchr;
 }
 
 static const KeyPress nonePress = {0, Key_none, KeyReleased, 0};
@@ -575,10 +426,16 @@ KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
             out.code = Key_capsLock;
 
             // toggle if not toggled, otherwise let it be released/pressed
-            if (!released &&
-                state->keystates[(unsigned)(Key_capsLock)] != KeyToggled) {
+            if (state->keystates[(unsigned)(Key_capsLock)] != KeyToggled) {
+                if (!released) {
+                    out.event = KeyToggled;
+                }
+            } else if (!released) { // untoggle
+                out.event = KeyPressed;
+            } else { // keep it toggled on release
                 out.event = KeyToggled;
             }
+
             break;
         case 0x3B:
             out.code = Key_f1;
@@ -614,8 +471,13 @@ KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
             out.code = Key_numLock;
 
             // toggle if not toggled, otherwise let it be released/pressed
-            if (!released &&
-                state->keystates[(unsigned)(Key_numLock)] != KeyToggled) {
+            if (state->keystates[(unsigned)(Key_numLock)] != KeyToggled) {
+                if (!released) {
+                    out.event = KeyToggled;
+                }
+            } else if (!released) { // untoggle
+                out.event = KeyPressed;
+            } else { // keep it toggled on release
                 out.event = KeyToggled;
             }
             break;
@@ -623,8 +485,13 @@ KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
             out.code = Key_scrollLock;
 
             // toggle if not toggled, otherwise let it be released/pressed
-            if (!released &&
-                state->keystates[(unsigned)(Key_scrollLock)] != KeyToggled) {
+            if (state->keystates[(unsigned)(Key_scrollLock)] != KeyToggled) {
+                if (!released) {
+                    out.event = KeyToggled;
+                }
+            } else if (!released) { // untoggle
+                out.event = KeyPressed;
+            } else { // keep it toggled on release
                 out.event = KeyToggled;
             }
             break;
