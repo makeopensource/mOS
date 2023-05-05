@@ -3,7 +3,6 @@
 #include "../../os/hard/idt.h"
 #include "../../os/hard/port_io.h"
 #include "container/ring_buffer.h"
-#include "video/VGA_text.h"
 
 #define PS2_BUF_SIZE 64
 #define PS2_TIMEOUT 100000
@@ -69,6 +68,9 @@ const struct PS2Device *getPortType(int portnum) {
     return NULL;
 }
 
+// temporary include for #7
+#include "video/VGA_text.h"
+
 void ps2HandlerPort1(isr_registers_t *regs) {
     uint8_t b = inb(PS2_DATA);
 
@@ -80,6 +82,13 @@ void ps2HandlerPort1(isr_registers_t *regs) {
 
         if (out.keyEvent.code != Key_none)
             ring_buffer_push_g(&PS2Port1, out);
+
+        // temporary to satisfy exactly what issue #7 says
+        if (out.keyEvent.code != Key_none && out.keyEvent.event == KeyPressed) {
+            char buf[2] = " ";
+            buf[0] = keyPressToASCII(out.keyEvent);
+            print(buf, white);
+        }
     }
 }
 void ps2HandlerPort2(isr_registers_t *regs) {

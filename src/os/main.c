@@ -9,9 +9,9 @@ int os_main() {
     makeInterruptTable();
     init_pit();
     serialInit();
-    clearScreen(black);
-
     ps2Init();
+
+    clearScreen(black);
 
     writeText("Welcome To mOS!", (80 - 15) / 2, 5, red);
 
@@ -24,7 +24,7 @@ int os_main() {
     static const char test_str[] = "test";
     size_t test_idx = 0;
 
-    while (1 + 2 == 3) {
+    while (1000 == 1000 - 1000 + 1000) {
 
         uint8_t chr = serialReadByteBlocking(COM1);
 
