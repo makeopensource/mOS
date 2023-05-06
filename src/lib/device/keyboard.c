@@ -42,7 +42,7 @@ uint8_t getActiveModifiers(const struct KeyboardState *state) {
 }
 
 // designated initializers! Lesser known C (not C++) feature.
-static const char asciiLUT[(unsigned)(Key_Code_Count)] = {
+static const char asciiLUT[] = {
     [Key_grave] = '`',      [Key_1] = '1',          [Key_2] = '2',
     [Key_3] = '3',          [Key_4] = '4',          [Key_5] = '5',
     [Key_6] = '6',          [Key_7] = '7',          [Key_8] = '8',
@@ -67,12 +67,15 @@ static const char asciiLUT[(unsigned)(Key_Code_Count)] = {
     [Key_num2] = '2',       [Key_num3] = '3',       [Key_numEnter] = '\n',
     [Key_num0] = '0',       [Key_numDecimal] = '.'};
 
+// also note the correct usage of what Dr. Blanton tells you not to do.
+static const size_t asciiLUTsize = sizeof(asciiLUT) / sizeof(asciiLUT[0]);
+
 #define CAP_DELTA ('a' - 'A')
 
 char keyPressToASCII(KeyPress press) {
 
     // out of bounds somehow
-    if (press.code >= Key_Code_Count)
+    if (press.code >= asciiLUTsize)
         return '\0';
 
     bool numLock = press.modifiers & KEY_MOD_NUMLOCK;
@@ -182,7 +185,7 @@ static const enum KeyCode sc1LUT[] = {
     Key_num3,        Key_num0,       Key_numDecimal,  [0x57] = Key_f11,
     Key_f12};
 
-static const size_t sc1LUTsize = sizeof(sc1LUT) / sizeof(enum KeyCode);
+static const size_t sc1LUTsize = sizeof(sc1LUT) / sizeof(sci1LUT[0]);
 
 KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
     if (state == NULL)
