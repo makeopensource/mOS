@@ -21,6 +21,11 @@ bool isNumpadNumber(enum KeyCode keycode) {
     }
 }
 
+bool isToggleableKey(enum KeyCode keycode) {
+    return keycode == Key_capsLock || keycode == Key_numLock ||
+           keycode == Key_scrollLock;
+}
+
 uint8_t getActiveModifiers(const struct KeyboardState *state) {
     uint8_t mods = 0;
 
@@ -322,8 +327,7 @@ KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
         out.code = sc1LUT[adjcode];
 
         // handle toggleables
-        if (out.code == Key_capsLock || out.code == Key_numLock ||
-            out.code == Key_scrollLock) {
+        if (isToggleableKey(out.code)) {
             if (state->keystates[(unsigned)(out.code)] != KeyToggled) {
                 if (!released) { // set toggle on press
                     out.event = KeyToggled;

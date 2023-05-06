@@ -155,6 +155,8 @@ enum KeyCode {
 
 bool isNumpadNumber(enum KeyCode keycode);
 
+bool isToggleableKey(enum KeyCode keycode);
+
 // note: toggleable keys == KeyToggled when toggled, otherwise could be either
 enum KeyState {
     KeyReleased,
