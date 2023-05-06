@@ -12,7 +12,8 @@ typedef ring_buffer_g(PS2_BUF_SIZE, struct PS2Buf_t) ps2_buffer_t;
 ps2_buffer_t PS2Port1;
 ps2_buffer_t PS2Port2;
 
-static struct PS2Buf_t initPS2BufVal;
+static const struct PS2Buf_t initPS2BufVal = {.type = PS2_NONE_EVENT,
+                                              .noneEvent = NULL};
 
 struct PS2Buf_t peekDev(const ps2_buffer_t *dev) {
     struct PS2Buf_t out;
@@ -198,10 +199,8 @@ bool sendPort2(uint8_t b) {
 }
 
 struct PS2Device detectDeviceType(uint8_t port) {
-    struct PS2Device errDev;
-    errDev.type = Ps2Unknown;
-    errDev.isKeyboard = false;
-    errDev.unknownState = NULL;
+    struct PS2Device errDev = {
+        .type = Ps2Unknown, .isKeyboard = false, .unknownState = NULL};
 
     if (port != 1 && port != 2)
         return errDev;
@@ -273,9 +272,6 @@ bool ps2Port1Present(void) { return port1works; }
 bool ps2Port2Present(void) { return port2works; }
 
 int ps2Init() {
-    initPS2BufVal.type = PS2_NONE_EVENT;
-    initPS2BufVal.noneEvent = NULL;
-
     ring_buffer_init(&PS2Port1, initPS2BufVal);
     ring_buffer_init(&PS2Port2, initPS2BufVal);
 

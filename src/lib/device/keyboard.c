@@ -41,16 +41,31 @@ uint8_t getActiveModifiers(const struct KeyboardState *state) {
     return mods;
 }
 
+// designated initializers! Lesser known C (not C++) feature.
 static const char asciiLUT[(unsigned)(Key_Code_Count)] = {
-    '\0', '`',  '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',  '0',
-    '-',  '=',  8,    '\t', 'q',  'w',  'e',  'r',  't',  'y',  'u',  'i',
-    'o',  'p',  '[',  ']',  '\\', '\0', 'a',  's',  'd',  'f',  'g',  'h',
-    'j',  'k',  'l',  ';',  '\'', '\n', '\0', 'z',  'x',  'c',  'v',  'b',
-    'n',  'm',  ',',  '.',  '/',  '\0', '\0', '\0', '\0', ' ',  '\0', '\0',
-    '\0', '\0', 27,   '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
-    '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
-    '\0', '\0', '\0', '\0', '\0', '/',  '*',  '-',  '+',  '7',  '8',  '9',
-    '4',  '5',  '6',  '1',  '2',  '3',  '\n', '0',  '.'};
+    [Key_grave] = '`',      [Key_1] = '1',          [Key_2] = '2',
+    [Key_3] = '3',          [Key_4] = '4',          [Key_5] = '5',
+    [Key_6] = '6',          [Key_7] = '7',          [Key_8] = '8',
+    [Key_9] = '9',          [Key_0] = '0',          [Key_minus] = '-',
+    [Key_equal] = '=',      [Key_backspace] = 8,    [Key_tab] = '\t',
+    [Key_q] = 'q',          [Key_w] = 'w',          [Key_e] = 'e',
+    [Key_r] = 'r',          [Key_t] = 't',          [Key_y] = 'y',
+    [Key_u] = 'u',          [Key_i] = 'i',          [Key_o] = 'o',
+    [Key_p] = 'p',          [Key_openSquare] = '[', [Key_closeSquare] = ']',
+    [Key_backSlash] = '\\', [Key_a] = 'a',          [Key_s] = 's',
+    [Key_d] = 'd',          [Key_f] = 'f',          [Key_g] = 'g',
+    [Key_h] = 'h',          [Key_j] = 'j',          [Key_k] = 'k',
+    [Key_l] = 'l',          [Key_semicolon] = ';',  [Key_apostrophe] = '\'',
+    [Key_enter] = '\n',     [Key_z] = 'z',          [Key_x] = 'x',
+    [Key_c] = 'c',          [Key_v] = 'v',          [Key_b] = 'b',
+    [Key_n] = 'n',          [Key_m] = 'm',          [Key_comma] = ',',
+    [Key_period] = '.',     [Key_slash] = '/',      [Key_space] = ' ',
+    [Key_esc] = 27,         [Key_numDiv] = '/',     [Key_numMult] = '*',
+    [Key_numSub] = '-',     [Key_numAdd] = '+',     [Key_num7] = '7',
+    [Key_num8] = '8',       [Key_num9] = '9',       [Key_num4] = '4',
+    [Key_num5] = '5',       [Key_num6] = '6',       [Key_num1] = '1',
+    [Key_num2] = '2',       [Key_num3] = '3',       [Key_numEnter] = '\n',
+    [Key_num0] = '0',       [Key_numDecimal] = '.'};
 
 #define CAP_DELTA ('a' - 'A')
 
@@ -61,7 +76,7 @@ char keyPressToASCII(KeyPress press) {
         return '\0';
 
     bool numLock = press.modifiers & KEY_MOD_NUMLOCK;
-    bool numPadNum = press.code >= Key_num7 && press.code <= Key_num3;
+    bool numPadNum = press.code >= Key_num7 && press.code <= Key_num0;
 
     // numpad but numlock off
     if (!numLock && numPadNum)
@@ -143,6 +158,94 @@ static const KeyPress nonePress = {0, Key_none, KeyReleased, 0};
 
 KeyPress codePointDiscard(struct KeyboardState *, uint8_t) { return nonePress; }
 
+static const enum KeyCode sc1LUT[] = {[0x1] = Key_esc,
+                                      Key_1,
+                                      Key_2,
+                                      Key_3,
+                                      Key_4,
+                                      Key_5,
+                                      Key_6,
+                                      Key_7,
+                                      Key_8,
+                                      Key_9,
+                                      Key_0,
+                                      Key_minus,
+                                      Key_equal,
+                                      Key_backspace,
+                                      Key_tab,
+                                      Key_q,
+                                      Key_w,
+                                      Key_e,
+                                      Key_r,
+                                      Key_t,
+                                      Key_y,
+                                      Key_u,
+                                      Key_i,
+                                      Key_o,
+                                      Key_p,
+                                      Key_openSquare,
+                                      Key_closeSquare,
+                                      Key_enter,
+                                      Key_Lctrl,
+                                      Key_a,
+                                      Key_s,
+                                      Key_d,
+                                      Key_f,
+                                      Key_g,
+                                      Key_h,
+                                      Key_j,
+                                      Key_k,
+                                      Key_l,
+                                      Key_semicolon,
+                                      Key_apostrophe,
+                                      Key_grave,
+                                      Key_LShift,
+                                      Key_backSlash,
+                                      Key_z,
+                                      Key_x,
+                                      Key_c,
+                                      Key_v,
+                                      Key_b,
+                                      Key_n,
+                                      Key_m,
+                                      Key_comma,
+                                      Key_period,
+                                      Key_slash,
+                                      Key_RShift,
+                                      Key_numMult,
+                                      Key_Lalt,
+                                      Key_space,
+                                      Key_capsLock,
+                                      Key_f1,
+                                      Key_f2,
+                                      Key_f3,
+                                      Key_f4,
+                                      Key_f5,
+                                      Key_f6,
+                                      Key_f7,
+                                      Key_f8,
+                                      Key_f9,
+                                      Key_f10,
+                                      Key_numLock,
+                                      Key_scrollLock,
+                                      Key_num7,
+                                      Key_num8,
+                                      Key_num9,
+                                      Key_numSub,
+                                      Key_num4,
+                                      Key_num5,
+                                      Key_num6,
+                                      Key_numAdd,
+                                      Key_num1,
+                                      Key_num2,
+                                      Key_num3,
+                                      Key_num0,
+                                      Key_numDecimal,
+                                      [0x57] = Key_f11,
+                                      Key_f12};
+
+static const size_t sc1LUTsize = sizeof(sc1LUT) / sizeof(enum KeyCode);
+
 KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
     if (state == NULL)
         return nonePress;
@@ -164,6 +267,8 @@ KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
 
     bool numLock = state->keystates[(unsigned)(Key_numLock)] == KeyToggled;
 
+    uint8_t adjcode = code & 0b01111111; // code without release
+
     if (state->extended == 3) { // 1st extended byte of 0xE1
         state->extended = 2;
         return nonePress;
@@ -172,7 +277,7 @@ KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
         state->extended = 0;
         return nonePress;
     } else if (state->extended == 1) { // 0xE0 multibyte
-        switch (code & 0b01111111) {
+        switch (adjcode) {
         case 0x1C:
             out.code = Key_numEnter;
             break;
@@ -250,334 +355,58 @@ KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
         }
         state->extended = 0;
     } else if (state->extended == 0) {
-        switch (code & 0b01111111) {
-        case 0x1:
-            out.code = Key_esc;
-            break;
-        case 0x2:
-            out.code = Key_1;
-            break;
-        case 0x3:
-            out.code = Key_2;
-            break;
-        case 0x4:
-            out.code = Key_3;
-            break;
-        case 0x5:
-            out.code = Key_4;
-            break;
-        case 0x6:
-            out.code = Key_5;
-            break;
-        case 0x7:
-            out.code = Key_6;
-            break;
-        case 0x8:
-            out.code = Key_7;
-            break;
-        case 0x9:
-            out.code = Key_8;
-            break;
-        case 0xA:
-            out.code = Key_9;
-            break;
-        case 0xB:
-            out.code = Key_0;
-            break;
-        case 0xC:
-            out.code = Key_minus;
-            break;
-        case 0xD:
-            out.code = Key_equal;
-            break;
-        case 0xE:
-            out.code = Key_backspace;
-            break;
-        case 0xF:
-            out.code = Key_tab;
-            break;
-        case 0x10:
-            out.code = Key_q;
-            break;
-        case 0x11:
-            out.code = Key_w;
-            break;
-        case 0x12:
-            out.code = Key_e;
-            break;
-        case 0x13:
-            out.code = Key_r;
-            break;
-        case 0x14:
-            out.code = Key_t;
-            break;
-        case 0x15:
-            out.code = Key_y;
-            break;
-        case 0x16:
-            out.code = Key_u;
-            break;
-        case 0x17:
-            out.code = Key_i;
-            break;
-        case 0x18:
-            out.code = Key_o;
-            break;
-        case 0x19:
-            out.code = Key_p;
-            break;
-        case 0x1A:
-            out.code = Key_openSquare;
-            break;
-        case 0x1B:
-            out.code = Key_closeSquare;
-            break;
-        case 0x1C:
-            out.code = Key_enter;
-            break;
-        case 0x1D:
-            out.code = Key_Lctrl;
-            break;
-        case 0x1E:
-            out.code = Key_a;
-            break;
-        case 0x1F:
-            out.code = Key_s;
-            break;
-        case 0x20:
-            out.code = Key_d;
-            break;
-        case 0x21:
-            out.code = Key_f;
-            break;
-        case 0x22:
-            out.code = Key_g;
-            break;
-        case 0x23:
-            out.code = Key_h;
-            break;
-        case 0x24:
-            out.code = Key_j;
-            break;
-        case 0x25:
-            out.code = Key_k;
-            break;
-        case 0x26:
-            out.code = Key_l;
-            break;
-        case 0x27:
-            out.code = Key_semicolon;
-            break;
-        case 0x28:
-            out.code = Key_apostrophe;
-            break;
-        case 0x29:
-            out.code = Key_grave;
-            break;
-        case 0x2A:
-            out.code = Key_LShift;
-            break;
-        case 0x2B:
-            out.code = Key_backSlash;
-            break;
-        case 0x2C:
-            out.code = Key_z;
-            break;
-        case 0x2D:
-            out.code = Key_x;
-            break;
-        case 0x2E:
-            out.code = Key_c;
-            break;
-        case 0x2F:
-            out.code = Key_v;
-            break;
-        case 0x30:
-            out.code = Key_b;
-            break;
-        case 0x31:
-            out.code = Key_n;
-            break;
-        case 0x32:
-            out.code = Key_m;
-            break;
-        case 0x33:
-            out.code = Key_comma;
-            break;
-        case 0x34:
-            out.code = Key_period;
-            break;
-        case 0x35:
-            out.code = Key_slash;
-            break;
-        case 0x36:
-            out.code = Key_RShift;
-            break;
-        case 0x37:
-            out.code = Key_numMult;
-            break;
-        case 0x38:
-            out.code = Key_Lalt;
-            break;
-        case 0x39:
-            out.code = Key_space;
-            break;
-        case 0x3A:
-            out.code = Key_capsLock;
 
-            // toggle if not toggled, otherwise let it be released/pressed
-            if (state->keystates[(unsigned)(Key_capsLock)] != KeyToggled) {
-                if (!released) {
+        // outside LUT bounds, abort early
+        if (adjcode >= sc1LUTsize)
+            return out;
+
+        out.code = sc1LUT[adjcode];
+
+        // handle toggleables
+        if (out.code == Key_capsLock || out.code == Key_numLock ||
+            out.code == Key_scrollLock) {
+            if (state->keystates[(unsigned)(out.code)] != KeyToggled) {
+                if (!released) { // set toggle on press
                     out.event = KeyToggled;
                 }
-            } else if (!released) { // untoggle
+            } else if (!released) { // untoggle toggled
                 out.event = KeyPressed;
             } else { // keep it toggled on release
                 out.event = KeyToggled;
             }
+        }
 
-            break;
-        case 0x3B:
-            out.code = Key_f1;
-            break;
-        case 0x3C:
-            out.code = Key_f2;
-            break;
-        case 0x3D:
-            out.code = Key_f3;
-            break;
-        case 0x3E:
-            out.code = Key_f4;
-            break;
-        case 0x3F:
-            out.code = Key_f5;
-            break;
-        case 0x40:
-            out.code = Key_f6;
-            break;
-        case 0x41:
-            out.code = Key_f7;
-            break;
-        case 0x42:
-            out.code = Key_f8;
-            break;
-        case 0x43:
-            out.code = Key_f9;
-            break;
-        case 0x44:
-            out.code = Key_f10;
-            break;
-        case 0x45:
-            out.code = Key_numLock;
-
-            // toggle if not toggled, otherwise let it be released/pressed
-            if (state->keystates[(unsigned)(Key_numLock)] != KeyToggled) {
-                if (!released) {
-                    out.event = KeyToggled;
-                }
-            } else if (!released) { // untoggle
-                out.event = KeyPressed;
-            } else { // keep it toggled on release
-                out.event = KeyToggled;
-            }
-            break;
-        case 0x46:
-            out.code = Key_scrollLock;
-
-            // toggle if not toggled, otherwise let it be released/pressed
-            if (state->keystates[(unsigned)(Key_scrollLock)] != KeyToggled) {
-                if (!released) {
-                    out.event = KeyToggled;
-                }
-            } else if (!released) { // untoggle
-                out.event = KeyPressed;
-            } else { // keep it toggled on release
-                out.event = KeyToggled;
-            }
-            break;
-        case 0x47:
-            if (numLock) {
-                out.code = Key_num7;
-            } else {
+        // when numlock is on, numlock nums have different meaning
+        if (!numLock && (out.code >= Key_num7 && out.code <= Key_num0)) {
+            switch (out.code) {
+            case Key_num7:
                 out.code = Key_home;
-            }
-            break;
-        case 0x48:
-            if (numLock) {
-                out.code = Key_num8;
-            } else {
+                break;
+            case Key_num8:
                 out.code = Key_up;
-            }
-            break;
-        case 0x49:
-            if (numLock) {
-                out.code = Key_num9;
-            } else {
+                break;
+            case Key_num9:
                 out.code = Key_pgUp;
-            }
-            break;
-        case 0x4A:
-            out.code = Key_numSub;
-            break;
-        case 0x4B:
-            if (numLock) {
-                out.code = Key_num4;
-            } else {
+                break;
+            case Key_num4:
                 out.code = Key_left;
-            }
-            break;
-        case 0x4C:
-            if (numLock) {
-                out.code = Key_num5;
-            }
-            break;
-        case 0x4D:
-            if (numLock) {
-                out.code = Key_num6;
-            } else {
+                break;
+            case Key_num6:
                 out.code = Key_right;
-            }
-            break;
-        case 0x4E:
-            out.code = Key_numAdd;
-            break;
-        case 0x4F:
-            if (numLock) {
-                out.code = Key_num1;
-            } else {
+                break;
+            case Key_num1:
                 out.code = Key_end;
-            }
-            break;
-        case 0x50:
-            if (numLock) {
-                out.code = Key_num2;
-            } else {
+                break;
+            case Key_num2:
                 out.code = Key_down;
-            }
-            break;
-        case 0x51:
-            if (numLock) {
-                out.code = Key_num3;
-            } else {
+                break;
+            case Key_num3:
                 out.code = Key_pgDown;
+                break;
+            default: // some don't have another meaning
+                out.code = Key_none;
+                break;
             }
-            break;
-        case 0x52:
-            if (numLock) {
-                out.code = Key_num0;
-            }
-            break;
-        case 0x53:
-            out.code = Key_numDecimal;
-            break;
-        case 0x57:
-            out.code = Key_f11;
-            break;
-        case 0x58:
-            out.code = Key_f12;
-            break;
-        default:
-            break;
         }
     } else { // odd state
         state->extended = 0;

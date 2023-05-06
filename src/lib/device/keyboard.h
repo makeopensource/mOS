@@ -141,10 +141,12 @@ enum KeyCode {
     Key_num1,
     Key_num2,
     Key_num3,
+
+    Key_num0, // another wrong order!
+
     Key_numEnter,
 
     // row 5
-    Key_num0,
     Key_numDecimal,
 
     // NOTE: multimedia is NOT supported
