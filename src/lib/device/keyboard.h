@@ -125,12 +125,11 @@ enum KeyCode {
     Key_numMult,
     Key_numSub,
 
-    Key_numAdd, // wrong row but makes ascii easier
-
     // row 2
     Key_num7,
     Key_num8,
     Key_num9,
+    Key_numAdd,
 
     // row 3
     Key_num4,
@@ -142,11 +141,10 @@ enum KeyCode {
     Key_num2,
     Key_num3,
 
-    Key_num0, // another wrong order!
-
     Key_numEnter,
 
     // row 5
+    Key_num0,
     Key_numDecimal,
 
     // NOTE: multimedia is NOT supported
@@ -154,6 +152,8 @@ enum KeyCode {
     Key_Code_Count // very important that this is the last and there is no
                    // higher value
 };
+
+bool isNumpadNumber(enum KeyCode keycode);
 
 // note: toggleable keys == KeyToggled when toggled, otherwise could be either
 enum KeyState {

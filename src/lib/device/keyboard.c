@@ -3,6 +3,24 @@
 #include "../pit/pit.h"
 #include "stddef.h"
 
+bool isNumpadNumber(enum KeyCode keycode) {
+    switch (keycode) {
+    case Key_num0:
+    case Key_num1:
+    case Key_num2:
+    case Key_num3:
+    case Key_num4:
+    case Key_num5:
+    case Key_num6:
+    case Key_num7:
+    case Key_num8:
+    case Key_num9:
+        return true;
+    default:
+        return false;
+    }
+}
+
 uint8_t getActiveModifiers(const struct KeyboardState *state) {
     uint8_t mods = 0;
 
@@ -79,7 +97,7 @@ char keyPressToASCII(KeyPress press) {
         return '\0';
 
     bool numLock = press.modifiers & KEY_MOD_NUMLOCK;
-    bool numPadNum = press.code >= Key_num7 && press.code <= Key_num0;
+    bool numPadNum = isNumpadNumber(press.code);
 
     // numpad but numlock off
     if (!numLock && numPadNum)
@@ -185,7 +203,7 @@ static const enum KeyCode sc1LUT[] = {
     Key_num3,        Key_num0,       Key_numDecimal,  [0x57] = Key_f11,
     Key_f12};
 
-static const size_t sc1LUTsize = sizeof(sc1LUT) / sizeof(sci1LUT[0]);
+static const size_t sc1LUTsize = sizeof(sc1LUT) / sizeof(sc1LUT[0]);
 
 KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
     if (state == NULL)
@@ -318,7 +336,7 @@ KeyPress codePointPS2SC1(struct KeyboardState *state, uint8_t code) {
         }
 
         // when numlock is on, numlock nums have different meaning
-        if (!numLock && (out.code >= Key_num7 && out.code <= Key_num0)) {
+        if (!numLock && isNumpadNumber(out.code)) {
             switch (out.code) {
             case Key_num7:
                 out.code = Key_home;
