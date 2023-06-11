@@ -17,25 +17,25 @@ static const struct PS2Buf_t initPS2BufVal = {.type = PS2_NONE_EVENT,
 
 struct PS2Buf_t peekDev(const ps2_buffer_t *dev) {
     struct PS2Buf_t out;
-    disableInterrupts();
+    InterruptState iprev = disableInterrupts();
     if (ring_buffer_empty(dev)) {
         out = initPS2BufVal;
     } else {
         out = ring_buffer_top_g(dev);
     }
-    enableInterrupts();
+    setInterrupts(iprev);
     return out;
 }
 
 struct PS2Buf_t popDev(ps2_buffer_t *dev) {
     struct PS2Buf_t out;
-    disableInterrupts();
+    InterruptState iprev = disableInterrupts();
     if (ring_buffer_empty(dev)) {
         out = initPS2BufVal;
     } else {
         ring_buffer_pop_g(dev, out);
     }
-    enableInterrupts();
+    setInterrupts(iprev);
     return out;
 }
 
