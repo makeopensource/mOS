@@ -35,6 +35,17 @@ For contributing _fork_ this repository and then make your changes in the form o
 * clang-format
 * WSL (Windows only)
 
+#### For MacOS
+
+Use homebrew to install the dependencies use these commands:
+
+```shell
+brew link --overwrite i386-elf-binutils
+brew install i386-elf-binutils i386-elf-gcc nasm binutils qemu
+```
+
+You will need to ensure that these programs are on your PATH or make will not find them.
+
 ### Building
 
 * just run `make` in the root directory of the project

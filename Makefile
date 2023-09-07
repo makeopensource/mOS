@@ -1,6 +1,21 @@
+PLATFORM := $(shell uname)
+
+ifeq ($(PLATFORM), Darwin) 
+CC := i386-elf-gcc
+LD := i386-elf-ld
+OBJCOPY := gobjcopy
+else
 CC := gcc
-CFLAGS := -Wall -Werror -g3 -Os -Wl,--oformat=binary -no-pie -m32 -s -falign-functions=4 -ffreestanding -fno-asynchronous-unwind-tables -I./src/lib/
-LFLAGS := -melf_i386 --build-id=none
+LD := ld
+OBJCOPY := objcopy
+endif
+
+export CC
+export LD
+export OBJCOPY
+
+export CFLAGS := -Wall -Werror -g3 -Os -Wl,--oformat=binary -no-pie -m32 -s -falign-functions=4 -ffreestanding -fno-asynchronous-unwind-tables
+export LFLAGS := -melf_i386 --build-id=none
 
 ASM_BOOT_SECT_SOURCE := ./src/boot/boot_sect.asm
 ASM_OS_ENTRY_SOURCE := ./src/boot/os_entry.asm
@@ -20,8 +35,8 @@ OBJ_NAMES := src/os/main.o src/os/test.o os_entry.o src/lib/video/VGA_text.o \
 .PHONY: clean qemu test
 
 $(OS_BIN): $(OBJ_NAMES) $(BOOT_OBJ)
-	ld $(LFLAGS) -T link.ld $(OBJ_NAMES) -o mOS.elf
-	objcopy -O binary mOS.elf intermediate.bin
+	$(LD) $(LFLAGS) -T link.ld $(OBJ_NAMES) -o mOS.elf
+	$(OBJCOPY) -O binary mOS.elf intermediate.bin
 	cat $(BOOT_OBJ) intermediate.bin > $(OS_BIN) 
 
 $(BOOT_OBJ): $(ASM_BOOT_SECT_SOURCE)
@@ -31,7 +46,7 @@ os_entry.o: $(ASM_OS_ENTRY_SOURCE)
 	nasm $^ -f elf32 -o $@
 
 %.o: %.c
-	$(CC) -c $^ -o $@ $(CFLAGS)
+	$(CC) -c $^ -o $@ $(CFLAGS) -I./src/lib/
 
 %.o: %.asm
 	nasm $^ -f elf32 -o $@
