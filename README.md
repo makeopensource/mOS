@@ -37,14 +37,14 @@ For contributing _fork_ this repository and then make your changes in the form o
 
 #### For MacOS
 
-Use homebrew to install the dependencies use these commands:
+Use homebrew to install the dependencies using these commands:
 
 ```shell
 brew link --overwrite i386-elf-binutils
 brew install i386-elf-binutils i386-elf-gcc nasm binutils qemu
 ```
 
-You will need to ensure that these programs are on your PATH or make will not find them.
+You will need to ensure that these programs are on your PATH or `make` will not find them.
 
 ### Building
 
