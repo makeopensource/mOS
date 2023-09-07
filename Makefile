@@ -1,9 +1,9 @@
-CC=gcc
-CFLAGS=-Wall -Werror -g3 -Os -Wl,--oformat=binary -no-pie -m32 -s -falign-functions=4 -ffreestanding -masm=intel -fno-asynchronous-unwind-tables -I./src/lib/
-LFLAGS=-melf_i386 --build-id=none
+CC := gcc
+CFLAGS := -Wall -Werror -g3 -Os -Wl,--oformat=binary -no-pie -m32 -s -falign-functions=4 -ffreestanding -fno-asynchronous-unwind-tables -I./src/lib/
+LFLAGS := -melf_i386 --build-id=none
 
-ASM_BOOT_SECT_SOURCE=./src/boot/boot_sect.asm
-ASM_OS_ENTRY_SOURCE=./src/boot/os_entry.asm
+ASM_BOOT_SECT_SOURCE := ./src/boot/boot_sect.asm
+ASM_OS_ENTRY_SOURCE := ./src/boot/os_entry.asm
 
 BOOT_OBJ := boot.o
 OS_BIN := mOS.bin
@@ -31,7 +31,7 @@ os_entry.o: $(ASM_OS_ENTRY_SOURCE)
 	nasm $^ -f elf32 -o $@
 
 %.o: %.c
-	gcc -c $^ -o $@ $(CFLAGS)
+	$(CC) -c $^ -o $@ $(CFLAGS)
 
 %.o: %.asm
 	nasm $^ -f elf32 -o $@
