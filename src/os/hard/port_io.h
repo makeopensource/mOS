@@ -4,10 +4,10 @@
 #include <stdint.h>
 
 /*  NOTE:
-*   All inline assembly is at&t syntax.
-*   Dedicated assembly files use intel syntax.
-*   This is required because of MacOS.
-*/
+ *   All inline assembly is at&t syntax.
+ *   Dedicated assembly files use intel syntax.
+ *   This is required because of MacOS.
+ */
 
 static inline uint8_t inb(uint16_t port) {
     uint8_t ret;
