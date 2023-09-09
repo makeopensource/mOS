@@ -1,6 +1,6 @@
 # Using GDB
 
-To run gdb with qemu, simple run `qemu-gdb`! An instance of qemu will run in the
+To run gdb with qemu, simply run `make qemu-gdb`! An instance of qemu will run in the
 background while gdb is running in your current terminal.
 
 For a refresher on gdb, see the following resources:
@@ -10,14 +10,14 @@ For a refresher on gdb, see the following resources:
 
 ## Debugging the Bootloader
 
-To debug the instructions in the bootloader, start by running `qemu-gdb-boot`. A
+To debug the instructions in the bootloader, start by running `make qemu-gdb-boot`. A
 few things happen when you run this. First, we load a few default settings and
 macros from `gdb_init_real_mode.txt` that allow us to better debug in
 16-bit "real" mode. Using the `-ex` flag, we pass gdb a few commands. We connect
 to qemu, then set a breakpoint at 0x7c00, which is the address where the bootloader 
 code is located in memory.
 
-Once you run `qemu-gdb-boot`, gdb will be pointing to the start of 0x7c00, where
+Once you run `make qemu-gdb-boot`, gdb will be pointing to the start of 0x7c00, where
 you can then use gdb instruction commands or the macros provided by `gdb_init_real_mode.txt`
 to debug the bootloader. Because the bootloader is written in assembly, you have
 to use the assembly versions of gdb commands when debugging. See 
@@ -30,7 +30,7 @@ for more information on the macro commands provided. Some useful ones include
 
 ## Debugging the OS
 
-To debug various parts of the OS, start by running `qemu-gdb`. When you run
+To debug various parts of the OS, start by running `make qemu-gdb`. When you run
 this command, gdb connects to qemu and jumps to os_main, the first line of C
 code in mOS.
 

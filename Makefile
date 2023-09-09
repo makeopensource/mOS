@@ -14,14 +14,13 @@ export CC
 export LD
 export OBJCOPY
 
-export CFLAGS := -Wall -Werror -g -g3 -Os -Wl,--oformat=binary -no-pie -m32 -s -falign-functions=4 -ffreestanding -fno-asynchronous-unwind-tables
+export CFLAGS := -Wall -Werror -g3 -Os -Wl,--oformat=binary -no-pie -m32 -s -falign-functions=4 -ffreestanding -fno-asynchronous-unwind-tables
 export LFLAGS := -melf_i386 --build-id=none
 
 ASM_BOOT_SECT_SOURCE := ./src/boot/boot_sect.asm
 ASM_OS_ENTRY_SOURCE := ./src/boot/os_entry.asm
 
 BOOT_OBJ := boot.o
-BOOT_ELF := boot.elf
 OS_BIN := mOS.bin
 
 C_FILES = $(shell find ./ -name '*.[ch]')
