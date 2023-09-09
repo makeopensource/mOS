@@ -14,7 +14,7 @@ export CC
 export LD
 export OBJCOPY
 
-export CFLAGS := -Wall -Werror -ggdb -g3 -Os -Wl,--oformat=binary -no-pie -m32 -s -falign-functions=4 -ffreestanding -fno-asynchronous-unwind-tables
+export CFLAGS := -Wall -Werror -g -g3 -Os -Wl,--oformat=binary -no-pie -m32 -s -falign-functions=4 -ffreestanding -fno-asynchronous-unwind-tables
 export LFLAGS := -melf_i386 --build-id=none
 
 ASM_BOOT_SECT_SOURCE := ./src/boot/boot_sect.asm
@@ -56,6 +56,13 @@ qemu: $(OS_BIN)
 	qemu-system-i386 -boot c -drive format=raw,file=$^ -no-reboot -no-shutdown
 
 qemu-gdb: $(OS_BIN)
+	qemu-system-i386 -s -S -boot c -drive format=raw,file=$^ -no-reboot -no-shutdown &
+	gdb mOS.elf \
+		-ex 'target remote localhost:1234' \
+		-ex 'break os_main' \
+		-ex 'continue'
+
+qemu-gdb-boot: $(OS_BIN)
 	qemu-system-i386 -s -S -boot c -drive format=raw,file=$^ -no-reboot -no-shutdown &
 	gdb -ix gdb_init_real_mode.txt mOS.elf \
 		-ex 'target remote localhost:1234' \
