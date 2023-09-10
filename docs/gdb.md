@@ -36,3 +36,23 @@ code in mOS.
 
 Unlike real mode, 32-bit "protected" mode is a little easier to debug. You can
 use regular gdb commands to debug as expected.
+
+## FAQ
+
+The `qemu-gdb` command is hanging/timing out
+
+There could be a few scenarios going on here:
+
+1. You have two instances of qemu-gdb running. Because they connect to the same
+   port, the first one that connects will succeed, and any subsequent
+   connections will fail. Close any qemu-gdb sessions you are not using.
+
+2. Qemu is taking too long to load the OS. This may happen if you are using a
+   virtual machine. If this happens, run `make QEMU_GDB_TIMEOUT=<seconds>
+   qemu-gdb` where `<seconds>` is the number of seconds you want to wait before 
+   gdb launches. Ex: `make QEMU_GDB_TIMEOUT=20 qemu-gdb` will set the gdb
+   timeout to 20 seconds. Default is 10 seconds.
+
+3. Port 1234 is taken by another application. Qemu uses port 1234 by default,
+   but if for some reason it is using another port, gdb will not connect.
+   Closing the application will resolve the issue.

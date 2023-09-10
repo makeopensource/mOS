@@ -10,6 +10,8 @@ LD := ld
 OBJCOPY := objcopy
 endif
 
+QEMU_GDB_TIMEOUT ?= 10 # num. seconds to wait for qemu to start OS
+
 export CC
 export LD
 export OBJCOPY
@@ -57,6 +59,7 @@ qemu: $(OS_BIN)
 qemu-gdb: $(OS_BIN)
 	qemu-system-i386 -s -S -boot c -drive format=raw,file=$^ -no-reboot -no-shutdown &
 	gdb mOS.elf \
+		-ex 'set remotetimeout $(QEMU_GDB_TIMEOUT)' \
 		-ex 'target remote localhost:1234' \
 		-ex 'break os_main' \
 		-ex 'continue'
@@ -64,6 +67,7 @@ qemu-gdb: $(OS_BIN)
 qemu-gdb-boot: $(OS_BIN)
 	qemu-system-i386 -s -S -boot c -drive format=raw,file=$^ -no-reboot -no-shutdown &
 	gdb -ix gdb_init_real_mode.txt mOS.elf \
+		-ex 'set remotetimeout $(QEMU_GDB_TIMEOUT)' \
 		-ex 'target remote localhost:1234' \
 		-ex 'break *0x7c00' \
 		-ex 'continue'
