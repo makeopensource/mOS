@@ -42,7 +42,8 @@ C_FILES = $(shell find ./ -name '*.[ch]')
 
 OBJ_NAMES := src/os/main.o src/os/test.o os_entry.o src/lib/video/VGA_text.o \
 	src/os/hard/idt.o src/os/hard/except.o src/os/hard/pic.o \
-	src/lib/device/serial.o src/lib/container/ring_buffer.o \
+	src/lib/device/serial.o src/lib/device/ps2.o src/lib/device/keyboard.o \
+	src/lib/container/ring_buffer.o \
 	src/lib/stdlib/stdio.o src/lib/stdlib/stdlib.o src/lib/stdlib/string.o \
   src/lib/pit/pit.o
 
@@ -52,7 +53,7 @@ OBJ_NAMES := src/os/main.o src/os/test.o os_entry.o src/lib/video/VGA_text.o \
 $(OS_BIN): $(OBJ_NAMES) $(BOOT_OBJ)
 	$(LD) $(LFLAGS) -T link.ld $(OBJ_NAMES) -o mOS.elf
 	$(OBJCOPY) -O binary mOS.elf intermediate.bin
-	cat $(BOOT_OBJ) intermediate.bin > $(OS_BIN) 
+	cat $(BOOT_OBJ) intermediate.bin > $(OS_BIN)
 
 $(BOOT_OBJ): $(ASM_BOOT_SECT_SOURCE)
 	nasm $^ -f bin -o $@ $(DEBUG_NASM_FLAGS)
