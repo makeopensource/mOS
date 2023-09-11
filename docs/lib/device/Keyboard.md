@@ -8,7 +8,9 @@ This document does not describe the hardware interface of any keyboard device. F
 
 A keycode is an abstract representation of a physical key. There are many keyboard layouts; to reduce complexity and allow software to be independent from hardware, keycodes are used. Our keycodes reflect the layout of an ANSI US QWERTY full-size keyboard. For the full list of keycodes, see [keyboard.h](../../../src/lib/device/keyboard.h).
   
-Conversion from scancode, the byte(s) a keyboard gives us, to keycode differs from keyboard to keyboard. In addition, keyboards may have states that modify the interpretation of other keys. To abstract this, the state of every key is maintained along with a "code point function" associated with the keyboard. A "code point function" is a function that takes a reference to a keyboard's state and a scancode and returns a `KeyPress` structure. The function should modify and interpret the current state as necessary to perform translation, although it is not strictly necessary to do so. An example of one of these keys is numlock.
+The process of converting from scancode (the byte(s) a keyboard gives us) to keycode is different from keyboard to keyboard. Keyboards may have states that modify the interpretation of other keys. To abstract this, we maintain the state of every key along with a "code point function" associated with the keyboard. 
+
+A "code point function" is a function that takes a reference to a keyboard's state and a scancode and returns a `KeyPress` structure. The function should modify and interpret the current state as necessary to perform translation, although it is not strictly necessary to do so. An example of one of these keys is caps lock. When caps lock is not on (by default), the characters you type are all lowercase. Clicking the caps lock key changes the keyboard state, and all keys pressed thereafter are capitalized. Clicking caps lock again returns the keyboard capitalization to its default state.
 
 ## KeyPresses
 
