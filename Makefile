@@ -26,8 +26,9 @@ QEMU_GDB_TIMEOUT ?= 10 # num. seconds to wait for qemu to start OS
 export CC
 export LD
 export OBJCOPY
-export OFLAG
-export NASM_OFLAG
+export DEBUG_CFLAGS
+export DEBUG_NASM_FLAGS
+export DEBUG_QEMU_FLAGS
 
 export CFLAGS := -Wall -Werror $(DEBUG_CFLAGS) -Wl,--oformat=binary -no-pie -m32 -s -falign-functions=4 -ffreestanding -fno-asynchronous-unwind-tables
 export LFLAGS := -melf_i386 --build-id=none
@@ -68,7 +69,7 @@ os_entry.o: $(ASM_OS_ENTRY_SOURCE)
 	nasm $^ -f elf32 -o $@ $(DEBUG_NASM_FLAGS)
 
 qemu: $(OS_BIN)
-	qemu-system-i386 -boot c -drive format=raw,file=$^ -no-reboot -no-shutdown
+	qemu-system-i386 $(DEBUG_QEMU_FLAGS) -boot c -drive format=raw,file=$^ -no-reboot -no-shutdown
 
 qemu-gdb: $(OS_BIN)
 	qemu-system-i386 $(DEBUG_QEMU_FLAGS) -s -S -boot c -drive format=raw,file=$^ \
