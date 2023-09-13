@@ -182,7 +182,9 @@ char keyPressToASCII(KeyPress press) {
 
 static const KeyPress nonePress = {0, Key_none, KeyReleased, 0};
 
-KeyPress codePointDiscard(struct KeyboardState *, uint8_t) { return nonePress; }
+KeyPress codePointDiscard(struct KeyboardState *, uint8_t) {
+    return nonePress;
+}
 
 static const enum KeyCode sc1LUT[] = {
     [0x1] = Key_esc, Key_1,          Key_2,           Key_3,
