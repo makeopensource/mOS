@@ -1,7 +1,7 @@
-PLATFORM := $(shell uname)
+PLATFORM := $(shell uname -m)
 DEBUG ?= false # lowers optimization levels and increases command verbosity
 
-ifeq ($(PLATFORM), Darwin) 
+ifeq ($(PLATFORM), arm64) 
 CC := i386-elf-gcc
 LD := i386-elf-ld
 OBJCOPY := gobjcopy
