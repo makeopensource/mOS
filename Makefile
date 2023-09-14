@@ -2,9 +2,9 @@ PLATFORM := $(shell uname)
 DEBUG ?= false # lowers optimization levels and increases command verbosity
 
 ifeq ($(PLATFORM), Darwin) 
-CC := i386-elf-gcc
-LD := i386-elf-ld
-OBJCOPY := gobjcopy
+CC := x86_64-elf-gcc
+LD := x86_64-elf-ld
+OBJCOPY := x86_64-objcopy
 else
 CC := gcc
 LD := ld
