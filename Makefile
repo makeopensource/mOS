@@ -4,7 +4,7 @@ DEBUG ?= false # lowers optimization levels and increases command verbosity
 ifeq ($(PLATFORM), Darwin) 
 CC := x86_64-elf-gcc
 LD := x86_64-elf-ld
-OBJCOPY := x86_64-objcopy
+OBJCOPY := x86_64-elf-objcopy
 else
 CC := gcc
 LD := ld
