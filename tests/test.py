@@ -112,7 +112,7 @@ class TestInstance:
             self._qemu = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             time.sleep(1) #give qemu some time to open
             self._ready = True
-    
+
     def beginTest(self):
         self.test = Thread(target=test, args=[self])
         self.test.start()
@@ -152,7 +152,7 @@ class TestInstance:
                 self.test.join()
 
             self.test = None
-        
+
         with port_mutex:
             if (self.port in used_ports):
                 used_ports.remove(self.port)
@@ -200,7 +200,7 @@ def test(instance: TestInstance):
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
-            
+
             while (not instance.ready):
                 time.sleep(1)
 
@@ -229,7 +229,7 @@ def test(instance: TestInstance):
                     chunk = bin[i*SLICE_SIZE:(i+1)*SLICE_SIZE]
                     s.send(chunk)
                     time.sleep(DATA_DELAY)
-                
+
                 last = bin[chunks * SLICE_SIZE:]
                 if (len(last) > 0):
                     s.send(last)
@@ -272,7 +272,7 @@ def test(instance: TestInstance):
             print("test timed out")
 
         except socket.error as e:
-        
+
             if (e.errno == errno.EADDRINUSE or e.errno == errno.ECONNREFUSED):
                 # port already in use, get a new one
                 instance.endQemu()
@@ -293,13 +293,13 @@ def create_instance(bin_path, expected_path):
 
     instance = TestInstance(get_port(), bin_path, expected_path)
     instance.start()
-    
+
     return instance
 
 def do_tests():
     expected = get_all_files(EXPECTED_PATH)
     binaries = get_all_files(TEST_BINARY_PATH)
-   
+
     argc = len(sys.argv)
     if (argc > 1):
         tested_binaries = []
@@ -309,7 +309,7 @@ def do_tests():
                 if (sys.argv[i] == file[1]):
                     tested_binaries.append(file)
                     break
-            
+
             if (len(tested_binaries) == count):
                 print(f"Failed to find {sys.argv[i]}")
 
@@ -337,7 +337,7 @@ def do_tests():
         else:
             instances.append(create_instance(binary[0], expect[0]))
 
-    
+
     active = MAX_INSTANCES
     while (active != 0):
         with instance_mutex:
