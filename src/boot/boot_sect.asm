@@ -6,10 +6,11 @@ begin:
 	mov [BOOT_DRIVE], dl
     mov bp, 0x9000
     mov sp, bp
-    jmp load_kernel
+    jmp detect_mem
 
 %include "src/boot/gdt.asm"
 %include "src/boot/enter_pm.asm"
+%include "src/boot/detect_mem.asm"
 
 [bits 16]
 load_kernel:
@@ -26,7 +27,6 @@ load_kernel:
 begin_pm:
     call OS_OFFSET
     hlt
-    
 
 times 509 - ($ - $$) db 0 ;padding
 
