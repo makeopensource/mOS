@@ -14,6 +14,7 @@ begin:
 
 [bits 16]
 load_kernel:
+	mov dl, [BOOT_DRIVE] ;reset dl
     mov ah, 2 ;read BIOS chs
     mov al, 42 ;sectors to read
     mov cl, 0x02 ;start at sector 2
