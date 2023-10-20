@@ -4,10 +4,12 @@
 #include "pit/pit.h"
 #include "test.h"
 #include "video/VGA_text.h"
+#include "stdlib/palloc.h"
 
 int os_main() {
     makeInterruptTable();
     init_pit();
+    init_palloc();
     serialInit();
     ps2Init();
 
