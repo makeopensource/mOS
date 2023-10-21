@@ -5,20 +5,24 @@ ifeq ($(PLATFORM), Darwin)
 CC := x86_64-elf-gcc
 LD := x86_64-elf-ld
 OBJCOPY := x86_64-elf-objcopy
+GDB := x86_64-elf-gdb
 else
 CC := gcc
 LD := ld
 OBJCOPY := objcopy
+GDB := gdb
 endif
 
 ifeq ($(DEBUG), true)
 DEBUG_CFLAGS := -g3 -O0
 DEBUG_NASM_FLAGS := -O0
 DEBUG_QEMU_FLAGS := -monitor stdio
+DEBUG_LFLAGS := -g
 else
 DEBUG_CFLAGS := -Os
 DEBUG_NASM_FLAGS := -Ox
 DEBUG_QEMU_FLAGS :=
+DEBUG_LFLAGS :=
 endif
 
 QEMU_GDB_TIMEOUT ?= 10 # num. seconds to wait for qemu to start OS
@@ -33,7 +37,7 @@ export DEBUG_QEMU_FLAGS
 export CFLAGS := -Wall -Werror $(DEBUG_CFLAGS) -Wl,--oformat=binary -no-pie -m32 -mno-mmx -mno-sse -mno-sse2 -mno-sse3 \
 					-s -falign-functions=4 -ffreestanding -fno-asynchronous-unwind-tables
 
-export LFLAGS := -melf_i386 --build-id=none
+export LFLAGS := -melf_i386 --build-id=none $(DEBUG_LFLAGS)
 
 ASM_BOOT_SECT_SOURCE := ./src/boot/boot_sect.asm
 ASM_OS_ENTRY_SOURCE := ./src/boot/os_entry.asm
@@ -52,6 +56,9 @@ OBJ_NAMES := src/os/main.o src/os/test.o os_entry.o src/lib/video/VGA_text.o \
 
 
 .PHONY: clean qemu test
+
+all: $(OS_BIN)
+	echo DEBUG is set to $(DEBUG)
 
 $(OS_BIN): $(OBJ_NAMES) $(BOOT_OBJ)
 	$(LD) $(LFLAGS) -T link.ld $(OBJ_NAMES) -o mOS.elf
@@ -76,7 +83,7 @@ qemu: $(OS_BIN)
 qemu-gdb: $(OS_BIN)
 	qemu-system-i386 $(DEBUG_QEMU_FLAGS) -s -S -boot c -drive format=raw,file=$^ \
 		-no-reboot -no-shutdown &
-	gdb mOS.elf \
+	$(GDB) mOS.elf \
 		-q \
 		-ex 'set remotetimeout $(QEMU_GDB_TIMEOUT)' \
 		-ex 'target remote localhost:1234' \
@@ -86,7 +93,7 @@ qemu-gdb: $(OS_BIN)
 qemu-gdb-boot: $(OS_BIN)
 	qemu-system-i386 $(DEBUG_QEMU_FLAGS) -s -S -boot c -drive format=raw,file=$^ \
 		-no-reboot -no-shutdown &
-	gdb mOS.elf \
+	$(GDB) mOS.elf \
 		-q \
 		-ix gdb_init_real_mode.txt \
 		-ex 'set remotetimeout $(QEMU_GDB_TIMEOUT)' \
