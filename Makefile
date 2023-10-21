@@ -5,7 +5,7 @@ ifeq ($(PLATFORM), Darwin)
 CC := x86_64-elf-gcc
 LD := x86_64-elf-ld
 OBJCOPY := x86_64-elf-objcopy
-GDB := i386-elf-gdb
+GDB := x86_64-elf-gdb
 else
 CC := gcc
 LD := ld
