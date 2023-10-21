@@ -1,6 +1,5 @@
 #include "palloc.h"
 #include <stdint.h>
-#include <string.h>
 #include "stdlib/stdio.h"
 #include "stdlib/string.h"
 #include "video/VGA_text.h"
