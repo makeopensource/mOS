@@ -1,5 +1,5 @@
 #include "../../test_helper.h"
-#include "stdlib/string.h"
+#include "string.h"
 
 #define BUFSZ                                                                  \
     100 // the size of string compare buffers (to detect buffer overflow)

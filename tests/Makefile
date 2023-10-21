@@ -14,7 +14,7 @@ all: $(MOS_ELF) $(BIN_NAMES)
 	rm $@.elf
 
 %.o: %.c
-	$(CC) -c $^ -o $@ $(CFLAGS) -I./../src/lib/
+	$(CC) -c $^ -o $@ $(CFLAGS) -I./../src/lib/ -I./../src/lib/stdlib/
 
 test_entry.o: test_entry.asm
 	nasm $^ -f elf32 -o $@

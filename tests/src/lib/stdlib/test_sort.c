@@ -1,8 +1,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "../../test_helper.h"
-#include "stdlib/stdlib.h"
-#include "stdlib/string.h"
+#include "stdlib.h"
+#include "string.h"
 
 void verify_sorted(void *base, size_t nel, size_t width, int (*compar)(const void *a, const void *b)) {
     ASSERT(nel >= 0);

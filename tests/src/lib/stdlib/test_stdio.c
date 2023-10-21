@@ -1,6 +1,6 @@
 #include "../../test_helper.h"
-#include "stdlib/stdio.h"
-#include "stdlib/string.h"
+#include "stdio.h"
+#include "string.h"
 
 #include <stdarg.h>
 

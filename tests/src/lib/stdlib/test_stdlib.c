@@ -1,6 +1,6 @@
 #include "../../test_helper.h"
-#include "stdlib/stdlib.h"
-#include "stdlib/string.h"
+#include "stdlib.h"
+#include "string.h"
 
 #define BUFSZ 100
 
