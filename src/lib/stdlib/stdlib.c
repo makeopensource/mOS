@@ -81,3 +81,33 @@ void itoa_s(int in, char *buf, int bufsz) {
     if (bufsz != 0)
         buf[i] = '\0';
 }
+
+// Implements insertion sort
+// 
+// parameters:
+//   void *base:      base pointer for array
+//   size_t nel:      array length
+//   size_t width:    sizeof array type
+//   int (*compar)(const void *a, const void *b): comparison function between two void * values
+
+void isort(void *base, size_t nel, size_t width, int (*compar)(const void *a, const void *b) ) {
+
+    if (nel == 0 || nel == 1) {
+        return;
+    }
+
+    for (int i = 0; i < nel; i++) {
+        for (int j = i+1; j < nel; j++) {
+
+            void *a = base + i * width;
+            void *b = base + j * width;
+
+            if (compar(a, b) == 1) { 
+                char temp_b[width];
+                memcpy(temp_b, b, width);
+                memcpy(b, a, width);
+                memcpy(a, temp_b, width);
+            }
+        }
+    }
+}
