@@ -55,7 +55,6 @@ int cmpfunc(const void *a, const void *b) {
 }
 
 void test_integer_sort() { 
-
     int empty_arr[1] = {0};
     int empty_arr_expected[1] = {0};
     isort(&empty_arr, 0, sizeof(int), intcmpfunc);
@@ -67,7 +66,6 @@ void test_integer_sort() {
     isort(&single_arr, 1, sizeof(int), intcmpfunc);
     verify_sorted(single_arr, 1, sizeof(int), intcmpfunc);
     verify_expected(single_arr, single_arr_expected, 1, sizeof(int));
-
 
     int double_arr[2] = {-1, -2};
     int double_arr_expected[2] = {-2, -1};
@@ -89,9 +87,28 @@ void test_struct_sort() {
     Type case_a[2] = {{.c = 'c', .i = 5, .d = 0.3}, {.c = 'a', .i = 5, .d = 0.3}};
     Type case_a_expected[2] = {{.c = 'a', .i = 5, .d = 0.3}, {.c = 'c', .i = 5, .d = 0.3}};
 
-    isort(&case_a, 2, sizeof(Type), &cmpfunc);
-    verify_sorted(&case_a, 2, sizeof(Type), &cmpfunc);
-    verify_expected(&case_a, &case_a_expected, 2, sizeof(Type));
+    isort(case_a, 2, sizeof(Type), cmpfunc);
+    verify_sorted(case_a, 2, sizeof(Type), cmpfunc);
+    verify_expected(case_a, case_a_expected, 2, sizeof(Type));
+
+    Type case_b[5] = {
+        {.c = 'b', .i = 8, .d = -0.3},
+        {.c = 'b', .i = 8, .d = 0.3},
+        {.c = 'a', .i = 5, .d = 0.3},
+        {.c = 'b', .i = 8, .d = 2.7},
+        {.c = 'b', .i = 5, .d = 0.3},
+    };
+    Type case_b_expected[5] = {
+        {.c = 'a', .i = 5, .d = -0.3},
+        {.c = 'b', .i = 5, .d = 0.3},
+        {.c = 'b', .i = 8, .d = -0.3},
+        {.c = 'b', .i = 8, .d = 0.3},
+        {.c = 'b', .i = 8, .d = 2.7},
+    };
+
+    isort(case_b, 5, sizeof(Type), cmpfunc);
+    verify_sorted(case_b, 5, sizeof(Type), cmpfunc);
+    verify_expected(case_b, case_b_expected, 5, sizeof(Type));
 
     char done[] = "test_struct_sort done\n";
     serialWrite(COM1, (uint8_t *)(done), sizeof(done) - 1);
