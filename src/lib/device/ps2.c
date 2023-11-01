@@ -126,7 +126,9 @@ enum DeviceType translateDeviceType(uint8_t b) {
     }
 }
 
-uint8_t readStat(void) { return inb(PS2_STAT_CMD); }
+uint8_t readStat(void) {
+    return inb(PS2_STAT_CMD);
+}
 
 bool sendCMD(uint8_t b) {
     // await ready
@@ -191,7 +193,9 @@ void setConf(uint8_t newconf) {
 }
 
 // public alias of sendData
-bool sendPort1(uint8_t b) { return sendData(b); }
+bool sendPort1(uint8_t b) {
+    return sendData(b);
+}
 
 bool sendPort2(uint8_t b) {
     // note that short circuit eval will happen
@@ -267,9 +271,15 @@ bool ps2works = false;
 bool port1works = false;
 bool port2works = false;
 
-bool ps2Present(void) { return ps2works; }
-bool ps2Port1Present(void) { return port1works; }
-bool ps2Port2Present(void) { return port2works; }
+bool ps2Present(void) {
+    return ps2works;
+}
+bool ps2Port1Present(void) {
+    return port1works;
+}
+bool ps2Port2Present(void) {
+    return port2works;
+}
 
 int ps2Init() {
     ring_buffer_init(&PS2Port1, initPS2BufVal);

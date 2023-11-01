@@ -31,14 +31,18 @@ uint32_t getOffset(IdtEntry entry) {
     return (((uint32_t)(entry.high) << 16) | (uint32_t)(entry.low));
 }
 
-uint8_t getGateType(IdtEntry entry) { return entry.flags & GATE_MASK; }
+uint8_t getGateType(IdtEntry entry) {
+    return entry.flags & GATE_MASK;
+}
 
 uint8_t getPrivilegeLevels(IdtEntry entry) {
     // mask the privilege bits then shift them to be 0 based
     return (entry.flags & PRIVILEGE_MASK) >> 5;
 }
 
-bool isValid(IdtEntry entry) { return ((entry.flags & PRESENT_MASK) != 0); }
+bool isValid(IdtEntry entry) {
+    return ((entry.flags & PRESENT_MASK) != 0);
+}
 
 extern void *idt_stub_table[];
 static IdtEntry idt[IDT_ENTRIES];

@@ -4,7 +4,9 @@
 
 #define BUFSZ 100
 
-void test_atoi(char *in, int exp) { ASSERT(atoi(in) == exp); }
+void test_atoi(char *in, int exp) {
+    ASSERT(atoi(in) == exp);
+}
 
 // expsz is the last argument because it is the size of the second argument
 void test_itoa_s(int in, char *exp, int bufsz, int cmpsz) {
