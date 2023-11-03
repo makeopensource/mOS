@@ -2,10 +2,6 @@
 
 // RAM addr of structure describing useable memory
 #define MEM_STRUCT_ADDR 0x8000
-#define MEM_FREE 0
-#define MEM_RESERVED 1
-
-#define PAGE_SIZE 4096
 
 // for the purposes of our os, which is 32-bit, we
 // will rely soley on the lower 32-bits

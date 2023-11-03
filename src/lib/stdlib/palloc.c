@@ -1,46 +1,69 @@
 #include "palloc.h"
 #include <stdint.h>
-#include "stdlib/stdio.h"
-#include "stdlib/string.h"
-#include "video/VGA_text.h"
+#include "stdio.h"
+#include "string.h"
+#include "stdlib.h"
+
+#define MAX_CHUNKS 100
 
 void handle_chunk(Chunk *c);
 void sort_chunks(int len, Chunk *array);
+void merge_chunks(Chunk *chunks, size_t len);
+int compar(const void *ina, const void *inb);
 
 void init_palloc() {
-    int len = *(uint32_t *)MEM_STRUCT_ADDR;
-    Chunk *chunk = (Chunk *)(MEM_STRUCT_ADDR + sizeof(uint32_t));
+    // last entry is repeat of first
+    size_t len = *(uint32_t *)MEM_STRUCT_ADDR - 1;
 
-    sort_chunks(len, chunk);
+    if (len > MAX_CHUNKS)
+        len = MAX_CHUNKS;
 
-    for (int i = 0; i < len; i++, chunk++) {
-        handle_chunk(chunk);
+    Chunk *chunks = (Chunk *)(MEM_STRUCT_ADDR + sizeof(uint32_t));
+
+    isort(chunks, len, sizeof(Chunk), compar);
+    // merge_chunks(chunks, len);
+    // remove_duplicates(chunks, len)
+}
+
+// sorts first by type, then by base address
+//
+// Types:
+// - type 1: usable memory
+// - type > 1: unusable (some types are reclaimable, but is left unimplemented for now)
+int compar(const void *ina, const void *inb) {
+    Chunk a = *(Chunk *)ina;
+    Chunk b = *(Chunk *)inb;
+
+    if (a.type < b.type)
+        return -1;
+    else if (a.type > b.type)
+        return 1;
+    else if (a.base_lower < b.base_lower)
+        return -1;
+    else if (a.base_lower == b.base_lower) {
+        ((Chunk *)inb) -> type = 2; // a bit janky for sure: changes duplicate to unusable type
+        return -1;
     }
+    return 1;
 }
 
-void handle_chunk(Chunk *c) {
-}
-
-//  5, 2 , 4 , 5 , 9 , 3
-// [2, 5], 4 , 5 , 9 , 3
-//  2,[4 , 5], 5 , 9 , 3
-//  2, 4 ,[5 , 5], 9 , 3
-//  2, 4 , 5 ,[5 , 9], 3
-//  2, 4 , 5 , 5 ,[3 , 9]
-
-// Insertion Sort; Theta(1) space complexity, Theta(1) time
-// complexity if chunks are upper bounded by some constant
-// (usually about 10)
-void sort_chunks(int len, Chunk *array) {
-    for (int i = 0; i < len; i++) {
-        for (int j = i+1; j < len; j++) {
-            if (array[i].base_lower < array[j].base_lower) {
-                Chunk a = array[i];
-                Chunk b = array[j];
-
-                memcpy(&array[j], &a, sizeof(Chunk));
-                memcpy(&array[i], &b, sizeof(Chunk));
-            }
-        }
-    }
-}
+// void merge_chunks(Chunk *chunks, size_t len) {
+//     if (len < 2)
+//         return;
+// 
+//     for (int i = 0; i < len - 1; i++) {
+//         Chunk curr = chunks[i];
+//         Chunk next = chunks[i+1];
+// 
+//         if (curr.base_lower + curr.len_lower < next.base_lower) 
+//             continue;
+// 
+//         // check if two chunks intersect (after sort)
+//         else if (curr.base_lower >= next.base_lower) // This should never happen?????
+//             return;
+// 
+//         else if (curr.base_lower + curr.len_lower >= next.base_lower) {
+//             
+//         }
+//     }
+// }
