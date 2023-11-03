@@ -81,7 +81,7 @@ void test_memswap(void *in_a, void *in_b, int sz) {
     memcpy(swap_b, b, BUFSZ);
 
     memswap(swap_a, swap_b, sz);
-    
+
     for (int i = 0; i < sz; i++) {
         ASSERT(a[i] == swap_b[i]);
         ASSERT(b[i] == swap_a[i]);

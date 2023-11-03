@@ -71,6 +71,6 @@ void memswap(void *restrict src_a, void *restrict src_b, size_t n) {
         char swap_b = b[i];
 
         a[i] = swap_b;
-        b[i] = swap_a; 
+        b[i] = swap_a;
     }
 }
