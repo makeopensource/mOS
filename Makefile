@@ -72,7 +72,7 @@ os_entry.o: $(ASM_OS_ENTRY_SOURCE)
 	nasm $^ -f elf32 -o $@ $(DEBUG_NASM_FLAGS)
 
 %.o: %.c
-	$(CC) -c $^ -o $@ $(CFLAGS) -I./src/lib/
+	$(CC) -c $^ -o $@ $(CFLAGS) -I./src/lib/ -I./src/lib/stdlib/
 
 %.o: %.asm
 	nasm $^ -f elf32 -o $@ $(DEBUG_NASM_FLAGS)

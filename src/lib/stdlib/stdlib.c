@@ -81,3 +81,22 @@ void itoa_s(int in, char *buf, int bufsz) {
     if (bufsz != 0)
         buf[i] = '\0';
 }
+
+void isort(void *base, size_t nel, size_t width,
+           int (*compar)(const void *a, const void *b)) {
+    if (nel < 2 || width < 1) {
+        return;
+    }
+
+    for (int i = 0; i < nel; i++) {
+        for (int j = i + 1; j < nel; j++) {
+
+            void *a = base + i * width;
+            void *b = base + j * width;
+
+            if (compar(a, b) > 0) {
+                memswap(a, b, width);
+            }
+        }
+    }
+}

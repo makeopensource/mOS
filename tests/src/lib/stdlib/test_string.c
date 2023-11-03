@@ -1,5 +1,5 @@
 #include "../../test_helper.h"
-#include "stdlib/string.h"
+#include "string.h"
 
 #define BUFSZ                                                                  \
     100 // the size of string compare buffers (to detect buffer overflow)
@@ -68,6 +68,31 @@ void test_strcpy_s(void *in, int sz, int cmpsz) {
     }
 }
 
+void test_memswap(void *in_a, void *in_b, int sz) {
+    ASSERT(sz > 0);
+    char *a = (char *)in_a;
+    char *b = (char *)in_b;
+    char swap_a[BUFSZ + 1];
+    char swap_b[BUFSZ + 1];
+    swap_a[sz] = 'a';
+    swap_b[sz] = 'b';
+
+    memcpy(swap_a, a, BUFSZ);
+    memcpy(swap_b, b, BUFSZ);
+
+    memswap(swap_a, swap_b, sz);
+
+    for (int i = 0; i < sz; i++) {
+        ASSERT(a[i] == swap_b[i]);
+        ASSERT(b[i] == swap_a[i]);
+    }
+
+    for (int i = sz; i < BUFSZ; i++) {
+        ASSERT(swap_a[i] == a[i]);
+        ASSERT(swap_b[i] == b[i]);
+    }
+}
+
 int test_main() {
     test_strnlen_s("makeopensource!", 100, 15);
     test_strnlen_s("", 100, 0);
@@ -96,6 +121,8 @@ int test_main() {
     test_strcpy_s("copy\0", 100, 5);
     test_strcpy_s("makeopensource\0", 8, 8);
     test_strcpy_s("don't copy me", 0, 0);
+
+    test_memswap("12345678", "87654321", 8);
 
     char done[] = "test_string done\n";
     serialWrite(COM1, (uint8_t *)(done), sizeof(done) - 1);
