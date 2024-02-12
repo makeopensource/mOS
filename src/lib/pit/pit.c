@@ -7,7 +7,9 @@
 
 uint32_t timer_ticks = 0;
 
-uint32_t get_ticks() { return timer_ticks; }
+uint32_t get_ticks() {
+    return timer_ticks;
+}
 
 static void timer_handler(isr_registers_t *regs) {
     /* Increment 'Tick count' */

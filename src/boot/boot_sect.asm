@@ -3,7 +3,7 @@ OS_OFFSET equ 0x1000
 
 [bits 16]
 begin:
-	mov [BOOT_DRIVE], dl
+    mov [BOOT_DRIVE], dl
     mov bp, 0x9000
     mov sp, bp
     jmp detect_mem

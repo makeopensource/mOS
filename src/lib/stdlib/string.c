@@ -62,3 +62,15 @@ void memset(void *restrict dest, uint8_t c, size_t n) {
         ((uint8_t *)dest)[i] = c;
     }
 }
+
+void memswap(void *restrict src_a, void *restrict src_b, size_t n) {
+    char *a = (char *)src_a;
+    char *b = (char *)src_b;
+    for (int i = 0; i < n; i++) {
+        char swap_a = a[i];
+        char swap_b = b[i];
+
+        a[i] = swap_b;
+        b[i] = swap_a;
+    }
+}
