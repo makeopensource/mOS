@@ -33,12 +33,12 @@ void updateCursorPos(void) {
     uint16_t pos = (cursor - VGA_MEMORY);
 
     // low (mostly x but some y too)
-    outb(0x3D4, 0x0F);
-    outb(0x3D5, (uint8_t)(pos & 0xFF));
+    outb(VGA_ADDR_PORT, 0x0F);
+    outb(VGA_DATA_PORT, (uint8_t)(pos & 0xFF));
 
     // high (only y)
-    outb(0x3D4, 0x0E);
-    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+    outb(VGA_ADDR_PORT, 0x0E);
+    outb(VGA_DATA_PORT, (uint8_t)((pos >> 8) & 0xFF));
 }
 
 // checks and fixes the cursor, may do nothing

@@ -9,6 +9,9 @@
 #define VGA_SIZE (VGA_WIDTH * VGA_HEIGHT)
 #define VGA_END (VGA_MEMORY + VGA_SIZE)
 
+#define VGA_ADDR_PORT 0x3D4
+#define VGA_DATA_PORT 0x3D5
+
 // All the VGA colors, in order
 typedef enum {
     black,
