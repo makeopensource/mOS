@@ -1,6 +1,6 @@
-#include "../stdlib/stdio.h"
+#include "../../lib/stdlib/stdio.h"
 
-#include "../pit/pit.h"
+#include "../../lib/pit/pit.h"
 #include "disk.h"
 #include "port_io.h"
 
@@ -189,20 +189,20 @@ uint8_t ide_ata_access(uint8_t direction, uint8_t drive, uint32_t lba,
                 __asm__ volatile("rep insw"::"c"(words), "d"(bus), "D"(edi));
                 __asm__ volatile("popw %es");
                 edi += (words * 2);
-            } else {
+            }
+        } else {
                 for(i = 0; i < numsects; i++) {
                     ide_polling(channel, 0);
-                    __asm__ volatile("push");
+                    __asm__ volatile("pushw %ds");
                     __asm__ volatile("mov %%ax, %%ds"::"a"(selector));
                     __asm__ volatile("rep outsw"::"c"(words), "d"(bus), "S"(edi));
                     __asm__ volatile("popw %ds");
                     edi += (words*2);
                 }
-                ide_write(channel, ATA_REG_COMMAND, (char [3]) {ATA_CMD_CACHE_FLUSH,
-                    ATA_CMD_CACHE_FLUSH, ATA_CMD_CACHE_FLUSH_EXT});
+                ide_write(channel, ATA_REG_COMMAND, (char []){ATA_CMD_CACHE_FLUSH,
+                    ATA_CMD_CACHE_FLUSH, ATA_CMD_CACHE_FLUSH_EXT}[lba_mode]);
                 ide_polling(channel, 0);
             }
-        }
     }
 
     return 0;
