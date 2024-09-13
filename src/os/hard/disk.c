@@ -1,8 +1,29 @@
 #include "../../lib/stdlib/stdio.h"
-
 #include "../../lib/pit/pit.h"
+#include "../../lib/video/VGA_text.h"
 #include "disk.h"
 #include "port_io.h"
+
+static struct ide_device {
+   unsigned char  Reserved;    // 0 (Empty) or 1 (This Drive really exists).
+   unsigned char  Channel;     // 0 (Primary Channel) or 1 (Secondary Channel).
+   unsigned char  Drive;       // 0 (Master Drive) or 1 (Slave Drive).
+   unsigned short Type;        // 0: ATA, 1:ATAPI.
+   unsigned short Signature;   // Drive Signature
+   unsigned short Capabilities;// Features.
+   unsigned int   CommandSets; // Command Sets Supported.
+   unsigned int   Size;        // Size in Sectors.
+   unsigned char  Model[41];   // Model in string.
+} ide_devices[4];
+
+static struct IDEChannelRegisters {
+   unsigned short base;  // I/O Base.
+   unsigned short ctrl;  // Control Base
+   unsigned short bmide; // Bus Master IDE
+   unsigned char  nIEN;  // nIEN (No Interrupt);
+} channels[2];
+
+static uint8_t ide_buf[2048] = {0};
 
 static void insw(uint16_t reg, uint8_t *buffer, int bytes) {
     for(int i = 0; i < bytes; i++) {
@@ -84,10 +105,11 @@ void ide_initialize(unsigned int BAR0, unsigned int BAR1, unsigned int BAR2,
     for(i = 0; i < 4; i++) {
         char buff[256];
         if(ide_devices[i].Reserved) {
-            snprintf(buff, 256, " Found %s Drive %dGB - %s\n",
+            snprintf(buff, 256, "Found %s Drive %iGB - %s",
                 (const char* []){"ATA", "ATAPI"}[ide_devices[i].Type],
                 ide_devices[i].Size / 1024 / 1024 / 2,
                 ide_devices[i].Model);
+            println(buff, yellow);
         }
     }
 }
@@ -285,23 +307,24 @@ uint8_t ide_print_error(uint32_t drive, uint8_t err) {
     char buff[256];
 
     snprintf(buff, 32, "IDE:");
-    if(err == 1) { snprintf(buff, 32, "- Device Fault\n"); err = 19; }
+    print(buff, red);
+    if(err == 1) { snprintf(buff, 32, "- Device Fault"); println(buff, red); err = 19; }
     else if(err == 2) {
         uint8_t st = ide_read(ide_devices[drive].Channel, ATA_REG_ERROR);
-        if(st & ATA_ER_AMNF) { snprintf(buff, 32, "- No Address Mark Found\n"); err = 7; }
-        if(st & ATA_ER_TK0NF) { snprintf(buff, 32, "- No Media or Media Error\n"); err = 3; }
-        if(st & ATA_ER_ABRT) { snprintf(buff, 32, "- Command Aborted\n"); err = 20; }
-        if(st & ATA_ER_MCR) { snprintf(buff, 32, "- No Media or Media Error\n"); err = 3; }
-        if(st & ATA_ER_IDNF) { snprintf(buff, 32, "- ID Mark not Found\n"); err = 21; }
-        if(st & ATA_ER_MC) { snprintf(buff, 32, "- No Media or Media Error\n"); err = 3; }
-        if(st & ATA_ER_UNC) { snprintf(buff, 32, "- Uncorrectable Data Error\n"); err = 22; }
-        if(st & ATA_ER_BBK) { snprintf(buff, 32, "- Bad Sectors\n"); err = 13; }
-    } else if(err == 3) { snprintf(buff, 32, "- Reads Nothing\n"); err = 23; }
-      else if(err == 4) { snprintf(buff, 32, "- Write Protected\n"); err = 8; }
-    snprintf(buff, 256, "- [%s %s] %s\n",
+        if(st & ATA_ER_AMNF) { snprintf(buff, 32, "- No Address Mark Found"); println(buff, red); err = 7; }
+        if(st & ATA_ER_TK0NF) { snprintf(buff, 32, "- No Media or Media Error"); println(buff, red); err = 3; }
+        if(st & ATA_ER_ABRT) { snprintf(buff, 32, "- Command Aborted"); println(buff, red); err = 20; }
+        if(st & ATA_ER_MCR) { snprintf(buff, 32, "- No Media or Media Error"); println(buff, red); err = 3; }
+        if(st & ATA_ER_IDNF) { snprintf(buff, 32, "- ID Mark not Found"); println(buff, red); err = 21; }
+        if(st & ATA_ER_MC) { snprintf(buff, 32, "- No Media or Media Error"); println(buff, red); err = 3; }
+        if(st & ATA_ER_UNC) { snprintf(buff, 32, "- Uncorrectable Data Error"); println(buff, red); err = 22; }
+        if(st & ATA_ER_BBK) { snprintf(buff, 32, "- Bad Sectors"); println(buff, red); err = 13; }
+    } else if(err == 3) { snprintf(buff, 32, "- Reads Nothing"); println(buff, red); err = 23; }
+      else if(err == 4) { snprintf(buff, 32, "- Write Protected"); println(buff, red); err = 8; }
+    snprintf(buff, 256, "- [%s %s] %s",
         (const char* []){"Primary", "Secondary"}[ide_devices[drive].Channel],
         (const char* []){"Master", "Slave"}[ide_devices[drive].Drive],
         ide_devices[drive].Model);
-    
+    println(buff, red); 
     return err;
 }
