@@ -107,7 +107,7 @@ void ide_initialize(unsigned int BAR0, unsigned int BAR1, unsigned int BAR2,
         if(ide_devices[i].Reserved) {
             snprintf(buff, 256, "Found %s Drive %iGB - %s",
                 (const char* []){"ATA", "ATAPI"}[ide_devices[i].Type],
-                ide_devices[i].Size / 1024 / 1024 / 2,
+                ide_devices[i].Size, // / 1024 / 1024 / 2,
                 ide_devices[i].Model);
             println(buff, yellow);
         }
