@@ -54,6 +54,14 @@ void adjustCursor(void) {
     updateCursorPos();
 }
 
+static VGA_Color clearColor;
+void delete (void) {
+    VGA_Char clearChar = getVGAchar(' ', white, clearColor);
+
+    *--cursor = clearChar;
+    adjustCursor();
+}
+
 void print(const char *str, VGA_Color color) {
     while (*str != 0) {
         // preserve background
@@ -98,6 +106,7 @@ void scroll() {
 void clearScreen(VGA_Color color) {
     VGA_Char clearChr = getVGAchar(' ', white, color);
 
+    clearColor = color;
     clearScreenC(clearChr);
 }
 

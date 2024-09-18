@@ -50,6 +50,7 @@ void writeText(const char *str, int x, int y, VGA_Color color);
 
 // affect cursor
 
+void delete (void);
 // prints with wrapping, println does the same but adds a new line.
 void print(const char *str, VGA_Color color);
 void println(const char *str, VGA_Color color);
