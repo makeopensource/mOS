@@ -54,20 +54,19 @@ void adjustCursor(void) {
     updateCursorPos();
 }
 
-static VGA_Color clearColor;
 void deletePrevChar(void) {
-    VGA_Char clearChar = getVGAchar(' ', white, clearColor);
-
-    if (cursor > VGA_MEMORY)
+    if (cursor > VGA_MEMORY) {
+        VGA_Char clearChar = getVGAchar(' ', white, (cursor - 1)->color >> 4);
         *--cursor = clearChar;
+    }
     adjustCursor();
 }
 
 void deleteCurrentChar(void) {
-    VGA_Char clearChar = getVGAchar(' ', white, clearColor);
-
-    if (cursor < VGA_END - 1)
+    if (cursor < VGA_END - 1) {
+        VGA_Char clearChar = getVGAchar(' ', white, cursor->color >> 4);
         *cursor++ = clearChar;
+    }
     adjustCursor();
 }
 
@@ -143,7 +142,6 @@ void scroll() {
 void clearScreen(VGA_Color color) {
     VGA_Char clearChr = getVGAchar(' ', white, color);
 
-    clearColor = color;
     clearScreenC(clearChr);
 }
 
