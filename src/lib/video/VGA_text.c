@@ -62,6 +62,30 @@ void delete (void) {
     adjustCursor();
 }
 
+void cursorDown(void) {
+    if(cursor < VGA_END - VGA_WIDTH)
+        cursor += VGA_WIDTH;
+    else
+        cursor = VGA_END - 1;
+    adjustCursor();
+}
+
+void cursorUp(void) {
+    cursor -= VGA_WIDTH;
+    adjustCursor();
+}
+
+void cursorLeft(void) {
+    cursor--;
+    adjustCursor();
+}
+
+void cursorRight(void) {
+    if(cursor < VGA_END - 1)
+        cursor++; 
+    adjustCursor();
+}
+
 void print(const char *str, VGA_Color color) {
     while (*str != 0) {
         // preserve background

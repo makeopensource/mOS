@@ -86,12 +86,26 @@ void ps2HandlerPort1(isr_registers_t *regs) {
 
         // temporary to satisfy exactly what issue #7 says
         if (out.keyEvent.code != Key_none && out.keyEvent.event == KeyPressed) {
-            if (out.keyEvent.code != Key_backspace) {
-                char buf[2] = " ";
-                buf[0] = keyPressToASCII(out.keyEvent);
-                print(buf, white);
-            } else {
-                delete ();
+            switch(out.keyEvent.code) {
+                case Key_backspace:
+                    delete();
+                    break;
+                case Key_left:
+                    cursorLeft();
+                    break;
+                case Key_down:
+                    cursorDown();
+                    break;
+                case Key_up:
+                    cursorUp();
+                    break;
+                case Key_right:
+                    cursorRight();
+                    break;
+                default:
+                    char buf[2] = " ";
+                    buf[0] = keyPressToASCII(out.keyEvent);
+                    print(buf, white);
             }
         }
     }
