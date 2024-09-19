@@ -63,6 +63,14 @@ void deletePrevChar(void) {
     adjustCursor();
 }
 
+void deleteCurrentChar(void) {
+    VGA_Char clearChar = getVGAchar(' ', white, clearColor);
+
+    if (cursor < VGA_END - 1)
+        *cursor++ = clearChar;
+    adjustCursor();
+}
+
 void cursorDown(void) {
     if (cursor < VGA_END - VGA_WIDTH)
         cursor += VGA_WIDTH;

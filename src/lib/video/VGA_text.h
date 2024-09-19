@@ -51,6 +51,7 @@ void writeText(const char *str, int x, int y, VGA_Color color);
 // affect cursor
 
 void deletePrevChar(void);
+void deleteCurrentChar(void);
 void cursorDown(void);
 void cursorUp(void);
 void cursorLeft(void);

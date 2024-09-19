@@ -90,6 +90,9 @@ void ps2HandlerPort1(isr_registers_t *regs) {
             case Key_backspace:
                 deletePrevChar();
                 break;
+            case Key_delete:
+                deleteCurrentChar();
+                break;
             case Key_left:
                 cursorLeft();
                 break;
