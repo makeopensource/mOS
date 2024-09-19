@@ -55,7 +55,7 @@ void adjustCursor(void) {
 }
 
 static VGA_Color clearColor;
-void delete (void) {
+void deletePrevChar(void) {
     VGA_Char clearChar = getVGAchar(' ', white, clearColor);
 
     *--cursor = clearChar;
@@ -63,7 +63,7 @@ void delete (void) {
 }
 
 void cursorDown(void) {
-    if(cursor < VGA_END - VGA_WIDTH)
+    if (cursor < VGA_END - VGA_WIDTH)
         cursor += VGA_WIDTH;
     else
         cursor = VGA_END - 1;
@@ -81,8 +81,8 @@ void cursorLeft(void) {
 }
 
 void cursorRight(void) {
-    if(cursor < VGA_END - 1)
-        cursor++; 
+    if (cursor < VGA_END - 1)
+        cursor++;
     adjustCursor();
 }
 
