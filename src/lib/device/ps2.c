@@ -72,8 +72,6 @@ const struct PS2Device *getPortType(int portnum) {
 // temporary include for #7
 #include "video/VGA_text.h"
 
-#define SIGNUM(x) ((x > 0) - (x < 0))
-
 static int highlight_offset = 0;
 
 void specialHandler(struct PS2Buf_t out) {
@@ -86,16 +84,32 @@ void specialHandler(struct PS2Buf_t out) {
             deleteCurrentChar();
             break;
         case Key_left:
-            cursorLeft();
+            if (highlight_offset) {
+                cursorHighlightLeft(highlight_offset);
+                highlight_offset = 0;
+            } else
+                cursorLeft();
             break;
         case Key_down:
-            cursorDown();
+            if(highlight_offset) {
+                cursorHighlightDown(highlight_offset);
+                highlight_offset = 0;
+            } else
+                cursorDown();
             break;
         case Key_up:
-            cursorUp();
+            if(highlight_offset) {
+                cursorHighlightUp(highlight_offset);
+                highlight_offset = 0;
+            } else
+                cursorUp();
             break;
         case Key_right:
-            cursorRight();
+            if (highlight_offset) {
+                cursorHighlightRight(highlight_offset);
+                highlight_offset = 0;
+            } else
+                cursorRight();
             break;
         default:
             break;

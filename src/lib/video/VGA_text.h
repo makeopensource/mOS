@@ -57,9 +57,13 @@ void highlightCurrentChar(void);
 
 void deletePrevChar(void);
 void deleteCurrentChar(void);
+void cursorHighlightDown(int offset);
 void cursorDown(void);
+void cursorHighlightUp(int offset);
 void cursorUp(void);
+void cursorHighlightLeft(int offset);
 void cursorLeft(void);
+void cursorHighlightRight(int offset);
 void cursorRight(void);
 // prints with wrapping, println does the same but adds a new line.
 void print(const char *str, VGA_Color color);

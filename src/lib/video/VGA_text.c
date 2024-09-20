@@ -39,16 +39,6 @@ static inline VGA_Color invert(VGA_Color color) {
     return 15 - (unsigned)color;
 }
 
-void highlightChar(unsigned short charPos) {
-    if (VGA_END - VGA_MEMORY < charPos)
-        return;
-
-    VGA_Char highlighted = (VGA_MEMORY[charPos]);
-    VGA_MEMORY[charPos] =
-        getVGAchar(highlighted.chr, invert(highlighted.color & 0xf),
-                   invert((highlighted.color >> 4) & 0xf));
-}
-
 void updateCursorPos(void) {
 
     // evil (but useful) pointer arithmetic
@@ -77,8 +67,8 @@ void adjustCursor(void) {
 }
 
 void highlightCurrentChar(void) {
-    uint16_t pos = (cursor - VGA_MEMORY);
-    highlightChar(pos);
+    *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
+                   invert((cursor->color >> 4) & 0xf));
 }
 
 #define CLEAR_CHAR(ptr) (getVGAchar(' ', white, (ptr)->color >> 4))
@@ -103,11 +93,41 @@ void deleteCurrentChar(void) {
 
 #undef CLEAR_CHAR
 
+#define SIGNUM(x) ((x > 0) - (x < 0))
+
+void cursorHighlightDown(int offset) {
+    cursor -= offset;
+    int sign = SIGNUM(offset);
+    int abs_offset = SIGNUM(offset) * offset;
+    for(int i = abs_offset; i >= 0; i--) {
+        *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
+                   invert((cursor->color >> 4) & 0xf));
+        cursor += sign;
+    }
+    cursor -= sign;
+    cursorDown();
+    adjustCursor();
+}
+
 void cursorDown(void) {
     if (cursor < VGA_END - VGA_WIDTH)
         cursor += VGA_WIDTH;
     else
         cursor = VGA_END - 1;
+    adjustCursor();
+}
+
+void cursorHighlightUp(int offset) {
+    cursor -= offset;
+    int sign = SIGNUM(offset);
+    int abs_offset = SIGNUM(offset) * offset;
+    for(int i = abs_offset; i >= 0; i--) {
+        *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
+                   invert((cursor->color >> 4) & 0xf));
+        cursor += sign;
+    }
+    cursor -= sign;
+    cursorUp();
     adjustCursor();
 }
 
@@ -119,9 +139,35 @@ void cursorUp(void) {
     adjustCursor();
 }
 
+void cursorHighlightLeft(int offset) {
+    if (offset < 0)
+        cursor -= offset;
+    int abs_offset = SIGNUM(offset) * offset;
+    for (int i = abs_offset; i >= 0; i--) {
+        *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
+                   invert((cursor->color >> 4) & 0xf));
+        cursor--;
+    }
+    cursor++;
+    adjustCursor();
+}
+
 void cursorLeft(void) {
     if (!cursorIsAtStart())
         cursor--;
+    adjustCursor();
+}
+
+void cursorHighlightRight(int offset) {
+    if (offset > 0)
+        cursor -= offset;
+    int abs_offset = SIGNUM(offset) * offset;
+    for (int i = abs_offset; i >= 0; i--) {
+        *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
+                   invert((cursor->color >> 4) & 0xf));
+        cursor++;
+    }
+    cursor--;
     adjustCursor();
 }
 
@@ -130,6 +176,8 @@ void cursorRight(void) {
         cursor++;
     adjustCursor();
 }
+
+#undef SIGNUM
 
 void print(const char *str, VGA_Color color) {
     while (*str != 0) {
