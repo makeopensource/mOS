@@ -27,6 +27,18 @@ void writeText(const char *str, int x, int y, VGA_Color color) {
     }
 }
 
+static inline VGA_Color invert(VGA_Color color) {
+    return 15 - (unsigned)color;
+}
+
+void highlightChar(unsigned short charPos) {
+    if (VGA_END - VGA_MEMORY < charPos)
+        return;
+
+    VGA_Char highlighted = (VGA_MEMORY[charPos]);
+    VGA_MEMORY[charPos] = getVGAchar(highlighted.chr, invert(highlighted.color & 0xf), invert((highlighted.color >> 4) & 0xf));
+}
+
 void updateCursorPos(void) {
 
     // evil (but useful) pointer arithmetic
@@ -54,9 +66,17 @@ void adjustCursor(void) {
     updateCursorPos();
 }
 
+void highlightCurrentChar(void) {
+    uint16_t pos = (cursor - VGA_MEMORY);
+    highlightChar(pos);
+}
+
+#define CLEAR_CHAR(ptr) (getVGAchar(' ', white, (ptr)->color >> 4))
+
 void deletePrevChar(void) {
     if (cursor > VGA_MEMORY) {
-        VGA_Char clearChar = getVGAchar(' ', white, (cursor - 1)->color >> 4);
+        // preserve background
+        VGA_Char clearChar = CLEAR_CHAR(cursor - 1);
         *--cursor = clearChar;
     }
     adjustCursor();
@@ -64,11 +84,14 @@ void deletePrevChar(void) {
 
 void deleteCurrentChar(void) {
     if (cursor < VGA_END - 1) {
-        VGA_Char clearChar = getVGAchar(' ', white, cursor->color >> 4);
+        // preserve background
+        VGA_Char clearChar = CLEAR_CHAR(cursor);
         *cursor++ = clearChar;
     }
     adjustCursor();
 }
+
+#undef CLEAR_CHAR
 
 void cursorDown(void) {
     if (cursor < VGA_END - VGA_WIDTH)

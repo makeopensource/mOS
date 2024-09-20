@@ -48,6 +48,8 @@ VGA_Char getVGAchar(unsigned char chr, VGA_Color foreground,
 // prints text at location, will NOT wrap
 void writeText(const char *str, int x, int y, VGA_Color color);
 
+void highlightCurrentChar(void);
+
 // affect cursor
 
 void deletePrevChar(void);

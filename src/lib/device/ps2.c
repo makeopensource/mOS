@@ -72,6 +72,10 @@ const struct PS2Device *getPortType(int portnum) {
 // temporary include for #7
 #include "video/VGA_text.h"
 
+#define SIGNUM(x) ((x > 0) - (x < 0))
+
+static unsigned short highlight_offset = 0;
+
 void ps2HandlerPort1(isr_registers_t *regs) {
     uint8_t b = inb(PS2_DATA);
 
@@ -86,29 +90,52 @@ void ps2HandlerPort1(isr_registers_t *regs) {
 
         // temporary to satisfy exactly what issue #7 says
         if (out.keyEvent.code != Key_none && out.keyEvent.event == KeyPressed) {
-            switch (out.keyEvent.code) {
-            case Key_backspace:
-                deletePrevChar();
-                break;
-            case Key_delete:
-                deleteCurrentChar();
-                break;
-            case Key_left:
-                cursorLeft();
-                break;
-            case Key_down:
-                cursorDown();
-                break;
-            case Key_up:
-                cursorUp();
-                break;
-            case Key_right:
-                cursorRight();
-                break;
-            default:
-                char buf[2] = " ";
-                buf[0] = keyPressToASCII(out.keyEvent);
-                print(buf, white);
+            if(!(out.keyEvent.modifiers & KEY_MOD_SHIFT)) {
+                switch (out.keyEvent.code) {
+                case Key_backspace:
+                    deletePrevChar();
+                    break;
+                case Key_delete:
+                    deleteCurrentChar();
+                    break;
+                case Key_left:
+                    cursorLeft();
+                    break;
+                case Key_down:
+                    cursorDown();
+                    break;
+                case Key_up:
+                    cursorUp();
+                    break;
+                case Key_right:
+                    cursorRight();
+                    break;
+                default:
+                    char buf[2] = " ";
+                    buf[0] = keyPressToASCII(out.keyEvent);
+                    print(buf, white);
+                }
+            } else {
+                switch (out.keyEvent.code) {
+                case Key_left:
+                    if(!highlight_offset)
+                        highlightCurrentChar();
+                    cursorLeft();
+                    highlightCurrentChar();
+                    highlight_offset--;
+                    break;
+                case Key_right:
+                    if(!highlight_offset)
+                        highlightCurrentChar();
+                    cursorRight();
+                    highlightCurrentChar();
+                    highlight_offset++;
+                    break;
+                default:
+                    char buf[2] = " ";
+                    buf[0] = keyPressToASCII(out.keyEvent);
+                    print(buf, white);
+                }
             }
         }
     }
