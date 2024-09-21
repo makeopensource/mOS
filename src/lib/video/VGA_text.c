@@ -68,7 +68,7 @@ void adjustCursor(void) {
 
 void highlightCurrentChar(void) {
     *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
-                   invert((cursor->color >> 4) & 0xf));
+                         invert((cursor->color >> 4) & 0xf));
 }
 
 #define CLEAR_CHAR(ptr) (getVGAchar(' ', white, (ptr)->color >> 4))
@@ -99,9 +99,9 @@ void cursorHighlightDown(int offset) {
     cursor -= offset;
     int sign = SIGNUM(offset);
     int abs_offset = SIGNUM(offset) * offset;
-    for(int i = abs_offset; i >= 0; i--) {
+    for (int i = abs_offset; i >= 0; i--) {
         *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
-                   invert((cursor->color >> 4) & 0xf));
+                             invert((cursor->color >> 4) & 0xf));
         cursor += sign;
     }
     cursor -= sign;
@@ -121,9 +121,9 @@ void cursorHighlightUp(int offset) {
     cursor -= offset;
     int sign = SIGNUM(offset);
     int abs_offset = SIGNUM(offset) * offset;
-    for(int i = abs_offset; i >= 0; i--) {
+    for (int i = abs_offset; i >= 0; i--) {
         *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
-                   invert((cursor->color >> 4) & 0xf));
+                             invert((cursor->color >> 4) & 0xf));
         cursor += sign;
     }
     cursor -= sign;
@@ -145,7 +145,7 @@ void cursorHighlightLeft(int offset) {
     int abs_offset = SIGNUM(offset) * offset;
     for (int i = abs_offset; i >= 0; i--) {
         *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
-                   invert((cursor->color >> 4) & 0xf));
+                             invert((cursor->color >> 4) & 0xf));
         cursor--;
     }
     cursor++;
@@ -164,7 +164,7 @@ void cursorHighlightRight(int offset) {
     int abs_offset = SIGNUM(offset) * offset;
     for (int i = abs_offset; i >= 0; i--) {
         *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
-                   invert((cursor->color >> 4) & 0xf));
+                             invert((cursor->color >> 4) & 0xf));
         cursor++;
     }
     cursor--;

@@ -91,14 +91,14 @@ void specialHandler(struct PS2Buf_t out) {
                 cursorLeft();
             break;
         case Key_down:
-            if(highlight_offset) {
+            if (highlight_offset) {
                 cursorHighlightDown(highlight_offset);
                 highlight_offset = 0;
             } else
                 cursorDown();
             break;
         case Key_up:
-            if(highlight_offset) {
+            if (highlight_offset) {
                 cursorHighlightUp(highlight_offset);
                 highlight_offset = 0;
             } else
