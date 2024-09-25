@@ -118,20 +118,34 @@ void specialHandler(struct PS2Buf_t out) {
         switch (out.keyEvent.code) {
         case Key_left:
             if (!cursorIsAtStart()) {
-                if (!highlight_offset || highlight_offset == 1)
+                if (!highlight_offset)
                     highlightCurrentChar();
-                cursorLeft();
-                highlightCurrentChar();
+                if (highlight_offset > 0) {
+                    highlightCurrentChar();
+                    cursorLeft();
+                } else {
+                    cursorLeft();
+                    highlightCurrentChar();
+                }
                 highlight_offset--;
+                if (!highlight_offset)
+                    highlightCurrentChar();
             }
             break;
         case Key_right:
             if (!cursorIsAtEnd()) {
-                if (!highlight_offset || highlight_offset == -1)
+                if (!highlight_offset)
                     highlightCurrentChar();
-                cursorRight();
-                highlightCurrentChar();
+                if (highlight_offset < 0) {
+                    highlightCurrentChar();
+                    cursorRight();
+                } else {
+                    cursorRight();
+                    highlightCurrentChar();
+                }
                 highlight_offset++;
+                if (!highlight_offset)
+                    highlightCurrentChar();
             }
             break;
         default:
