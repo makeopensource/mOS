@@ -135,7 +135,7 @@ void specialHandler(struct PS2Buf_t out) {
             }
             break;
         case Key_down:
-            if(!cursorIsAtEnd()) {
+            if (!cursorIsAtEnd()) {
                 if (!highlight_offset)
                     highlightCurrentChar();
                 for (int i = 0; i < VGA_WIDTH && !cursorIsAtEnd(); i++) {
