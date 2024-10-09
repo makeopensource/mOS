@@ -116,6 +116,42 @@ void specialHandler(struct PS2Buf_t out) {
         }
     } else {
         switch (out.keyEvent.code) {
+        case Key_up:
+            if (!cursorIsAtStart()) {
+                if (!highlight_offset)
+                    highlightCurrentChar();
+                for (int i = 0; i < VGA_WIDTH && !cursorIsAtStart(); i++) {
+                    if (highlight_offset > 0) {
+                        highlightCurrentChar();
+                        cursorLeft();
+                    } else {
+                        cursorLeft();
+                        highlightCurrentChar();
+                    }
+                    highlight_offset--;
+                }
+                if (!highlight_offset)
+                    highlightCurrentChar();
+            }
+            break;
+        case Key_down:
+            if(!cursorIsAtEnd()) {
+                if (!highlight_offset)
+                    highlightCurrentChar();
+                for (int i = 0; i < VGA_WIDTH && !cursorIsAtEnd(); i++) {
+                    if (highlight_offset < 0) {
+                        highlightCurrentChar();
+                        cursorRight();
+                    } else {
+                        cursorRight();
+                        highlightCurrentChar();
+                    }
+                    highlight_offset++;
+                }
+                if (!highlight_offset)
+                    highlightCurrentChar();
+            }
+            break;
         case Key_left:
             if (!cursorIsAtStart()) {
                 if (!highlight_offset)
