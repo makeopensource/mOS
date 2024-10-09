@@ -222,6 +222,10 @@ void ps2HandlerPort1(isr_registers_t *regs) {
                 specialHandler(out);
                 break;
             default:
+                if(highlight_offset) {
+                    highlightDeletePrev(highlight_offset);
+                    highlight_offset = 0;
+                }
                 char buf[2] = " ";
                 buf[0] = keyPressToASCII(out.keyEvent);
                 print(buf, white);
