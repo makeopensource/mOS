@@ -73,12 +73,40 @@ void highlightCurrentChar(void) {
 
 #define CLEAR_CHAR(ptr) (getVGAchar(' ', white, (ptr)->color >> 4))
 
+#define SIGNUM(x) (((x) > 0) - ((x) < 0))
+
+void highlightDeletePrev(int offset) {
+    if (offset < 0)
+        cursor -= offset;
+    int abs_offset = SIGNUM(offset) * offset;
+    for (int i = abs_offset; i >= 0; i--) {
+        highlightCurrentChar();
+        *cursor = CLEAR_CHAR(cursor);
+        cursor--;
+    }
+    cursor++;
+    adjustCursor();
+}
+
 void deletePrevChar(void) {
     if (!cursorIsAtStart()) {
         // preserve background
         VGA_Char clearChar = CLEAR_CHAR(cursor - 1);
         *--cursor = clearChar;
     }
+    adjustCursor();
+}
+
+void highlightDeleteCurrent(int offset) {
+    if (offset > 0)
+        cursor -= offset;
+    int abs_offset = SIGNUM(offset) * offset;
+    for (int i = abs_offset; i >= 0; i--) {
+        highlightCurrentChar();
+        *cursor = CLEAR_CHAR(cursor);
+        cursor++;
+    }
+    cursor--;
     adjustCursor();
 }
 
@@ -93,12 +121,10 @@ void deleteCurrentChar(void) {
 
 #undef CLEAR_CHAR
 
-#define SIGNUM(x) ((x > 0) - (x < 0))
-
 void cursorHighlightDown(int offset) {
     cursor -= offset;
     int sign = SIGNUM(offset);
-    int abs_offset = SIGNUM(offset) * offset;
+    int abs_offset = sign * offset;
     for (int i = abs_offset; i >= 0; i--) {
         *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
                              invert((cursor->color >> 4) & 0xf));
@@ -120,7 +146,7 @@ void cursorDown(void) {
 void cursorHighlightUp(int offset) {
     cursor -= offset;
     int sign = SIGNUM(offset);
-    int abs_offset = SIGNUM(offset) * offset;
+    int abs_offset = sign * offset;
     for (int i = abs_offset; i >= 0; i--) {
         *cursor = getVGAchar(cursor->chr, invert(cursor->color & 0xf),
                              invert((cursor->color >> 4) & 0xf));

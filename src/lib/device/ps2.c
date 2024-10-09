@@ -78,10 +78,18 @@ void specialHandler(struct PS2Buf_t out) {
     if (!(out.keyEvent.modifiers & KEY_MOD_SHIFT)) {
         switch (out.keyEvent.code) {
         case Key_backspace:
-            deletePrevChar();
+            if (highlight_offset) {
+                highlightDeletePrev(highlight_offset);
+                highlight_offset = 0;
+            } else
+                deletePrevChar();
             break;
         case Key_delete:
-            deleteCurrentChar();
+            if (highlight_offset) {
+                highlightDeleteCurrent(highlight_offset);
+                highlight_offset = 0;
+            } else
+                deleteCurrentChar();
             break;
         case Key_left:
             if (highlight_offset) {
