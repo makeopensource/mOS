@@ -198,6 +198,27 @@ void specialHandler(struct PS2Buf_t out) {
     }
 }
 
+void vgaEditor(struct PS2Buf_t out) {
+    switch (out.keyEvent.code) {
+    case Key_backspace:
+    case Key_delete:
+    case Key_left:
+    case Key_down:
+    case Key_up:
+    case Key_right:
+        specialHandler(out);
+        break;
+    default:
+        if(highlight_offset) {
+            highlightDeletePrev(highlight_offset);
+            highlight_offset = 0;
+        }
+        char buf[2] = " ";
+        buf[0] = keyPressToASCII(out.keyEvent);
+        print(buf, white);
+    }
+}
+
 void ps2HandlerPort1(isr_registers_t *regs) {
     uint8_t b = inb(PS2_DATA);
 
@@ -212,24 +233,7 @@ void ps2HandlerPort1(isr_registers_t *regs) {
 
         // temporary to satisfy exactly what issue #7 says
         if (out.keyEvent.code != Key_none && out.keyEvent.event == KeyPressed) {
-            switch (out.keyEvent.code) {
-            case Key_backspace:
-            case Key_delete:
-            case Key_left:
-            case Key_down:
-            case Key_up:
-            case Key_right:
-                specialHandler(out);
-                break;
-            default:
-                if(highlight_offset) {
-                    highlightDeletePrev(highlight_offset);
-                    highlight_offset = 0;
-                }
-                char buf[2] = " ";
-                buf[0] = keyPressToASCII(out.keyEvent);
-                print(buf, white);
-            }
+            vgaEditor(out);
         }
     }
 }
