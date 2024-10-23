@@ -72,7 +72,7 @@ const struct PS2Device *getPortType(int portnum) {
 // temporary include for #7
 #include "video/VGA_text.h"
 
-static int highlight_offset = 0;
+int highlight_offset = 0;
 
 void specialHandler(struct PS2Buf_t out) {
     if (!(out.keyEvent.modifiers & KEY_MOD_SHIFT)) {
