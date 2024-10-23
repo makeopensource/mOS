@@ -72,16 +72,24 @@ const struct PS2Device *getPortType(int portnum) {
 // temporary include for #7
 #include "video/VGA_text.h"
 
-static int highlight_offset = 0;
+int highlight_offset = 0;
 
 void specialHandler(struct PS2Buf_t out) {
     if (!(out.keyEvent.modifiers & KEY_MOD_SHIFT)) {
         switch (out.keyEvent.code) {
         case Key_backspace:
-            deletePrevChar();
+            if (highlight_offset) {
+                highlightDeletePrev(highlight_offset);
+                highlight_offset = 0;
+            } else
+                deletePrevChar();
             break;
         case Key_delete:
-            deleteCurrentChar();
+            if (highlight_offset) {
+                highlightDeleteCurrent(highlight_offset);
+                highlight_offset = 0;
+            } else
+                deleteCurrentChar();
             break;
         case Key_left:
             if (highlight_offset) {
@@ -116,27 +124,98 @@ void specialHandler(struct PS2Buf_t out) {
         }
     } else {
         switch (out.keyEvent.code) {
+        case Key_up:
+            if (!cursorIsAtStart()) {
+                if (!highlight_offset)
+                    highlightCurrentChar();
+                for (int i = 0; i < VGA_WIDTH && !cursorIsAtStart(); i++) {
+                    if (highlight_offset > 0) {
+                        highlightCurrentChar();
+                        cursorLeft();
+                    } else {
+                        cursorLeft();
+                        highlightCurrentChar();
+                    }
+                    highlight_offset--;
+                }
+                if (!highlight_offset)
+                    highlightCurrentChar();
+            }
+            break;
+        case Key_down:
+            if (!cursorIsAtEnd()) {
+                if (!highlight_offset)
+                    highlightCurrentChar();
+                for (int i = 0; i < VGA_WIDTH && !cursorIsAtEnd(); i++) {
+                    if (highlight_offset < 0) {
+                        highlightCurrentChar();
+                        cursorRight();
+                    } else {
+                        cursorRight();
+                        highlightCurrentChar();
+                    }
+                    highlight_offset++;
+                }
+                if (!highlight_offset)
+                    highlightCurrentChar();
+            }
+            break;
         case Key_left:
             if (!cursorIsAtStart()) {
-                if (!highlight_offset || highlight_offset == 1)
+                if (!highlight_offset)
                     highlightCurrentChar();
-                cursorLeft();
-                highlightCurrentChar();
+                if (highlight_offset > 0) {
+                    highlightCurrentChar();
+                    cursorLeft();
+                } else {
+                    cursorLeft();
+                    highlightCurrentChar();
+                }
                 highlight_offset--;
+                if (!highlight_offset)
+                    highlightCurrentChar();
             }
             break;
         case Key_right:
             if (!cursorIsAtEnd()) {
-                if (!highlight_offset || highlight_offset == -1)
+                if (!highlight_offset)
                     highlightCurrentChar();
-                cursorRight();
-                highlightCurrentChar();
+                if (highlight_offset < 0) {
+                    highlightCurrentChar();
+                    cursorRight();
+                } else {
+                    cursorRight();
+                    highlightCurrentChar();
+                }
                 highlight_offset++;
+                if (!highlight_offset)
+                    highlightCurrentChar();
             }
             break;
         default:
             break;
         }
+    }
+}
+
+void vgaEditor(struct PS2Buf_t out) {
+    switch (out.keyEvent.code) {
+    case Key_backspace:
+    case Key_delete:
+    case Key_left:
+    case Key_down:
+    case Key_up:
+    case Key_right:
+        specialHandler(out);
+        break;
+    default:
+        if(highlight_offset) {
+            highlightDeletePrev(highlight_offset);
+            highlight_offset = 0;
+        }
+        char buf[2] = " ";
+        buf[0] = keyPressToASCII(out.keyEvent);
+        print(buf, white);
     }
 }
 
@@ -154,20 +233,7 @@ void ps2HandlerPort1(isr_registers_t *regs) {
 
         // temporary to satisfy exactly what issue #7 says
         if (out.keyEvent.code != Key_none && out.keyEvent.event == KeyPressed) {
-            switch (out.keyEvent.code) {
-            case Key_backspace:
-            case Key_delete:
-            case Key_left:
-            case Key_down:
-            case Key_up:
-            case Key_right:
-                specialHandler(out);
-                break;
-            default:
-                char buf[2] = " ";
-                buf[0] = keyPressToASCII(out.keyEvent);
-                print(buf, white);
-            }
+            vgaEditor(out);
         }
     }
 }
