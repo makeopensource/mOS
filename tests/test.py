@@ -269,7 +269,7 @@ def test(instance: TestInstance):
             return test_end_stub(instance, passed)
 
         except socket.timeout:
-            print("test timed out")
+            print(instance.bin_path.name + " | test timed out")
 
         except socket.error as e:
 
@@ -348,7 +348,7 @@ def do_tests():
     for instance in instances:
         instance.end()
 
-    print("All tests completed in " + str(time.time() - start) + "seconds")
+    print("All tests completed in " + str(time.time() - start) + " seconds")
     total_fail = 0
     total_pass = 0
 
