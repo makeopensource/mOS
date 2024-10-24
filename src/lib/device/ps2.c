@@ -209,7 +209,7 @@ void vgaEditor(struct PS2Buf_t out) {
         specialHandler(out);
         break;
     default:
-        if(highlight_offset) {
+        if (highlight_offset) {
             highlightDeletePrev(highlight_offset);
             highlight_offset = 0;
         }

@@ -1,7 +1,7 @@
-#include "../../test_helper.h"
 #include "../../../../src/lib/device/keyboard.h"
 #include "../../../../src/lib/device/ps2.h"
 #include "../../../../src/lib/video/VGA_text.h"
+#include "../../test_helper.h"
 #include "stdio.h"
 #include "string.h"
 
@@ -12,7 +12,8 @@ extern VGA_Char *cursor;
 
 int init_pos;
 
-enum CMD {keyPress, checkOffset, checkPosition, end};
+// enum representing the kinds of commands available
+enum CMD { keyPress, checkOffset, checkPosition, end };
 
 struct TestCMD {
     enum CMD cmd;
@@ -22,37 +23,47 @@ struct TestCMD {
     } data;
 };
 
-struct TestCMD kbCMD(enum KeyCode code, enum KeyState event, uint8_t modifiers) {
+// creates a simulated key press command
+struct TestCMD kbCMD(enum KeyCode code, enum KeyState event,
+                     uint8_t modifiers) {
     KeyPress kp = (KeyPress){0, code, event, modifiers};
     struct PS2Buf_t b = (struct PS2Buf_t){PS2_KEY_EVENT, {.keyEvent = kp}};
     return (struct TestCMD){keyPress, {.kb = b}};
 }
 
+// creates an offset check command
 struct TestCMD chkOffCMD(int expected) {
     return (struct TestCMD){checkOffset, {.offset = expected}};
 }
 
+// creates a position check command
 // expected position is relative to the beginning of vga memory
 struct TestCMD chkPosCMD(unsigned expected) {
     return (struct TestCMD){checkPosition, {.offset = expected}};
 }
 
+// creates an end command
 struct TestCMD endCMD() {
     return (struct TestCMD){end, {}};
 }
 
 void execCMD(struct TestCMD cmd) {
     switch (cmd.cmd) {
-    case checkOffset:
-        ASSERT_M(highlight_offset == cmd.data.offset, "Highlight difference | ");
+    case checkOffset: // asserts that the current highlight offset matches the
+                      // supplied offset
+        ASSERT_M(highlight_offset == cmd.data.offset,
+                 "Highlight difference | ");
         break;
-    case checkPosition:
-        ASSERT_M(cursor - VGA_MEMORY == cmd.data.offset, "Position difference | ");
+    case checkPosition: // asserts that the relative position from the start of
+                        // vga memory matches the supplied position
+        ASSERT_M(cursor - VGA_MEMORY == cmd.data.offset,
+                 "Position difference | ");
         break;
-    case keyPress:
+    case keyPress: // simulates a keypress
         vgaEditor(cmd.data.kb);
         break;
-    case end:
+    case end: // end command has no effect on state, it is only used as a
+              // terminator
         break;
     }
 }
