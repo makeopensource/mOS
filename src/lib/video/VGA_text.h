@@ -57,7 +57,10 @@ void highlightCurrentChar(void);
 
 // deletion
 
+void highlightDeletePrev(int offset);
 void deletePrevChar(void);
+
+void highlightDeleteCurrent(int offset);
 void deleteCurrentChar(void);
 
 // movement
