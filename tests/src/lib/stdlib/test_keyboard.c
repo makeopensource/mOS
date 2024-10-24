@@ -75,10 +75,13 @@ void test_main() {
         chkPosCMD(0),
         kbCMD(Key_b, KeyPressed, 0),
         chkOffCMD(0),
+        chkPosCMD(1),
         kbCMD(Key_down, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(80),
+        chkPosCMD(81),
         kbCMD(Key_up, KeyPressed, 0),
         chkOffCMD(0),
+        chkPosCMD(1),
         // Remember to end command sequence!
         endCMD(),
     };
