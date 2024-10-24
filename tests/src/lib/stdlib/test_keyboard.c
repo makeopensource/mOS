@@ -10,8 +10,6 @@
 extern int highlight_offset;
 extern VGA_Char *cursor;
 
-int init_pos;
-
 // enum representing the kinds of commands available
 enum CMD { keyPress, checkOffset, checkPosition, end };
 
@@ -69,18 +67,19 @@ void execCMD(struct TestCMD cmd) {
 }
 
 void test_main() {
-    init_pos = cursor - VGA_MEMORY;
     struct TestCMD b[] = {
-        chkPosCMD(init_pos),
+        // The position checks assume that only 2 lines of text have been
+        // written during boot
+        chkPosCMD(160),
         kbCMD(Key_a, KeyPressed, 0),
         chkOffCMD(0),
-        chkPosCMD(init_pos + 1),
+        chkPosCMD(161),
         kbCMD(Key_left, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(-1),
-        chkPosCMD(init_pos),
+        chkPosCMD(160),
         kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(-81),
-        chkPosCMD(init_pos - 80),
+        chkPosCMD(80),
         kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(-161),
         chkPosCMD(0),
