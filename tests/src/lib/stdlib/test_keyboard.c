@@ -8,6 +8,9 @@
 #include <stdarg.h>
 
 extern int highlight_offset;
+extern VGA_Char *cursor;
+
+int init_pos;
 
 enum CMD {keyPress, checkOffset, end};
 
@@ -47,13 +50,21 @@ void execCMD(struct TestCMD cmd) {
 }
 
 void test_main() {
-    //VGA_Char* vm = VGA_MEMORY;
+    init_pos = cursor - VGA_MEMORY;
     struct TestCMD b[] = {
         kbCMD(Key_a, KeyPressed, 0),
         chkOffCMD(0),
         kbCMD(Key_left, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(-1),
+        kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
+        chkOffCMD(-81),
+        kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
+        chkOffCMD(-161),
         kbCMD(Key_b, KeyPressed, 0),
+        chkOffCMD(0),
+        kbCMD(Key_down, KeyPressed, KEY_MOD_SHIFT),
+        chkOffCMD(80),
+        kbCMD(Key_up, KeyPressed, 0),
         chkOffCMD(0),
         // Remember to end command sequence!
         endCMD(),
