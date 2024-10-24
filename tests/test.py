@@ -112,6 +112,7 @@ class TestInstance:
             self._qemu = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             time.sleep(1) #give qemu some time to open
             self._ready = True
+        print(self.bin_path.name + " has started.")
 
     def beginTest(self):
         self.test = Thread(target=test, args=[self])
@@ -137,9 +138,11 @@ class TestInstance:
                 except:
                     # force qemu to quit since it refuses to exit normally
                     self._qemu.kill()
+                    print(self.bin_path.name + " was forcefully closed.")
 
                 self._qemu = None
                 self._ready = False
+                print(self.bin_path.name + " has exited.")
                 os.remove(self._qemu_file)
 
     def end(self):
