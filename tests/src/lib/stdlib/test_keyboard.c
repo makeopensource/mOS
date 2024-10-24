@@ -12,7 +12,7 @@ extern VGA_Char *cursor;
 
 int init_pos;
 
-enum CMD {keyPress, checkOffset, end};
+enum CMD {keyPress, checkOffset, checkPosition, end};
 
 struct TestCMD {
     enum CMD cmd;
@@ -32,6 +32,11 @@ struct TestCMD chkOffCMD(int expected) {
     return (struct TestCMD){checkOffset, {.offset = expected}};
 }
 
+// expected position is relative to the beginning of vga memory
+struct TestCMD chkPosCMD(unsigned expected) {
+    return (struct TestCMD){checkPosition, {.offset = expected}};
+}
+
 struct TestCMD endCMD() {
     return (struct TestCMD){end, {}};
 }
@@ -40,6 +45,9 @@ void execCMD(struct TestCMD cmd) {
     switch (cmd.cmd) {
     case checkOffset:
         ASSERT_M(highlight_offset == cmd.data.offset, "Highlight difference | ");
+        break;
+    case checkPosition:
+        ASSERT_M(cursor - VGA_MEMORY == cmd.data.offset, "Position difference | ");
         break;
     case keyPress:
         vgaEditor(cmd.data.kb);
@@ -52,14 +60,19 @@ void execCMD(struct TestCMD cmd) {
 void test_main() {
     init_pos = cursor - VGA_MEMORY;
     struct TestCMD b[] = {
+        chkPosCMD(init_pos),
         kbCMD(Key_a, KeyPressed, 0),
         chkOffCMD(0),
+        chkPosCMD(init_pos + 1),
         kbCMD(Key_left, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(-1),
+        chkPosCMD(init_pos),
         kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(-81),
+        chkPosCMD(init_pos - 80),
         kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(-161),
+        chkPosCMD(0),
         kbCMD(Key_b, KeyPressed, 0),
         chkOffCMD(0),
         kbCMD(Key_down, KeyPressed, KEY_MOD_SHIFT),
