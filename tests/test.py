@@ -291,8 +291,12 @@ def test(instance: TestInstance):
 
 
 def create_instance(bin_path, expected_path):
-    while (active_instances > MAX_INSTANCES):
-        time.sleep(0.5)
+    while (True):
+        with instance_mutex:
+            if(active_instances >= MAX_INSTANCES):
+                time.sleep(0.5)
+            else:
+                break
 
     instance = TestInstance(get_port(), bin_path, expected_path)
     instance.start()
