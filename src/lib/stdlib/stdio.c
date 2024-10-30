@@ -54,6 +54,7 @@ int vsnprintf(char *restrict buffer, size_t bufsz, char *format, va_list ap) {
                 if (len + n + 1 < bufsz) {
                     memcpy(buffer, s, len);
                     buffer += len;
+                    n += len - 1;
                 } else {
                     return n;
                 }
@@ -88,6 +89,7 @@ int vsnprintf(char *restrict buffer, size_t bufsz, char *format, va_list ap) {
                 if (bufSize + n + 1 < bufsz) {
                     itoa_s(i, buffer, MAX_SNPRINTF_STRING - n);
                     buffer += bufSize;
+                    n += bufSize - 1;
                 } else {
                     return n;
                 }
