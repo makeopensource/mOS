@@ -8,6 +8,7 @@
 #include <stdarg.h>
 
 // in case changes are made to the width of the screen text
+// we still have a portable way of selecting the final column
 #define END_COL (VGA_WIDTH - 1)
 
 extern int highlight_offset;
@@ -44,6 +45,8 @@ struct TestCMD chkPosCMD(unsigned line, unsigned col) {
                             {.offset = (line * VGA_WIDTH) + col}};
 }
 
+// creates a set position command
+// position is relative to the beginning of VGA memory
 struct TestCMD setPosCMD(unsigned line, unsigned col) {
     return (struct TestCMD){setPosition, {.offset = (line * VGA_WIDTH) + col}};
 }
@@ -53,6 +56,7 @@ struct TestCMD endCMD() {
     return (struct TestCMD){end, {}};
 }
 
+// execute the supplied command based on its `cmd` field
 void execCMD(struct TestCMD cmd) {
     switch (cmd.cmd) {
     case checkOffset: // asserts that the current highlight offset matches the
@@ -67,7 +71,8 @@ void execCMD(struct TestCMD cmd) {
                  "Position difference | Expected: %i, Actual: %i",
                  cmd.data.offset, cursor - VGA_MEMORY);
         break;
-    case setPosition:
+    case setPosition:   // sets the cursor position, checks that the position is in bounds 
+
         cursor = VGA_MEMORY + cmd.data.offset;
         break;
     case keyPress: // simulates a keypress
