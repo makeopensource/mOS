@@ -8,8 +8,9 @@
 #include <stdarg.h>
 
 // in case changes are made to the width of the screen text
-// we still have a portable way of selecting the final column
+// we still have a portable way of selecting the specific positions
 #define END_COL (VGA_WIDTH - 1)
+#define END_LINE (VGA_HEIGHT - 1)
 
 extern int highlight_offset;
 extern VGA_Char *cursor;
@@ -57,7 +58,7 @@ struct TestCMD endCMD() {
 }
 
 // execute the supplied command based on its `cmd` field
-void execCMD(struct TestCMD cmd) {
+int execCMD(struct TestCMD cmd) {
     switch (cmd.cmd) {
     case checkOffset: // asserts that the current highlight offset matches the
                       // supplied offset
@@ -71,8 +72,12 @@ void execCMD(struct TestCMD cmd) {
                  "Position difference | Expected: %i, Actual: %i",
                  cmd.data.offset, cursor - VGA_MEMORY);
         break;
-    case setPosition:   // sets the cursor position, checks that the position is in bounds 
-
+    case setPosition: // sets the cursor position, checks that the position is
+                      // in bounds
+        if(cmd.data.offset < 0 || cmd.data.offset >= VGA_SIZE) {
+            FAIL_M("Offset of %i is out of bounds for VGA of length %i.", cmd.data.offset, VGA_SIZE);
+            return 1;
+        }
         cursor = VGA_MEMORY + cmd.data.offset;
         break;
     case keyPress: // simulates a keypress
@@ -81,7 +86,11 @@ void execCMD(struct TestCMD cmd) {
     case end: // end command has no effect on state, it is only used as a
               // terminator
         break;
+    default:
+        FAIL_M("Unexpected command type: %i", cmd.cmd);
+        return 1;
     }
+    return 0;
 }
 
 void test_main() {
@@ -116,11 +125,24 @@ void test_main() {
         chkPosCMD(1, 0),
         kbCMD(Key_left, KeyPressed, 0),
         chkPosCMD(0, END_COL),
+        setPosCMD(END_LINE, 0),
+        kbCMD(Key_down, KeyPressed, 0),
+        chkPosCMD(END_LINE, END_COL),
+        kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
+        kbCMD(Key_down, KeyPressed, 0),
+        chkPosCMD(END_LINE, END_COL),
         // Remember to end command sequence!
         endCMD(),
     };
     for (int i = 0; b[i].cmd != end; i++) {
-        execCMD(b[i]);
+        if (execCMD(b[i])) {
+            char err[] = "test_keyboard errored at command ";
+            serialWrite(COM1, (uint8_t *)err, sizeof(err) - 1);
+            char buf[4];
+            int len = snprintf(buf, 4, "%i", i);
+            serialWrite(COM1, (uint8_t *)buf, len);
+            return;
+        }
     }
     char done[] = "test_keyboard done\n";
     serialWrite(COM1, (uint8_t *)(done), sizeof(done) - 1);
