@@ -76,22 +76,22 @@ int vsnprintf(char *restrict buffer, size_t bufsz, char *format, va_list ap) {
             case 'i':
                 i = va_arg(ap, int);
                 int temp = i;
-                int bufSize = 0;
+                len = 0;
                 if (i < 0) {
-                    bufSize++;
+                    len++;
                     temp *= -1;
                 }
-                for (; temp >= 1; temp = temp / 10, bufSize++)
+                for (; temp >= 1; temp = temp / 10, len++)
                     ;
                 if(i == 0)
-                    bufSize++;
+                    len++;
 
                 // checks if there is space for the entire string
                 // plus the null-terminating byte
-                if (bufSize + n + 1 < bufsz) {
+                if (len + n + 1 < bufsz) {
                     itoa_s(i, buffer, MAX_SNPRINTF_STRING - n);
-                    buffer += bufSize;
-                    n += bufSize - 1;
+                    buffer += len;
+                    n += len - 1;
                 } else {
                     return n;
                 }
