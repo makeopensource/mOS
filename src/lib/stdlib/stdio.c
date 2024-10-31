@@ -83,7 +83,7 @@ int vsnprintf(char *restrict buffer, size_t bufsz, char *format, va_list ap) {
                 }
                 for (; temp >= 1; temp = temp / 10, len++)
                     ;
-                if(i == 0)
+                if (i == 0)
                     len++;
 
                 // checks if there is space for the entire string

@@ -7,6 +7,9 @@
 
 #include <stdarg.h>
 
+// in case changes are made to the width of the screen text
+#define END_COL (VGA_WIDTH - 1)
+
 extern int highlight_offset;
 extern VGA_Char *cursor;
 
@@ -89,23 +92,25 @@ void test_main() {
         chkOffCMD(-1),
         chkPosCMD(2, 0),
         kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
-        chkOffCMD(-81),
+        chkOffCMD(-VGA_WIDTH - 1),
         chkPosCMD(1, 0),
         kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
-        chkOffCMD(-161),
+        chkOffCMD(-(2 * VGA_WIDTH) - 1),
         chkPosCMD(0, 0),
         kbCMD(Key_b, KeyPressed, 0),
         chkOffCMD(0),
         chkPosCMD(0, 1),
         kbCMD(Key_down, KeyPressed, KEY_MOD_SHIFT),
-        chkOffCMD(80),
+        chkOffCMD(VGA_WIDTH),
         chkPosCMD(1, 1),
         kbCMD(Key_up, KeyPressed, 0),
         chkOffCMD(0),
         chkPosCMD(0, 1),
-        setPosCMD(0, 79),
+        setPosCMD(0, END_COL),
         kbCMD(Key_right, KeyPressed, 0),
         chkPosCMD(1, 0),
+        kbCMD(Key_left, KeyPressed, 0),
+        chkPosCMD(0, END_COL),
         // Remember to end command sequence!
         endCMD(),
     };
