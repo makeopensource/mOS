@@ -12,16 +12,37 @@ void _assert_fail_m(char *fmt, const char *assertion, const char *file,
     va_start(args, function);
     char buff[1024];
     char errfmt[] = "%s:%i Assertion '%s' failed.\n";
-    int len = snprintf(buff, 1024, errfmt, file, line, assertion);
+    int len = snprintf(buff, 1024, errfmt, function, line, assertion);
     while (!serialWriteReady(COM1))
         ;
     serialWrite(COM1, (uint8_t *)buff, len);
 
-    len = vsnprintf(buff, 1024, fmt, args);
+    if (fmt[0] != 0) {
+        len = vsnprintf(buff, 1024, fmt, args);
+        while (!serialWriteReady(COM1))
+            ;
+        serialWrite(COM1, (uint8_t *)buff, len);
+    }
+
+    va_end(args);
+}
+
+void _fail_m(char *fmt, unsigned line, const char *function, ...) {
+    va_list args;
+    va_start(args, function);
+    char buff[1024];
+    char errfmt[] = "%s:%i Fail assertion reached.\n";
+    int len = snprintf(buff, 1024, errfmt, function, line);
     while (!serialWriteReady(COM1))
         ;
     serialWrite(COM1, (uint8_t *)buff, len);
 
+    if (fmt[0] != 0) {
+        len = vsnprintf(buff, 1024, fmt, args);
+        while (!serialWriteReady(COM1))
+            ;
+        serialWrite(COM1, (uint8_t *)buff, len);
+    }
     va_end(args);
 }
 
@@ -36,6 +57,9 @@ void _assert_fail_m(char *fmt, const char *assertion, const char *file,
         _assert_fail_m(fmt "\n", #condition, __FILE__, __LINE__,               \
                        __func__ __VA_OPT__(, ) __VA_ARGS__);                   \
     }
+
+#define FAIL_M(fmt, ...)                                                       \
+    _fail_m(fmt "\n", __LINE__, __func__ __VA_OPT__(, ) __VA_ARGS__)
 
 #define ASSERT(condition) ASSERT_M(condition, "")
 
