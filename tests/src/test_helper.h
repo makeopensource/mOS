@@ -6,19 +6,27 @@
 
 #include <stdarg.h>
 
-void _assert_fail_m(char *fmt, const char *assertion, const char *file,
-                    unsigned line, const char *function, ...) {
+void _assert_fail_m(char *fmt, const char *assertion, unsigned line,
+                    const char *function, ...) {
     va_list args;
     va_start(args, function);
-    char buff[1024];
+
+    // buffer to write the messages to
+    char buff[256];
+    // "{function name}:{line number} Assertion '{assertion as a string}'
+    // failed."
     char errfmt[] = "%s:%i Assertion '%s' failed.\n";
+
     int len = snprintf(buff, 1024, errfmt, function, line, assertion);
     while (!serialWriteReady(COM1))
+
         ;
     serialWrite(COM1, (uint8_t *)buff, len);
 
+    // avoid an empty line
     if (fmt[0] != 0) {
         len = vsnprintf(buff, 1024, fmt, args);
+
         while (!serialWriteReady(COM1))
             ;
         serialWrite(COM1, (uint8_t *)buff, len);
@@ -30,19 +38,27 @@ void _assert_fail_m(char *fmt, const char *assertion, const char *file,
 void _fail_m(char *fmt, unsigned line, const char *function, ...) {
     va_list args;
     va_start(args, function);
-    char buff[1024];
+
+    // buffer to write the messages to
+    char buff[256];
+    // "{function name}:{line number} Fail assertion reached."
     char errfmt[] = "%s:%i Fail assertion reached.\n";
+
     int len = snprintf(buff, 1024, errfmt, function, line);
+
     while (!serialWriteReady(COM1))
         ;
     serialWrite(COM1, (uint8_t *)buff, len);
 
+    // avoid an empty line
     if (fmt[0] != 0) {
         len = vsnprintf(buff, 1024, fmt, args);
+
         while (!serialWriteReady(COM1))
             ;
         serialWrite(COM1, (uint8_t *)buff, len);
     }
+
     va_end(args);
 }
 
@@ -54,7 +70,7 @@ void _fail_m(char *fmt, unsigned line, const char *function, ...) {
 
 #define ASSERT_M(condition, fmt, ...)                                          \
     if (!(condition)) {                                                        \
-        _assert_fail_m(fmt "\n", #condition, __FILE__, __LINE__,               \
+        _assert_fail_m(fmt "\n", #condition, __LINE__,                         \
                        __func__ __VA_OPT__(, ) __VA_ARGS__);                   \
     }
 
