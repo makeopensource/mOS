@@ -74,8 +74,9 @@ int execCMD(struct TestCMD cmd) {
         break;
     case setPosition: // sets the cursor position, checks that the position is
                       // in bounds
-        if(cmd.data.offset < 0 || cmd.data.offset >= VGA_SIZE) {
-            FAIL_M("Offset of %i is out of bounds for VGA of length %i.", cmd.data.offset, VGA_SIZE);
+        if (cmd.data.offset < 0 || cmd.data.offset >= VGA_SIZE) {
+            FAIL_M("Offset of %i is out of bounds for VGA of length %i.",
+                   cmd.data.offset, VGA_SIZE);
             return 1;
         }
         cursor = VGA_MEMORY + cmd.data.offset;
