@@ -1,9 +1,9 @@
-#include "../../../../src/lib/device/keyboard.h"
-#include "../../../../src/lib/device/ps2.h"
-#include "../../../../src/lib/video/VGA_text.h"
-#include "../../test_helper.h"
+#include "device/keyboard.h"
+#include "device/ps2.h"
 #include "stdio.h"
 #include "string.h"
+#include "test_helper.h"
+#include "video/VGA_text.h"
 
 #include <stdarg.h>
 
