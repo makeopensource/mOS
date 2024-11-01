@@ -208,7 +208,7 @@ void vgaEditor(struct PS2Buf_t out) {
     case Key_right:
         specialHandler(out);
         break;
-    default:     
+    default:
         char buf[2] = " ";
         buf[0] = keyPressToASCII(out.keyEvent);
         if (buf[0] != 0) {
