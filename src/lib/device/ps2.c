@@ -208,14 +208,16 @@ void vgaEditor(struct PS2Buf_t out) {
     case Key_right:
         specialHandler(out);
         break;
-    default:
-        if (highlight_offset) {
-            highlightDeletePrev(highlight_offset);
-            highlight_offset = 0;
-        }
+    default:     
         char buf[2] = " ";
         buf[0] = keyPressToASCII(out.keyEvent);
-        print(buf, white);
+        if (buf[0] != 0) {
+            if (highlight_offset) {
+                highlightDeletePrev(highlight_offset);
+                highlight_offset = 0;
+            }
+            print(buf, white);
+        }
     }
 }
 
