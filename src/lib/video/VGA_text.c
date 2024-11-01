@@ -119,8 +119,6 @@ void deleteCurrentChar(void) {
     adjustCursor();
 }
 
-#undef CLEAR_CHAR
-
 void cursorHighlightDown(int offset) {
     cursor -= offset;
     int sign = SIGNUM(offset);
@@ -202,8 +200,6 @@ void cursorRight(void) {
         cursor++;
     adjustCursor();
 }
-
-#undef SIGNUM
 
 void print(const char *str, VGA_Color color) {
     while (*str != 0) {
