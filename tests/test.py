@@ -132,13 +132,14 @@ class TestInstance:
             if (self._qemu != None and self._qemu.poll() == None):
                 try:
                     # send the exit command to QEMU
-                    self._qemu.communicate(b"\x01x", 5)
+                    self._qemu.terminate()
                     self._qemu.wait(10)
 
                 except:
                     # force qemu to quit since it refuses to exit normally
-                    self._qemu.kill()
                     print(self.bin_path.name + " was forcefully closed.")
+                    self._qemu.kill()
+                    self._qemu.wait(5)
 
                 self._qemu = None
                 self._ready = False
