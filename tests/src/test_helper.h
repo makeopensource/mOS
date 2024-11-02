@@ -6,6 +6,8 @@
 
 #include <stdarg.h>
 
+#define ERR_BUFF_SIZE 256
+
 void _assert_fail_m(char *fmt, const char *assertion, unsigned line,
                     const char *function, ...) {
     va_list args;
@@ -17,7 +19,7 @@ void _assert_fail_m(char *fmt, const char *assertion, unsigned line,
     // failed."
     char errfmt[] = "%s:%i Assertion '%s' failed.\n";
 
-    int len = snprintf(buff, 1024, errfmt, function, line, assertion);
+    int len = snprintf(buff, sizeof(buff), errfmt, function, line, assertion);
     while (!serialWriteReady(COM1))
 
         ;
@@ -25,7 +27,7 @@ void _assert_fail_m(char *fmt, const char *assertion, unsigned line,
 
     // avoid an empty line
     if (fmt[0] != 0) {
-        len = vsnprintf(buff, 1024, fmt, args);
+        len = vsnprintf(buff, sizeof(buff), fmt, args);
 
         while (!serialWriteReady(COM1))
             ;
@@ -44,7 +46,7 @@ void _fail_m(char *fmt, unsigned line, const char *function, ...) {
     // "{function name}:{line number} Fail assertion reached."
     char errfmt[] = "%s:%i Fail assertion reached.\n";
 
-    int len = snprintf(buff, 1024, errfmt, function, line);
+    int len = snprintf(buff, sizeof(buff), errfmt, function, line);
 
     while (!serialWriteReady(COM1))
         ;
@@ -52,7 +54,7 @@ void _fail_m(char *fmt, unsigned line, const char *function, ...) {
 
     // avoid an empty line
     if (fmt[0] != 0) {
-        len = vsnprintf(buff, 1024, fmt, args);
+        len = vsnprintf(buff, sizeof(buff), fmt, args);
 
         while (!serialWriteReady(COM1))
             ;
