@@ -46,10 +46,10 @@ typedef struct {
 typedef struct {
     VGA_Char *pos;
     int highlight_offset;
-} cursor_struct;
+} VGA_Cursor;
 
 // is this a normal thing to do? no clue, I'll let god and/or Trevor decide
-extern cursor_struct cursor;
+extern VGA_Cursor cursor;
 
 // returns a VGA_Char with the supplied attributes
 VGA_Char getVGAchar(unsigned char chr, VGA_Color foreground,

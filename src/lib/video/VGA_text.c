@@ -2,7 +2,7 @@
 
 #include "../../os/hard/port_io.h"
 
-cursor_struct cursor = {VGA_MEMORY, 0};
+VGA_Cursor cursor = {VGA_MEMORY, 0};
 
 VGA_Char getVGAchar(unsigned char chr, VGA_Color foreground,
                     VGA_Color background) {
