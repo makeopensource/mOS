@@ -4,9 +4,16 @@ OBJ_NAMES := $(C_FILES:%.c=%.o)
 
 MOS_ELF := ./../mOS.elf
 
+VENV = .venv
+VENV_PY = $(VENV)/bin/python
+
 .PHONY: clean test
 
-all: $(MOS_ELF) $(BIN_NAMES)
+all: $(MOS_ELF) $(BIN_NAMES) venv_setup
+
+venv_setup:
+	python3 -m venv $(VENV)
+	$(VENV_PY) -m pip install termcolor
 
 %.bin: %.o test_entry.o
 	$(LD) -o $@.elf $(LFLAGS) -T link.ld $^ --just-symbols=$(MOS_ELF)
@@ -24,9 +31,9 @@ $(MOS_ELF):
 
 test: all
 ifdef TESTS
-	python3 test.py $(TESTS)
+	$(VENV_PY) test.py $(TESTS)
 else
-	python3 test.py
+	$(VENV_PY) test.py
 endif
 
 clean:

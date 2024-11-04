@@ -7,6 +7,7 @@ import errno
 import shutil
 import sys
 
+from termcolor import cprint
 
 BASE_PORT = 1111
 MAX_PORT = 1234
@@ -112,7 +113,7 @@ class TestInstance:
             self._qemu = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             time.sleep(1) #give qemu some time to open
             self._ready = True
-        print(self.bin_path.name + " has started.")
+        cprint(self.bin_path.name + " has started.", "green")
 
     def beginTest(self):
         self.test = Thread(target=test, args=[self])
@@ -137,13 +138,13 @@ class TestInstance:
 
                 except:
                     # force qemu to quit since it refuses to exit normally
-                    print(self.bin_path.name + " was forcefully closed.")
+                    cprint(self.bin_path.name + " was forcefully closed.", "red", attrs=["bold"])
                     self._qemu.kill()
                     self._qemu.wait(5)
 
                 self._qemu = None
                 self._ready = False
-                print(self.bin_path.name + " has exited.")
+                cprint(self.bin_path.name + " has exited.", "cyan")
                 os.remove(self._qemu_file)
 
     def end(self):
@@ -273,7 +274,7 @@ def test(instance: TestInstance):
             return test_end_stub(instance, passed)
 
         except socket.timeout:
-            print(instance.bin_path.name + " | test timed out")
+            cprint(instance.bin_path.name + " | test timed out", "red")
 
         except socket.error as e:
 
@@ -364,10 +365,10 @@ def do_tests():
         result = instance.result
         if (result):
             total_pass += 1
-            print(instance.bin_path.name + " PASSED")
+            cprint(instance.bin_path.name + " PASSED", "light_green")
         else:
             total_fail += 1
-            print(instance.bin_path.name + " FAILED")
+            cprint(instance.bin_path.name + " FAILED", "red", attrs=["bold"])
 
     print("Summary: PASSED-{}, FAILED-{}, TOTAL-{}"
         .format(total_pass, total_fail, len(instances)))
