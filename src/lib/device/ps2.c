@@ -72,50 +72,48 @@ const struct PS2Device *getPortType(int portnum) {
 // temporary include for #7
 #include "video/VGA_text.h"
 
-int highlight_offset = 0;
-
-void specialHandler(struct PS2Buf_t out) {
-    if (!(out.keyEvent.modifiers & KEY_MOD_SHIFT)) {
-        switch (out.keyEvent.code) {
+void specialHandler(KeyPress out) {
+    if (!(out.modifiers & KEY_MOD_SHIFT)) {
+        switch (out.code) {
         case Key_backspace:
-            if (highlight_offset) {
-                highlightDeletePrev(highlight_offset);
-                highlight_offset = 0;
+            if (cursor.highlight_offset) {
+                highlightDeletePrev(cursor.highlight_offset);
+                cursor.highlight_offset = 0;
             } else
                 deletePrevChar();
             break;
         case Key_delete:
-            if (highlight_offset) {
-                highlightDeleteCurrent(highlight_offset);
-                highlight_offset = 0;
+            if (cursor.highlight_offset) {
+                highlightDeleteCurrent(cursor.highlight_offset);
+                cursor.highlight_offset = 0;
             } else
                 deleteCurrentChar();
             break;
         case Key_left:
-            if (highlight_offset) {
-                cursorHighlightLeft(highlight_offset);
-                highlight_offset = 0;
+            if (cursor.highlight_offset) {
+                cursorHighlightLeft(cursor.highlight_offset);
+                cursor.highlight_offset = 0;
             } else
                 cursorLeft();
             break;
         case Key_down:
-            if (highlight_offset) {
-                cursorHighlightDown(highlight_offset);
-                highlight_offset = 0;
+            if (cursor.highlight_offset) {
+                cursorHighlightDown(cursor.highlight_offset);
+                cursor.highlight_offset = 0;
             } else
                 cursorDown();
             break;
         case Key_up:
-            if (highlight_offset) {
-                cursorHighlightUp(highlight_offset);
-                highlight_offset = 0;
+            if (cursor.highlight_offset) {
+                cursorHighlightUp(cursor.highlight_offset);
+                cursor.highlight_offset = 0;
             } else
                 cursorUp();
             break;
         case Key_right:
-            if (highlight_offset) {
-                cursorHighlightRight(highlight_offset);
-                highlight_offset = 0;
+            if (cursor.highlight_offset) {
+                cursorHighlightRight(cursor.highlight_offset);
+                cursor.highlight_offset = 0;
             } else
                 cursorRight();
             break;
@@ -123,72 +121,72 @@ void specialHandler(struct PS2Buf_t out) {
             break;
         }
     } else {
-        switch (out.keyEvent.code) {
+        switch (out.code) {
         case Key_up:
             if (!cursorIsAtStart()) {
-                if (!highlight_offset)
+                if (!cursor.highlight_offset)
                     highlightCurrentChar();
                 for (int i = 0; i < VGA_WIDTH && !cursorIsAtStart(); i++) {
-                    if (highlight_offset > 0) {
+                    if (cursor.highlight_offset > 0) {
                         highlightCurrentChar();
                         cursorLeft();
                     } else {
                         cursorLeft();
                         highlightCurrentChar();
                     }
-                    highlight_offset--;
+                    cursor.highlight_offset--;
                 }
-                if (!highlight_offset)
+                if (!cursor.highlight_offset)
                     highlightCurrentChar();
             }
             break;
         case Key_down:
             if (!cursorIsAtEnd()) {
-                if (!highlight_offset)
+                if (!cursor.highlight_offset)
                     highlightCurrentChar();
                 for (int i = 0; i < VGA_WIDTH && !cursorIsAtEnd(); i++) {
-                    if (highlight_offset < 0) {
+                    if (cursor.highlight_offset < 0) {
                         highlightCurrentChar();
                         cursorRight();
                     } else {
                         cursorRight();
                         highlightCurrentChar();
                     }
-                    highlight_offset++;
+                    cursor.highlight_offset++;
                 }
-                if (!highlight_offset)
+                if (!cursor.highlight_offset)
                     highlightCurrentChar();
             }
             break;
         case Key_left:
             if (!cursorIsAtStart()) {
-                if (!highlight_offset)
+                if (!cursor.highlight_offset)
                     highlightCurrentChar();
-                if (highlight_offset > 0) {
+                if (cursor.highlight_offset > 0) {
                     highlightCurrentChar();
                     cursorLeft();
                 } else {
                     cursorLeft();
                     highlightCurrentChar();
                 }
-                highlight_offset--;
-                if (!highlight_offset)
+                cursor.highlight_offset--;
+                if (!cursor.highlight_offset)
                     highlightCurrentChar();
             }
             break;
         case Key_right:
             if (!cursorIsAtEnd()) {
-                if (!highlight_offset)
+                if (!cursor.highlight_offset)
                     highlightCurrentChar();
-                if (highlight_offset < 0) {
+                if (cursor.highlight_offset < 0) {
                     highlightCurrentChar();
                     cursorRight();
                 } else {
                     cursorRight();
                     highlightCurrentChar();
                 }
-                highlight_offset++;
-                if (!highlight_offset)
+                cursor.highlight_offset++;
+                if (!cursor.highlight_offset)
                     highlightCurrentChar();
             }
             break;
@@ -206,15 +204,15 @@ void vgaEditor(struct PS2Buf_t out) {
     case Key_down:
     case Key_up:
     case Key_right:
-        specialHandler(out);
+        specialHandler(out.keyEvent);
         break;
     default:
         char buf[2] = " ";
         buf[0] = keyPressToASCII(out.keyEvent);
         if (buf[0] != 0) {
-            if (highlight_offset) {
-                highlightDeletePrev(highlight_offset);
-                highlight_offset = 0;
+            if (cursor.highlight_offset) {
+                highlightDeletePrev(cursor.highlight_offset);
+                cursor.highlight_offset = 0;
             }
             print(buf, white);
         }

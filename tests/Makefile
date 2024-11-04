@@ -13,7 +13,7 @@ all: $(MOS_ELF) $(BIN_NAMES) venv_setup
 
 venv_setup:
 	python3 -m venv $(VENV)
-	$(VENV_PY) -m pip install termcolor
+	$(VENV_PY) -m pip install -r requirements.txt
 
 %.bin: %.o test_entry.o
 	$(LD) -o $@.elf $(LFLAGS) -T link.ld $^ --just-symbols=$(MOS_ELF)

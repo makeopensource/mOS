@@ -12,9 +12,6 @@
 #define END_COL (VGA_WIDTH - 1)
 #define END_LINE (VGA_HEIGHT - 1)
 
-extern int highlight_offset;
-extern VGA_Char *cursor;
-
 // enum representing the kinds of commands available
 enum CMD { keyPress, checkOffset, checkPosition, setPosition, end };
 
@@ -58,28 +55,29 @@ struct TestCMD endCMD() {
 }
 
 // execute the supplied command based on its `cmd` field
-int execCMD(struct TestCMD cmd) {
+int execCMD(struct TestCMD cmd, int idx) {
     switch (cmd.cmd) {
     case checkOffset: // asserts that the current highlight offset matches the
                       // supplied offset
-        ASSERT_M(highlight_offset == cmd.data.offset,
-                 "Highlight difference | Expected: %i, Actual: %i",
-                 cmd.data.offset, highlight_offset);
+        ASSERT_M(cursor.highlight_offset == cmd.data.offset,
+                 "CMD %i: Highlight difference | Expected: %i, Actual: %i", idx,
+                 cmd.data.offset, cursor.highlight_offset);
         break;
     case checkPosition: // asserts that the relative position from the start of
                         // vga memory matches the supplied position
-        ASSERT_M(cursor - VGA_MEMORY == cmd.data.offset,
-                 "Position difference | Expected: %i, Actual: %i",
-                 cmd.data.offset, cursor - VGA_MEMORY);
+        ASSERT_M(cursor.pos - VGA_MEMORY == cmd.data.offset,
+                 "CMD %i: Position difference | Expected: %i, Actual: %i", idx,
+                 cmd.data.offset, cursor.pos - VGA_MEMORY);
         break;
     case setPosition: // sets the cursor position, checks that the position is
                       // in bounds
         if (cmd.data.offset < 0 || cmd.data.offset >= VGA_SIZE) {
-            FAIL_M("Offset of %i is out of bounds for VGA of length %i.",
-                   cmd.data.offset, VGA_SIZE);
+            FAIL_M(
+                "CMD %i: Offset of %i is out of bounds for VGA of length %i.",
+                idx, cmd.data.offset, VGA_SIZE);
             return 1;
         }
-        cursor = VGA_MEMORY + cmd.data.offset;
+        cursor.pos = VGA_MEMORY + cmd.data.offset;
         break;
     case keyPress: // simulates a keypress
         vgaEditor(cmd.data.kb);
@@ -88,24 +86,30 @@ int execCMD(struct TestCMD cmd) {
               // terminator
         break;
     default:
-        FAIL_M("Unexpected command type: %i", cmd.cmd);
+        FAIL_M("CMD %i: Unexpected command type: %i", idx, cmd.cmd);
         return 1;
     }
     return 0;
 }
 
 void test_main() {
-    cursor = VGA_MEMORY + 160;
     struct TestCMD b[] = {
-        // The position checks assume that only 2 lines of text have been
-        // written during boot
+        // set cursor position to a known position to prevent breaking if the
+        // boot text changes
+        setPosCMD(2, 0),
+        // make sure that the position is set properly
         chkPosCMD(2, 0),
+
         kbCMD(Key_a, KeyPressed, 0),
         chkOffCMD(0),
         chkPosCMD(2, 1),
+
         kbCMD(Key_left, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(-1),
         chkPosCMD(2, 0),
+
+        // make sure keys that do not produce a character do not affect the
+        // highlight offset
         kbCMD(Key_Lctrl, KeyPressed, 0),
         chkOffCMD(-1),
         kbCMD(Key_Rctrl, KeyPressed, 0),
@@ -122,37 +126,50 @@ void test_main() {
         chkOffCMD(-1),
         kbCMD(Key_pgDown, KeyPressed, 0),
         chkOffCMD(-1),
+
+        // check that highlighting works properly
         kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(-VGA_WIDTH - 1),
         chkPosCMD(1, 0),
         kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(-(2 * VGA_WIDTH) - 1),
         chkPosCMD(0, 0),
+
+        // check that key press removes highlight and sets cursor position to
+        // after typed character
         kbCMD(Key_b, KeyPressed, 0),
         chkOffCMD(0),
         chkPosCMD(0, 1),
+
+        // check that vertical keypresses move cursor properly while
+        // highlighting
         kbCMD(Key_down, KeyPressed, KEY_MOD_SHIFT),
         chkOffCMD(VGA_WIDTH),
         chkPosCMD(1, 1),
         kbCMD(Key_up, KeyPressed, 0),
         chkOffCMD(0),
         chkPosCMD(0, 1),
+
+        // check wrapping
         setPosCMD(0, END_COL),
         kbCMD(Key_right, KeyPressed, 0),
         chkPosCMD(1, 0),
         kbCMD(Key_left, KeyPressed, 0),
         chkPosCMD(0, END_COL),
+
+        // check bottom bounds check
         setPosCMD(END_LINE, 0),
         kbCMD(Key_down, KeyPressed, 0),
         chkPosCMD(END_LINE, END_COL),
         kbCMD(Key_up, KeyPressed, KEY_MOD_SHIFT),
         kbCMD(Key_down, KeyPressed, 0),
         chkPosCMD(END_LINE, END_COL),
-        // Remember to end command sequence!
+
         endCMD(),
     };
-    for (int i = 0; b[i].cmd != end; i++) {
-        if (execCMD(b[i])) {
+    for (int i = 0; b[i].cmd != end && i < sizeof(b) / sizeof(struct TestCMD);
+         i++) {
+        if (execCMD(b[i], i)) {
             char err[] = "test_keyboard errored at command ";
             serialWrite(COM1, (uint8_t *)err, sizeof(err) - 1);
             char buf[4];

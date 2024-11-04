@@ -3,31 +3,23 @@
 
 #include "device/serial.h"
 #include "stdio.h"
+#include "string.h"
 
 #include <stdarg.h>
 
-#define ERR_BUFF_SIZE 256
-
-void _assert_fail_m(char *fmt, const char *assertion, unsigned line,
-                    const char *function, ...) {
+void _assert_fail_m(char *fmt, const char *msg, ...) {
     va_list args;
-    va_start(args, function);
+    va_start(args, msg);
 
     // buffer to write the messages to
     char buff[256];
-    // "{function name}:{line number} Assertion '{assertion as a string}'
-    // failed."
-    char errfmt[] = "%s:%i Assertion '%s' failed.\n";
-
-    int len = snprintf(buff, sizeof(buff), errfmt, function, line, assertion);
     while (!serialWriteReady(COM1))
-
         ;
-    serialWrite(COM1, (uint8_t *)buff, len);
+    serialWrite(COM1, (uint8_t *)msg, strnlen_s(msg, 256));
 
     // avoid an empty line
     if (fmt[0] != 0) {
-        len = vsnprintf(buff, sizeof(buff), fmt, args);
+        int len = vsnprintf(buff, sizeof(buff), fmt, args);
 
         while (!serialWriteReady(COM1))
             ;
@@ -37,24 +29,19 @@ void _assert_fail_m(char *fmt, const char *assertion, unsigned line,
     va_end(args);
 }
 
-void _fail_m(char *fmt, unsigned line, const char *function, ...) {
+void _fail_m(char *fmt, const char *msg, ...) {
     va_list args;
-    va_start(args, function);
+    va_start(args, msg);
 
     // buffer to write the messages to
     char buff[256];
-    // "{function name}:{line number} Fail assertion reached."
-    char errfmt[] = "%s:%i Fail assertion reached.\n";
-
-    int len = snprintf(buff, sizeof(buff), errfmt, function, line);
-
     while (!serialWriteReady(COM1))
         ;
-    serialWrite(COM1, (uint8_t *)buff, len);
+    serialWrite(COM1, (uint8_t *)msg, strnlen_s(msg, 256));
 
     // avoid an empty line
     if (fmt[0] != 0) {
-        len = vsnprintf(buff, sizeof(buff), fmt, args);
+        int len = vsnprintf(buff, sizeof(buff), fmt, args);
 
         while (!serialWriteReady(COM1))
             ;
@@ -72,12 +59,14 @@ void _fail_m(char *fmt, unsigned line, const char *function, ...) {
 
 #define ASSERT_M(condition, fmt, ...)                                          \
     if (!(condition)) {                                                        \
-        _assert_fail_m(fmt "\n", #condition, __LINE__,                         \
-                       __func__ __VA_OPT__(, ) __VA_ARGS__);                   \
+        _assert_fail_m(fmt "\n", "Line " STR_LINE ": Assertion '" #condition   \
+                                 "' failed.\n" __VA_OPT__(, ) __VA_ARGS__);    \
     }
 
 #define FAIL_M(fmt, ...)                                                       \
-    _fail_m(fmt "\n", __LINE__, __func__ __VA_OPT__(, ) __VA_ARGS__)
+    _fail_m(fmt "\n",                                                          \
+            "Line " STR_LINE ": Fail assertion reached.\n" __VA_OPT__(, )      \
+                __VA_ARGS__)
 
 #define ASSERT(condition) ASSERT_M(condition, "")
 
