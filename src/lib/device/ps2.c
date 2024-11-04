@@ -76,44 +76,44 @@ void specialHandler(KeyPress out) {
     if (!(out.modifiers & KEY_MOD_SHIFT)) {
         switch (out.code) {
         case Key_backspace:
-            if (cursor.highlight_offset) {
-                highlightDeletePrev(cursor.highlight_offset);
-                cursor.highlight_offset = 0;
+            if (getCursor()->highlight_offset) {
+                highlightDeletePrev(getCursor()->highlight_offset);
+                getCursor()->highlight_offset = 0;
             } else
                 deletePrevChar();
             break;
         case Key_delete:
-            if (cursor.highlight_offset) {
-                highlightDeleteCurrent(cursor.highlight_offset);
-                cursor.highlight_offset = 0;
+            if (getCursor()->highlight_offset) {
+                highlightDeleteCurrent(getCursor()->highlight_offset);
+                getCursor()->highlight_offset = 0;
             } else
                 deleteCurrentChar();
             break;
         case Key_left:
-            if (cursor.highlight_offset) {
-                cursorHighlightLeft(cursor.highlight_offset);
-                cursor.highlight_offset = 0;
+            if (getCursor()->highlight_offset) {
+                cursorHighlightLeft(getCursor()->highlight_offset);
+                getCursor()->highlight_offset = 0;
             } else
                 cursorLeft();
             break;
         case Key_down:
-            if (cursor.highlight_offset) {
-                cursorHighlightDown(cursor.highlight_offset);
-                cursor.highlight_offset = 0;
+            if (getCursor()->highlight_offset) {
+                cursorHighlightDown(getCursor()->highlight_offset);
+                getCursor()->highlight_offset = 0;
             } else
                 cursorDown();
             break;
         case Key_up:
-            if (cursor.highlight_offset) {
-                cursorHighlightUp(cursor.highlight_offset);
-                cursor.highlight_offset = 0;
+            if (getCursor()->highlight_offset) {
+                cursorHighlightUp(getCursor()->highlight_offset);
+                getCursor()->highlight_offset = 0;
             } else
                 cursorUp();
             break;
         case Key_right:
-            if (cursor.highlight_offset) {
-                cursorHighlightRight(cursor.highlight_offset);
-                cursor.highlight_offset = 0;
+            if (getCursor()->highlight_offset) {
+                cursorHighlightRight(getCursor()->highlight_offset);
+                getCursor()->highlight_offset = 0;
             } else
                 cursorRight();
             break;
@@ -124,69 +124,69 @@ void specialHandler(KeyPress out) {
         switch (out.code) {
         case Key_up:
             if (!cursorIsAtStart()) {
-                if (!cursor.highlight_offset)
+                if (!getCursor()->highlight_offset)
                     highlightCurrentChar();
                 for (int i = 0; i < VGA_WIDTH && !cursorIsAtStart(); i++) {
-                    if (cursor.highlight_offset > 0) {
+                    if (getCursor()->highlight_offset > 0) {
                         highlightCurrentChar();
                         cursorLeft();
                     } else {
                         cursorLeft();
                         highlightCurrentChar();
                     }
-                    cursor.highlight_offset--;
+                    getCursor()->highlight_offset--;
                 }
-                if (!cursor.highlight_offset)
+                if (!getCursor()->highlight_offset)
                     highlightCurrentChar();
             }
             break;
         case Key_down:
             if (!cursorIsAtEnd()) {
-                if (!cursor.highlight_offset)
+                if (!getCursor()->highlight_offset)
                     highlightCurrentChar();
                 for (int i = 0; i < VGA_WIDTH && !cursorIsAtEnd(); i++) {
-                    if (cursor.highlight_offset < 0) {
+                    if (getCursor()->highlight_offset < 0) {
                         highlightCurrentChar();
                         cursorRight();
                     } else {
                         cursorRight();
                         highlightCurrentChar();
                     }
-                    cursor.highlight_offset++;
+                    getCursor()->highlight_offset++;
                 }
-                if (!cursor.highlight_offset)
+                if (!getCursor()->highlight_offset)
                     highlightCurrentChar();
             }
             break;
         case Key_left:
             if (!cursorIsAtStart()) {
-                if (!cursor.highlight_offset)
+                if (!getCursor()->highlight_offset)
                     highlightCurrentChar();
-                if (cursor.highlight_offset > 0) {
+                if (getCursor()->highlight_offset > 0) {
                     highlightCurrentChar();
                     cursorLeft();
                 } else {
                     cursorLeft();
                     highlightCurrentChar();
                 }
-                cursor.highlight_offset--;
-                if (!cursor.highlight_offset)
+                getCursor()->highlight_offset--;
+                if (!getCursor()->highlight_offset)
                     highlightCurrentChar();
             }
             break;
         case Key_right:
             if (!cursorIsAtEnd()) {
-                if (!cursor.highlight_offset)
+                if (!getCursor()->highlight_offset)
                     highlightCurrentChar();
-                if (cursor.highlight_offset < 0) {
+                if (getCursor()->highlight_offset < 0) {
                     highlightCurrentChar();
                     cursorRight();
                 } else {
                     cursorRight();
                     highlightCurrentChar();
                 }
-                cursor.highlight_offset++;
-                if (!cursor.highlight_offset)
+                getCursor()->highlight_offset++;
+                if (!getCursor()->highlight_offset)
                     highlightCurrentChar();
             }
             break;
@@ -210,9 +210,9 @@ void vgaEditor(struct PS2Buf_t out) {
         char buf[2] = " ";
         buf[0] = keyPressToASCII(out.keyEvent);
         if (buf[0] != 0) {
-            if (cursor.highlight_offset) {
-                highlightDeletePrev(cursor.highlight_offset);
-                cursor.highlight_offset = 0;
+            if (getCursor()->highlight_offset) {
+                highlightDeletePrev(getCursor()->highlight_offset);
+                getCursor()->highlight_offset = 0;
             }
             print(buf, white);
         }

@@ -48,8 +48,7 @@ typedef struct {
     int highlight_offset;
 } VGA_Cursor;
 
-// is this a normal thing to do? no clue, I'll let god and/or Trevor decide
-extern VGA_Cursor cursor;
+VGA_Cursor *getCursor(void);
 
 // returns a VGA_Char with the supplied attributes
 VGA_Char getVGAchar(unsigned char chr, VGA_Color foreground,

@@ -59,15 +59,15 @@ int execCMD(struct TestCMD cmd, int idx) {
     switch (cmd.cmd) {
     case checkOffset: // asserts that the current highlight offset matches the
                       // supplied offset
-        ASSERT_M(cursor.highlight_offset == cmd.data.offset,
+        ASSERT_M(getCursor()->highlight_offset == cmd.data.offset,
                  "CMD %i: Highlight difference | Expected: %i, Actual: %i", idx,
-                 cmd.data.offset, cursor.highlight_offset);
+                 cmd.data.offset, getCursor()->highlight_offset);
         break;
     case checkPosition: // asserts that the relative position from the start of
                         // vga memory matches the supplied position
-        ASSERT_M(cursor.pos - VGA_MEMORY == cmd.data.offset,
+        ASSERT_M(getCursor()->pos - VGA_MEMORY == cmd.data.offset,
                  "CMD %i: Position difference | Expected: %i, Actual: %i", idx,
-                 cmd.data.offset, cursor.pos - VGA_MEMORY);
+                 cmd.data.offset, getCursor()->pos - VGA_MEMORY);
         break;
     case setPosition: // sets the cursor position, checks that the position is
                       // in bounds
@@ -77,7 +77,7 @@ int execCMD(struct TestCMD cmd, int idx) {
                 idx, cmd.data.offset, VGA_SIZE);
             return 1;
         }
-        cursor.pos = VGA_MEMORY + cmd.data.offset;
+        getCursor()->pos = VGA_MEMORY + cmd.data.offset;
         break;
     case keyPress: // simulates a keypress
         vgaEditor(cmd.data.kb);

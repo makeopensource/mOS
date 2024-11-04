@@ -4,6 +4,10 @@
 
 VGA_Cursor cursor = {VGA_MEMORY, 0};
 
+VGA_Cursor *getCursor(void) {
+    return &cursor;
+}
+
 VGA_Char getVGAchar(unsigned char chr, VGA_Color foreground,
                     VGA_Color background) {
     VGA_Char out = {chr, ((background << 4) | foreground)};
