@@ -121,47 +121,18 @@ void specialHandler(KeyPress out) {
             break;
         }
     } else {
+        if (((out.code == Key_up || out.code == Key_left) &&
+             cursorIsAtStart()) ||
+            ((out.code == Key_down || out.code == Key_right) &&
+             cursorIsAtEnd()))
+            return;
+        if ((out.code == Key_up || out.code == Key_left ||
+             out.code == Key_down || out.code == Key_right) &&
+            !getCursor()->highlight_offset)
+            highlightCurrentChar();
         switch (out.code) {
         case Key_up:
-            if (!cursorIsAtStart()) {
-                if (!getCursor()->highlight_offset)
-                    highlightCurrentChar();
-                for (int i = 0; i < VGA_WIDTH && !cursorIsAtStart(); i++) {
-                    if (getCursor()->highlight_offset > 0) {
-                        highlightCurrentChar();
-                        cursorLeft();
-                    } else {
-                        cursorLeft();
-                        highlightCurrentChar();
-                    }
-                    getCursor()->highlight_offset--;
-                }
-                if (!getCursor()->highlight_offset)
-                    highlightCurrentChar();
-            }
-            break;
-        case Key_down:
-            if (!cursorIsAtEnd()) {
-                if (!getCursor()->highlight_offset)
-                    highlightCurrentChar();
-                for (int i = 0; i < VGA_WIDTH && !cursorIsAtEnd(); i++) {
-                    if (getCursor()->highlight_offset < 0) {
-                        highlightCurrentChar();
-                        cursorRight();
-                    } else {
-                        cursorRight();
-                        highlightCurrentChar();
-                    }
-                    getCursor()->highlight_offset++;
-                }
-                if (!getCursor()->highlight_offset)
-                    highlightCurrentChar();
-            }
-            break;
-        case Key_left:
-            if (!cursorIsAtStart()) {
-                if (!getCursor()->highlight_offset)
-                    highlightCurrentChar();
+            for (int i = 0; i < VGA_WIDTH && !cursorIsAtStart(); i++) {
                 if (getCursor()->highlight_offset > 0) {
                     highlightCurrentChar();
                     cursorLeft();
@@ -170,14 +141,10 @@ void specialHandler(KeyPress out) {
                     highlightCurrentChar();
                 }
                 getCursor()->highlight_offset--;
-                if (!getCursor()->highlight_offset)
-                    highlightCurrentChar();
             }
             break;
-        case Key_right:
-            if (!cursorIsAtEnd()) {
-                if (!getCursor()->highlight_offset)
-                    highlightCurrentChar();
+        case Key_down:
+            for (int i = 0; i < VGA_WIDTH && !cursorIsAtEnd(); i++) {
                 if (getCursor()->highlight_offset < 0) {
                     highlightCurrentChar();
                     cursorRight();
@@ -186,13 +153,35 @@ void specialHandler(KeyPress out) {
                     highlightCurrentChar();
                 }
                 getCursor()->highlight_offset++;
-                if (!getCursor()->highlight_offset)
-                    highlightCurrentChar();
             }
+            break;
+        case Key_left:
+            if (getCursor()->highlight_offset > 0) {
+                highlightCurrentChar();
+                cursorLeft();
+            } else {
+                cursorLeft();
+                highlightCurrentChar();
+            }
+            getCursor()->highlight_offset--;
+            break;
+        case Key_right:
+            if (getCursor()->highlight_offset < 0) {
+                highlightCurrentChar();
+                cursorRight();
+            } else {
+                cursorRight();
+                highlightCurrentChar();
+            }
+            getCursor()->highlight_offset++;
             break;
         default:
             break;
         }
+        if ((out.code == Key_up || out.code == Key_left ||
+             out.code == Key_down || out.code == Key_right) &&
+            !getCursor()->highlight_offset)
+            highlightCurrentChar();
     }
 }
 
