@@ -18,7 +18,8 @@ void _assert_fail_m(char *fmt, const char *msg, ...) {
     serialWrite(COM1, (uint8_t *)msg, strnlen_s(msg, 256));
 
     // avoid an empty line
-    if (fmt[0] != 0) {
+    // must be index 1 since a newline is appended by the macro
+    if (fmt[1] != 0) {
         int len = vsnprintf(buff, sizeof(buff), fmt, args);
 
         while (!serialWriteReady(COM1))
@@ -40,7 +41,8 @@ void _fail_m(char *fmt, const char *msg, ...) {
     serialWrite(COM1, (uint8_t *)msg, strnlen_s(msg, 256));
 
     // avoid an empty line
-    if (fmt[0] != 0) {
+    // must be index 1 since a newline is appended by the macro
+    if (fmt[1] != 0) {
         int len = vsnprintf(buff, sizeof(buff), fmt, args);
 
         while (!serialWriteReady(COM1))
