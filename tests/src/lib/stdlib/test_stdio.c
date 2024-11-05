@@ -37,8 +37,8 @@ void test_main() {
     test_vsnprintf("just a regular string\n", buffer, BUFSZ,
                    "just a regular string\n", 22, 0);
     test_vsnprintf("i=-42%\n", buffer, BUFSZ, "i=%i%%\n", 6, 1, 42);
-    test_vsnprintf("1, 2, 3, 4, 5\n", buffer, BUFSZ, "%i, %i, %i, %i, %i\n", 14, 5,
-                   1, 2, 3, 4, 5);
+    test_vsnprintf("1, 2, 3, 4, 5\n", buffer, BUFSZ, "%i, %i, %i, %i, %i\n", 14,
+                   5, 1, 2, 3, 4, 5);
     test_vsnprintf("i=0\n", buffer, BUFSZ, "i=%i\n", 4, 1, 0);
 
     char done[] = "test_stdio done\n";
