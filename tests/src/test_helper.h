@@ -7,12 +7,10 @@
 
 #include <stdarg.h>
 
-void _assert_fail_m(char *fmt, const char *msg, ...) {
+void _print_assert(char *fmt, const char *msg, ...) {
     va_list args;
     va_start(args, msg);
 
-    // buffer to write the messages to
-    char buff[256];
     while (!serialWriteReady(COM1))
         ;
     serialWrite(COM1, (uint8_t *)msg, strnlen_s(msg, 256));
@@ -20,29 +18,8 @@ void _assert_fail_m(char *fmt, const char *msg, ...) {
     // avoid an empty line
     // must be index 1 since a newline is appended by the macro
     if (fmt[1] != 0) {
-        int len = vsnprintf(buff, sizeof(buff), fmt, args);
-
-        while (!serialWriteReady(COM1))
-            ;
-        serialWrite(COM1, (uint8_t *)buff, len);
-    }
-
-    va_end(args);
-}
-
-void _fail_m(char *fmt, const char *msg, ...) {
-    va_list args;
-    va_start(args, msg);
-
-    // buffer to write the messages to
-    char buff[256];
-    while (!serialWriteReady(COM1))
-        ;
-    serialWrite(COM1, (uint8_t *)msg, strnlen_s(msg, 256));
-
-    // avoid an empty line
-    // must be index 1 since a newline is appended by the macro
-    if (fmt[1] != 0) {
+        // buffer to write the message to
+        char buff[256];
         int len = vsnprintf(buff, sizeof(buff), fmt, args);
 
         while (!serialWriteReady(COM1))
@@ -61,14 +38,14 @@ void _fail_m(char *fmt, const char *msg, ...) {
 
 #define ASSERT_M(condition, fmt, ...)                                          \
     if (!(condition)) {                                                        \
-        _assert_fail_m(fmt "\n", "Line " STR_LINE ": Assertion '" #condition   \
-                                 "' failed.\n" __VA_OPT__(, ) __VA_ARGS__);    \
+        _print_assert(fmt "\n", "Line " STR_LINE ": Assertion '" #condition    \
+                                "' failed.\n" __VA_OPT__(, ) __VA_ARGS__);     \
     }
 
 #define FAIL_M(fmt, ...)                                                       \
-    _fail_m(fmt "\n",                                                          \
-            "Line " STR_LINE ": Fail assertion reached.\n" __VA_OPT__(, )      \
-                __VA_ARGS__)
+    _print_assert(fmt "\n",                                                    \
+                  "Line " STR_LINE                                             \
+                  ": Fail assertion reached.\n" __VA_OPT__(, ) __VA_ARGS__)
 
 #define ASSERT(condition) ASSERT_M(condition, "")
 
