@@ -7,7 +7,7 @@
 
 #include <stdarg.h>
 
-void _print_assert(char *fmt, const char *msg, ...) {
+void _print_assert(const char *fmt, const char *msg, ...) {
     va_list args;
     va_start(args, msg);
 

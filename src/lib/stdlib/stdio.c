@@ -5,11 +5,12 @@
 
 #define MAX_SNPRINTF_STRING 100
 
-int snprintf(char *restrict buffer, size_t bufsz, char *format, ...);
-int vsnprintf(char *restrict buffer, size_t bufsz, char *format, va_list ap);
+int snprintf(char *restrict buffer, size_t bufsz, const char *format, ...);
+int vsnprintf(char *restrict buffer, size_t bufsz, const char *format,
+              va_list ap);
 
 // Inspired by chapter 7.3 of The C Programming Language
-int snprintf(char *restrict buffer, size_t bufsz, char *format, ...) {
+int snprintf(char *restrict buffer, size_t bufsz, const char *format, ...) {
     va_list ap;
     int retval;
     va_start(ap, format);
@@ -19,7 +20,8 @@ int snprintf(char *restrict buffer, size_t bufsz, char *format, ...) {
     return retval;
 }
 
-int vsnprintf(char *restrict buffer, size_t bufsz, char *format, va_list ap) {
+int vsnprintf(char *restrict buffer, size_t bufsz, const char *format,
+              va_list ap) {
     char *p;
 
     // valid types
