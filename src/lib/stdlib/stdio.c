@@ -22,7 +22,7 @@ int snprintf(char *restrict buffer, size_t bufsz, const char *format, ...) {
 
 int vsnprintf(char *restrict buffer, size_t bufsz, const char *format,
               va_list ap) {
-    char *p;
+    const char *p;
 
     // valid types
     unsigned char c; // printf("%c\n", 'c');
