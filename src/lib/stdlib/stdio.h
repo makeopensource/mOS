@@ -5,4 +5,5 @@
 
 int snprintf(char *restrict buffer, size_t bufsz, const char *format, ...);
 
-int vsnprintf(char *restrict buffer, size_t bufsz, const char *format, va_list ap);
+int vsnprintf(char *restrict buffer, size_t bufsz, const char *format,
+              va_list ap);
