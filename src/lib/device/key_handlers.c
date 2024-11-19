@@ -1,4 +1,5 @@
 #include "key_handlers.h"
+
 #include "video/VGA_text.h"
 
 void specialHandler(KeyPress out) {
