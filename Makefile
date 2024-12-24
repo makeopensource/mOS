@@ -44,6 +44,8 @@ ASM_OS_ENTRY_SOURCE := ./src/boot/os_entry.asm
 
 BOOT_OBJ := boot.o
 OS_BIN := mOS.bin
+OS_BIN_MAX_SECTORS := 42
+OS_BIN_MAX_SIZE := $$((512*$(OS_BIN_MAX_SECTORS)))
 
 C_FILES = $(shell find ./ -name '*.[ch]')
 
@@ -64,6 +66,12 @@ $(OS_BIN): $(OBJ_NAMES) $(BOOT_OBJ)
 	$(LD) $(LFLAGS) -T link.ld $(OBJ_NAMES) -o mOS.elf
 	$(OBJCOPY) -O binary mOS.elf intermediate.bin
 	cat $(BOOT_OBJ) intermediate.bin > $(OS_BIN)
+	@if [ $$(du -b mOS.bin | grep -o "[0-9]*") -gt $(OS_BIN_MAX_SIZE) ]; \
+	then \
+		echo "ERROR: mOS.bin too large!"; \
+		false; \
+	fi
+	truncate -s ">$(OS_BIN_MAX_SIZE)" $(OS_BIN)
 
 $(BOOT_OBJ): $(ASM_BOOT_SECT_SOURCE)
 	nasm $^ -f bin -o $@ $(DEBUG_NASM_FLAGS)
