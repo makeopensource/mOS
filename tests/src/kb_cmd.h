@@ -165,7 +165,7 @@ struct KbCmd endCMD() {
     return (struct KbCmd){CMD_END, {}};
 }
 
-// Returns  0 when exiting normally, and anything else when shit went fuck
+// Returns 0 when exiting normally, and anything else when shit went fuck
 typedef int (*ExecFunc)(struct KbCmd, int *);
 
 int baseExec(struct KbCmd cmd, int *idx) {

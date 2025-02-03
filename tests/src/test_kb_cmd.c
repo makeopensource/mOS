@@ -30,8 +30,9 @@ int testExec(struct KbCmd cmd, int *idx) {
         buff[buffIdx++] = keyPressToASCII(cmd.data.kb.keyEvent);
         break;
     case CMD_TYPE_WORD:
-        for(char *c = cmd.data.w; *c != 0; c++) {
-            buff[buffIdx++] = keyPressToASCII(keyPressCMDFromData(charToPressCMD[(int)*c]).data.kb.keyEvent);
+        for (char *c = cmd.data.w; *c != 0; c++) {
+            buff[buffIdx++] = keyPressToASCII(
+                keyPressCMDFromData(charToPressCMD[(int)*c]).data.kb.keyEvent);
         }
         break;
     case CMD_LOOP_START:
