@@ -19,51 +19,13 @@ char buff[64];
 int buffIdx = 0;
 
 int resetBuff() {
-    memset(buff, 0, 64);
+    memset(buff, 0, sizeof(buff));
     buffIdx = 0;
     return 0;
 }
 
-int testExec(struct KbCmd cmd, int *idx) {
-    switch (cmd.cmd) {
-    case CMD_KEY_PRESS:
-        buff[buffIdx++] = keyPressToASCII(cmd.data.kb.keyEvent);
-        break;
-    case CMD_TYPE_WORD:
-        for (char *c = cmd.data.w; *c != 0; c++) {
-            buff[buffIdx++] = keyPressToASCII(
-                keyPressCMDFromData(charToPressCMD[(int)*c]).data.kb.keyEvent);
-        }
-        break;
-    case CMD_LOOP_START:
-        if (cmd.data.loops < 1) {
-            FAIL_M("Loop count must be greater than 0, got %i", cmd.data.loops);
-            return 1;
-        }
-        if (current == -1 || loopStack[current].idx != *idx) {
-            current++;
-            loopStack[current] = (struct LoopNode){*idx, cmd.data.loops};
-        }
-        loopStack[current].remaining--;
-        break;
-    case CMD_LOOP_END:
-        if (loopStack[current].remaining) {
-            // subtract 1 because idx is incremented after command completes
-            // this was a surprisingly annoying issue to track down
-            *idx = loopStack[current].idx - 1;
-        } else {
-            current--;
-        }
-        break;
-    case CMD_FUNC:
-        return cmd.data.func();
-    case CMD_END:
-        break;
-    default:
-        FAIL_M("Unexpected command type: %i", cmd.cmd);
-        return 1;
-    }
-    return 0;
+void testKeyHandler(struct PS2Buf_t buf) {
+    buff[buffIdx++] = keyPressToASCII(buf.keyEvent);
 }
 
 // clang-format off
@@ -84,11 +46,14 @@ testEnd(charTableTest, "char table test")
 testStart(wordTest, "word test")
 testEnd(wordTest, "word test")
 
+// Complex word prints
+testStart(complexWordTest, "complex word test")
+testEnd(complexWordTest, "complex word test")
+
 // Loop testing
 int v = 0;
 
 // clang-format on
-// stop fucking this up
 
 int vReset() {
     v = 0;
@@ -133,6 +98,11 @@ int wordTest() {
     return 0;
 }
 
+int complexWordTest() {
+    ASSERT(strncmp("This is a very Loong word$%@^@\\", buff, 32))
+    return 0;
+}
+
 void test_main() {
     struct KbCmd list[] = {
         // Single loop test
@@ -165,9 +135,13 @@ void test_main() {
         typeWordCMD("test"),
         funcCMD(wordTestEnd),
 
+        funcCMD(complexWordTestStart),
+        typeWordCMD("This is a very Loong word$%@^@\\"),
+        funcCMD(complexWordTestEnd),
+
         endCMD(),
     };
-    execList(list, testExec);
+    execList(list, baseExec, testKeyHandler);
     char done[] = "test_kb_cmd done\n";
     serialWrite(COM1, (uint8_t *)(done), sizeof(done) - 1);
 }

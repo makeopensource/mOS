@@ -14,8 +14,8 @@ struct LoopNode {
 };
 
 // if you have more than 8 nested loops then what the fuck
-struct LoopNode loopStack[8];
-int current = -1;
+static struct LoopNode loopStack[8];
+static int current = -1;
 
 typedef enum {
     // A singular key press
@@ -68,7 +68,8 @@ struct KeyData {
     [unshiftedChar] = keyDataStruct(key, 0), [shiftedChar] = keyDataStruct(    \
                                                  key, KEY_MOD_SHIFT)
 
-struct KeyData charToPressCMD[] = {
+// clang-format off
+static const struct KeyData charToPressCMD[] = {
     // Row 1
     keyAndShifted('`', '~', Key_grave),
     keyAndShifted('1', '!', Key_1),
@@ -123,57 +124,65 @@ struct KeyData charToPressCMD[] = {
     keyAndShifted(',', '<', Key_comma),
     keyAndShifted('.', '>', Key_period),
     keyAndShifted('/', '?', Key_slash),
+
+    // Row 5
+    [' '] = keyDataStruct(Key_space, 0)
 };
+// clang-format on
+// clang-format can you please not butcher the readability of the code?
 
 #undef keyPressStruct
 #undef keyAndShifted
 #undef keyAndCapital
 
-struct KbCmd keyPressCMD(enum KeyCode code, enum KeyState event,
-                         uint8_t modifiers) {
+static struct KbCmd keyPressCMD(enum KeyCode code, enum KeyState event,
+                                uint8_t modifiers) {
     KeyPress kp = (KeyPress){0, code, event, modifiers};
     struct PS2Buf_t b = (struct PS2Buf_t){PS2_KEY_EVENT, {.keyEvent = kp}};
     return (struct KbCmd){CMD_KEY_PRESS, {.kb = b}};
 }
 
-struct KbCmd keyPressCMDFromData(struct KeyData data) {
-    KeyPress kp = (KeyPress){0, data.c, KeyPressed, data.mods};
-    struct PS2Buf_t b = (struct PS2Buf_t){PS2_KEY_EVENT, {.keyEvent = kp}};
-    return (struct KbCmd){CMD_KEY_PRESS, {.kb = b}};
+static struct KbCmd keyPressCMDFromData(struct KeyData data) {
+    return (keyPressCMD(data.c, KeyPressed, data.mods));
 }
 
-struct KbCmd typeWordCMD(char *word) {
+static struct KbCmd typeWordCMD(char *word) {
     return (struct KbCmd){CMD_TYPE_WORD, {.w = word}};
 }
 
 // `loops` must be greater than 0
-struct KbCmd loopStartCMD(int loops) {
+static struct KbCmd loopStartCMD(int loops) {
     return (struct KbCmd){CMD_LOOP_START, {.loops = loops}};
 }
 
-struct KbCmd loopEndCMD() {
+static struct KbCmd loopEndCMD() {
     return (struct KbCmd){CMD_LOOP_END, {}};
 }
 
-struct KbCmd funcCMD(CmdFunc func) {
+static struct KbCmd funcCMD(CmdFunc func) {
     return (struct KbCmd){CMD_FUNC, {.func = func}};
 }
 
-struct KbCmd endCMD() {
+static struct KbCmd endCMD() {
     return (struct KbCmd){CMD_END, {}};
 }
 
-// Returns 0 when exiting normally, and anything else when shit went fuck
-typedef int (*ExecFunc)(struct KbCmd, int *);
+// Returns 0 when exiting normally, and anything else when things go wrong
+typedef void (*KeyPressHandler)(struct PS2Buf_t);
+typedef int (*ExecFunc)(struct KbCmd, int *, KeyPressHandler);
 
-int baseExec(struct KbCmd cmd, int *idx) {
+void baseKeyHandler(struct PS2Buf_t kb) {
+    vgaEditor(kb);
+}
+
+static int baseExec(struct KbCmd cmd, int *idx, KeyPressHandler kp) {
     switch (cmd.cmd) {
     case CMD_KEY_PRESS:
-        vgaEditor(cmd.data.kb);
+        kp(cmd.data.kb);
         break;
     case CMD_TYPE_WORD:
-        for (char *c = cmd.data.w; c != 0; c++) {
-            vgaEditor(keyPressCMDFromData(charToPressCMD[(int)*c]).data.kb);
+        for (char *c = cmd.data.w; *c != 0; c++) {
+            kp(keyPressCMDFromData(charToPressCMD[(int)*c]).data.kb);
         }
         break;
     case CMD_LOOP_START:
@@ -207,11 +216,11 @@ int baseExec(struct KbCmd cmd, int *idx) {
     return 0;
 }
 
-int execList(struct KbCmd *cmds, ExecFunc f) {
+static int execList(struct KbCmd *cmds, ExecFunc f, KeyPressHandler kp) {
     for (int i = 0; cmds[i].cmd != CMD_END; i++) {
-        if (f(cmds[i], &i)) {
+        if (f(cmds[i], &i, kp)) {
             char buff[32];
-            int len = snprintf(buff, 32, "Command %i failed", i);
+            int len = snprintf(buff, sizeof(buff), "Command %i failed", i);
             serialWrite(COM1, (uint8_t *)buff, len);
             return 1;
         }
