@@ -171,7 +171,7 @@ static struct KbCmd endCMD() {
 typedef void (*KeyPressHandler)(struct PS2Buf_t);
 typedef int (*ExecFunc)(struct KbCmd, int *, KeyPressHandler);
 
-void baseKeyHandler(struct PS2Buf_t kb) {
+static void baseKeyHandler(struct PS2Buf_t kb) {
     vgaEditor(kb);
 }
 
