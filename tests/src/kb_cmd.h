@@ -59,72 +59,70 @@ struct KeyData {
     uint8_t mods;
 };
 
-#define keyDataStruct(code, modifiers)                                        \
-    (struct KeyData) {code, modifiers}
+#define keyDataStruct(code, modifiers)                                         \
+    (struct KeyData) {                                                         \
+        code, modifiers                                                        \
+    }
 
-#define keyAndShifted(unshiftedChar, shiftedChar, key) \
-    [unshiftedChar] = keyDataStruct(key, 0), \
-    [shiftedChar] = keyDataStruct(key, KEY_MOD_SHIFT),
-
-#define keyAndCapital(char, key) \
-    [char] = keyDataStruct(key, 0), \
-    [char - 32] = keyDataStruct(key, KEY_MOD_SHIFT),
+#define keyAndShifted(unshiftedChar, shiftedChar, key)                         \
+    [unshiftedChar] = keyDataStruct(key, 0), [shiftedChar] = keyDataStruct(    \
+                                                 key, KEY_MOD_SHIFT)
 
 struct KeyData charToPressCMD[] = {
     // Row 1
-    keyAndShifted('`', '~', Key_grave)
-    keyAndShifted('1', '!', Key_1)
-    keyAndShifted('2', '@', Key_2)
-    keyAndShifted('3', '#', Key_3)
-    keyAndShifted('4', '$', Key_4)
-    keyAndShifted('5', '%', Key_5)
-    keyAndShifted('6', '^', Key_6)
-    keyAndShifted('7', '&', Key_7)
-    keyAndShifted('8', '*', Key_8)
-    keyAndShifted('9', '(', Key_9)
-    keyAndShifted('0', ')', Key_0)
-    keyAndShifted('-', '_', Key_minus)
-    keyAndShifted('=', '+', Key_equal)
+    keyAndShifted('`', '~', Key_grave),
+    keyAndShifted('1', '!', Key_1),
+    keyAndShifted('2', '@', Key_2),
+    keyAndShifted('3', '#', Key_3),
+    keyAndShifted('4', '$', Key_4),
+    keyAndShifted('5', '%', Key_5),
+    keyAndShifted('6', '^', Key_6),
+    keyAndShifted('7', '&', Key_7),
+    keyAndShifted('8', '*', Key_8),
+    keyAndShifted('9', '(', Key_9),
+    keyAndShifted('0', ')', Key_0),
+    keyAndShifted('-', '_', Key_minus),
+    keyAndShifted('=', '+', Key_equal),
 
     // Row 2
-    keyAndCapital('q', Key_q)
-    keyAndCapital('w', Key_w)
-    keyAndCapital('e', Key_e)
-    keyAndCapital('r', Key_r)
-    keyAndCapital('t', Key_t)
-    keyAndCapital('y', Key_y)
-    keyAndCapital('u', Key_u)
-    keyAndCapital('i', Key_i)
-    keyAndCapital('o', Key_o)
-    keyAndCapital('p', Key_p)
-    keyAndShifted('[', '{', Key_openSquare)
-    keyAndShifted(']', '}', Key_closeSquare)
-    keyAndShifted('\\', '|', Key_backSlash)
+    keyAndShifted('q', 'Q', Key_q),
+    keyAndShifted('w', 'W', Key_w),
+    keyAndShifted('e', 'E', Key_e),
+    keyAndShifted('r', 'R', Key_r),
+    keyAndShifted('t', 'T', Key_t),
+    keyAndShifted('y', 'Y', Key_y),
+    keyAndShifted('u', 'U', Key_u),
+    keyAndShifted('i', 'I', Key_i),
+    keyAndShifted('o', 'O', Key_o),
+    keyAndShifted('p', 'P', Key_p),
+    keyAndShifted('[', '{', Key_openSquare),
+    keyAndShifted(']', '}', Key_closeSquare),
+    keyAndShifted('\\', '|', Key_backSlash),
 
     // Row 3
-    keyAndCapital('a', Key_a)
-    keyAndCapital('s', Key_s)
-    keyAndCapital('d', Key_d)
-    keyAndCapital('f', Key_f)
-    keyAndCapital('g', Key_g)
-    keyAndCapital('h', Key_h)
-    keyAndCapital('j', Key_j)
-    keyAndCapital('k', Key_k)
-    keyAndCapital('l', Key_l)
-    keyAndShifted(';', ':', Key_semicolon)
-    keyAndShifted('\'', '"', Key_apostrophe)
+    keyAndShifted('a', 'A', Key_a),
+    keyAndShifted('s', 'S', Key_s),
+    keyAndShifted('d', 'D', Key_d),
+    keyAndShifted('f', 'F', Key_f),
+    keyAndShifted('g', 'G', Key_g),
+    keyAndShifted('h', 'H', Key_h),
+    keyAndShifted('j', 'J', Key_j),
+    keyAndShifted('k', 'K', Key_k),
+    keyAndShifted('l', 'L', Key_l),
+    keyAndShifted(';', ':', Key_semicolon),
+    keyAndShifted('\'', '"', Key_apostrophe),
 
     // Row 4
-    keyAndCapital('z', Key_z)
-    keyAndCapital('x', Key_x)
-    keyAndCapital('c', Key_c)
-    keyAndCapital('v', Key_v)
-    keyAndCapital('b', Key_b)
-    keyAndCapital('n', Key_n)
-    keyAndCapital('m', Key_m)
-    keyAndShifted(',', '<', Key_comma)
-    keyAndShifted('.', '>', Key_period)
-    keyAndShifted('/', '?', Key_slash)
+    keyAndShifted('z', 'Z', Key_z),
+    keyAndShifted('x', 'X', Key_x),
+    keyAndShifted('c', 'C', Key_c),
+    keyAndShifted('v', 'V', Key_v),
+    keyAndShifted('b', 'B', Key_b),
+    keyAndShifted('n', 'N', Key_n),
+    keyAndShifted('m', 'M', Key_m),
+    keyAndShifted(',', '<', Key_comma),
+    keyAndShifted('.', '>', Key_period),
+    keyAndShifted('/', '?', Key_slash),
 };
 
 #undef keyPressStruct
@@ -174,7 +172,7 @@ int baseExec(struct KbCmd cmd, int *idx) {
         vgaEditor(cmd.data.kb);
         break;
     case CMD_TYPE_WORD:
-        for(char *c = cmd.data.w; c != 0; c++) {
+        for (char *c = cmd.data.w; c != 0; c++) {
             vgaEditor(keyPressCMDFromData(charToPressCMD[(int)*c]).data.kb);
         }
         break;
