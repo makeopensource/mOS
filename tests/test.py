@@ -332,11 +332,11 @@ def do_tests():
 
     if (len(binaries) == 0):
         print("No binaries to test")
-        return
+        return 1
 
     if (len(expected) == 0):
         print("No expecteds to test against")
-        return
+        return 1
 
     instances = []
 
