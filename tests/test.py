@@ -332,11 +332,11 @@ def do_tests():
 
     if (len(binaries) == 0):
         print("No binaries to test")
-        return
+        return 1
 
     if (len(expected) == 0):
         print("No expecteds to test against")
-        return
+        return 1
 
     instances = []
 
@@ -377,5 +377,7 @@ def do_tests():
         .format(total_pass, total_fail, len(instances)))
     print("See .got files for more details")
 
+    return 0 if total_fail == 0 else 1
+
 if __name__ == "__main__":
-    do_tests()
+    sys.exit(do_tests())
