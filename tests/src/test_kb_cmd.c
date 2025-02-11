@@ -94,12 +94,12 @@ int shiftTest() {
 
 // Word type testing
 int wordTest() {
-    ASSERT(strncmp("test", buff, 5))
+    ASSERT(strncmp("test", buff, 5) == 0)
     return 0;
 }
 
 int complexWordTest() {
-    ASSERT(strncmp("This is a very Loong word$%@^@\\", buff, 32))
+    ASSERT(strncmp("This is a very Loong word$%@^@\\", buff, 32) == 0)
     return 0;
 }
 
@@ -133,10 +133,14 @@ void test_main() {
         // Word type test
         funcCMD(wordTestStart),
         typeWordCMD("test"),
+        funcCMD(wordTest),
         funcCMD(wordTestEnd),
+
+        funcCMD(resetBuff),
 
         funcCMD(complexWordTestStart),
         typeWordCMD("This is a very Loong word$%@^@\\"),
+        funcCMD(complexWordTest),
         funcCMD(complexWordTestEnd),
 
         endCMD(),

@@ -171,9 +171,10 @@ static struct KbCmd endCMD() {
 typedef void (*KeyPressHandler)(struct PS2Buf_t);
 typedef int (*ExecFunc)(struct KbCmd, int *, KeyPressHandler);
 
-static void baseKeyHandler(struct PS2Buf_t kb) {
-    vgaEditor(kb);
-}
+// Commented out to avoid gcc complaining about it being unused
+// static void baseKeyHandler(struct PS2Buf_t kb) {
+//     vgaEditor(kb);
+// }
 
 static int baseExec(struct KbCmd cmd, int *idx, KeyPressHandler kp) {
     switch (cmd.cmd) {
