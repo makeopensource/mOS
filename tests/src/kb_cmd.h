@@ -144,7 +144,7 @@ static struct KbCmd keyPressCMD(enum KeyCode code, enum KeyState event,
 }
 
 static struct KbCmd keyPressCMDFromData(struct KeyData data) {
-    return (keyPressCMD(data.c, KeyPressed, data.mods));
+    return keyPressCMD(data.c, KeyPressed, data.mods);
 }
 
 static struct KbCmd typeWordCMD(char *word) {
