@@ -140,7 +140,7 @@ void test_main() {
         funcCMD(vInc),
         loopEndCMD(),
         funcCMD(testSingleIteration),
-        funcCMD(singleIterationTestEnd), 
+        funcCMD(singleIterationTestEnd),
 
         // Char table values test
         funcCMD(charTableTestStart),
