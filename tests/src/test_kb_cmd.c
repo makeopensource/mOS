@@ -38,6 +38,10 @@ testEnd(loopTest, "loop test")
 testStart(nestingTest, "nesting test")
 testEnd(nestingTest, "nesting test")
 
+// Single Iteration prints
+testStart(singleIterationTest, "single iteration test")
+testEnd(singleIterationTest, "single iteration test")
+
 // Char table prints
 testStart(charTableTest, "char table test")
 testEnd(charTableTest, "char table test")
@@ -72,6 +76,11 @@ int testSingleLoop(int) {
 
 int testNestedLoop(int) {
     ASSERT_M(v == 6, "Expected to loop 6 times, looped %i time(s) instead", v);
+    return 0;
+}
+
+int testSingleIteration(int) {
+    ASSERT_M(v == 1, "Expected to loop 1 time, looped %i time(s) instead", v);
     return 0;
 }
 
@@ -123,6 +132,15 @@ void test_main() {
         loopEndCMD(),
         funcCMD(testNestedLoop),
         funcCMD(nestingTestEnd),
+
+        funcCMD(vReset),
+        // Single iteration test
+        funcCMD(singleIterationTestStart),
+        loopStartCMD(1),
+        funcCMD(vInc),
+        loopEndCMD(),
+        funcCMD(testSingleIteration),
+        funcCMD(singleIterationTestEnd), 
 
         // Char table values test
         funcCMD(charTableTestStart),
