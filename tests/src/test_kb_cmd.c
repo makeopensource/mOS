@@ -2,14 +2,14 @@
 #include "string.h"
 
 #define testStart(name, print)                                                 \
-    int name##Start() {                                                        \
+    int name##Start(int) {                                                     \
         char text[] = print " starting\n";                                     \
         serialWrite(COM1, (uint8_t *)(text), sizeof(text) - 1);                \
         return 0;                                                              \
     }
 
 #define testEnd(name, print)                                                   \
-    int name##End() {                                                          \
+    int name##End(int) {                                                       \
         char text[] = print " completed\n";                                    \
         serialWrite(COM1, (uint8_t *)(text), sizeof(text) - 1);                \
         return 0;                                                              \
@@ -18,7 +18,7 @@
 char buff[64];
 int buffIdx = 0;
 
-int resetBuff() {
+int resetBuff(int) {
     memset(buff, 0, sizeof(buff));
     buffIdx = 0;
     return 0;
@@ -55,28 +55,28 @@ int v = 0;
 
 // clang-format on
 
-int vReset() {
+int vReset(int) {
     v = 0;
     return 0;
 }
 
-int vInc() {
+int vInc(int) {
     v++;
     return 0;
 }
 
-int testSingleLoop() {
+int testSingleLoop(int) {
     ASSERT_M(v == 4, "Expected to loop 4 times, looped %i time(s) instead", v);
     return 0;
 }
 
-int testNestedLoop() {
+int testNestedLoop(int) {
     ASSERT_M(v == 6, "Expected to loop 6 times, looped %i time(s) instead", v);
     return 0;
 }
 
 // Char table testing
-int capitalShiftTest() {
+int capitalShiftTest(int) {
     ASSERT(Key_a == charToPressCMD['a'].c);
     ASSERT(0 == charToPressCMD['a'].mods);
     ASSERT(Key_a == charToPressCMD['A'].c);
@@ -84,7 +84,7 @@ int capitalShiftTest() {
     return 0;
 }
 
-int shiftTest() {
+int shiftTest(int) {
     ASSERT(Key_grave == charToPressCMD['`'].c)
     ASSERT(0 == charToPressCMD['`'].mods)
     ASSERT(Key_grave == charToPressCMD['~'].c)
@@ -93,12 +93,12 @@ int shiftTest() {
 }
 
 // Word type testing
-int wordTest() {
+int wordTest(int) {
     ASSERT(strncmp("test", buff, 5) == 0)
     return 0;
 }
 
-int complexWordTest() {
+int complexWordTest(int) {
     ASSERT(strncmp("This is a very Loong word$%@^@\\", buff, 32) == 0)
     return 0;
 }

@@ -6,7 +6,8 @@
 #include "test_helper.h"
 
 // Returns 0 if executed successfully, non-zero otherwise
-typedef int (*CmdFunc)(void);
+// Index is passed in for logging purposes
+typedef int (*CmdFunc)(int);
 
 struct LoopNode {
     int idx;
@@ -167,8 +168,8 @@ static struct KbCmd endCMD() {
     return (struct KbCmd){CMD_END, {}};
 }
 
-// Returns 0 when exiting normally, and anything else when things go wrong
 typedef void (*KeyPressHandler)(struct PS2Buf_t);
+// Returns 0 when exiting normally, and anything else when things go wrong
 typedef int (*ExecFunc)(struct KbCmd, int *, KeyPressHandler);
 
 // Commented out to avoid gcc complaining about it being unused
@@ -207,7 +208,7 @@ static int baseExec(struct KbCmd cmd, int *idx, KeyPressHandler kp) {
         }
         break;
     case CMD_FUNC:
-        return cmd.data.func();
+        return cmd.data.func(*idx);
     case CMD_END:
         break;
     default:
