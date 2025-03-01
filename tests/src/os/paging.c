@@ -1,5 +1,6 @@
 #include "../test_helper.h"
 
+#include <../os/hard/idt.h>
 #include <../os/paging.h>
 
 // 1st megabyte is a safe place to read from, but not to write to
@@ -158,6 +159,60 @@ void test_modify_in_place(PageDirectory *base) {
     serialWrite(COM1, (uint8_t *)(done), sizeof(done) - 1);
 }
 
+volatile uint32_t errCode = -1;
+
+void test_handler(isr_registers_t *regs) {
+    errCode = regs->err_code;
+
+    // We are manually incrementing the instruction pointer.
+    // This is to avoid faulting on the same instruction forever.
+    // But it can cause some unexpected things to happen.
+    regs->eip++;
+}
+
+void assert_on_fault_code(uint32_t expected) {
+    InterruptState iprev = disableInterrupts();
+    uint32_t got = errCode;
+    errCode = -1;
+    setInterrupts(iprev);
+
+    // ASSERT must be called with interrupts enabled!
+    ASSERT_M(expected == got, "Expected %i but got %i as fault error code.",
+             expected, got);
+}
+
+void test_entry_not_present(PageDirectory *base) {
+    // steal the 3MiB page and 2 more
+    PageDirectory *newDir = (PageDirectory *)(MiB3);
+    PageTable *tables = (PageTable *)(MiB3 + sizeof(PageDirectory));
+
+    // setup identity paged dir
+    addTableToDirectory(newDir, 0, tables, DEFAULT_ENTRY_FLAGS);
+    addTableToDirectory(newDir, 1, tables + 1, DEFAULT_ENTRY_FLAGS);
+
+    identityMapTable(newDir, 0, DEFAULT_ENTRY_FLAGS);
+    identityMapTable(newDir, 1, ENTRY_RW | ENTRY_US);
+
+    setActivePageDir(newDir);
+
+    volatile uint32_t *faulter = (uint32_t *)(BOUND);
+
+    // cause a page fault
+    *faulter;
+
+    // this nop helps eip++ not do bad things
+    __asm__ volatile("nop");
+
+    // confusingly, the not present error code is 0.
+    assert_on_fault_code(0);
+
+    // swap back
+    setActivePageDir(base);
+
+    char done[] = "test_entry_not_present done\n";
+    serialWrite(COM1, (uint8_t *)(done), sizeof(done) - 1);
+}
+
 void test_main() {
     test_composition();
 
@@ -169,4 +224,9 @@ void test_main() {
     test_swap_page(idDir);
 
     test_modify_in_place(idDir);
+
+    // beware the page fault handler is overriden from this point on.
+    isrSetHandler(14, test_handler);
+
+    test_entry_not_present(idDir);
 }
