@@ -1,7 +1,7 @@
 [org 0x7c00]
 OS_OFFSET equ 0x1000
 MAX_READ_TRIES equ 3
-SECTORS_TO_READ equ 22
+SECTORS_TO_READ equ 41
 
 [bits 16]
 begin:
