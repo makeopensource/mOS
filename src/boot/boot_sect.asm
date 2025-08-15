@@ -23,11 +23,9 @@ begin:
     int 0x13
     jnc get_params_no_error
 ;;; Print and stop if there is an error reading the drive parameters
+    call print_error
     mov al, ah
     call print_byte
-    call print_cm
-    mov al, 'p'
-    call print_char
     jmp $
 
 get_params_no_error:
@@ -54,6 +52,7 @@ read:
     jle read
     call enter_pm
 
+;;; function read_drive:
 ;;; Reads one sector from the drive at the given LBA into the kernel memory
 ;;; space at the appropriate offset (assumming 512 byte sectors).
 ;;; Input:
@@ -96,30 +95,40 @@ read_drive_retry:
     int 0x13 ;do read
     jnc read_drive_no_error
 
-;;; If an error occurred during the read:
+;;; If an error occurred during the read, print out the following, separated by
+;;; commas:
+;;;  - [al] : The actual number of sectors read.
+;;;  - [ah] : The return code from interrupt 0x13.
+;;;  - READ_TRY_COUNT : The amount of times a read has been tried so far.
+;;;  - Original value of [al] when read_drive was called which is the sector
+;;;    at which the read was attempted.
+;;; After printing this info, try reading again if the number of retries has not
+;;; exceeded MAX_READ_TRIES, otherwise stop.
+    call print_error
     call print_byte
-    call print_cm
+    call print_comma
     mov al, ah
     call print_byte
-    call print_cm
+    call print_comma
     mov bl, [READ_TRY_COUNT]
     mov al, bl
     call print_byte
-    call print_cm
+    call print_comma
     mov ax, [esp] ; Restore [al] (LBA of sector to read from)
     call print_byte
-    call print_nl
+    call print_newline
     cmp bl, MAX_READ_TRIES
     jl read_drive_retry
     jmp $
 
 read_drive_no_error:
-    pop bx ; Pop old value of ax
+    pop bx ; Pop old value of ax which is no longer needed
     pop bx
     pop cx
     ret
 
-;;; Prints character in register al
+;;; function print_char:
+;;; Prints the character in register [al].
 print_char:
     push ax
     push bx
@@ -131,6 +140,8 @@ print_char:
     pop ax
     ret
 
+;;; function print_half_byte:
+;;; Print the 4 least significant bits in the register [al].
 print_half_byte:
     pushfd
     and al, 0x0F
@@ -142,7 +153,9 @@ skip_hex:
     call print_char
     popfd
     ret
-        
+
+;;; function print_byte:
+;;; Print the byte in register [al].
 print_byte:
     push ax
 
@@ -156,6 +169,8 @@ print_byte:
     pop ax
     ret
 
+;;; function print_word:
+;;; Print a 16-bit word in the register [ax].
 print_word:
     push ax
     mov al, ah
@@ -165,7 +180,9 @@ print_word:
     pop ax
     ret
 
-print_nl:
+;;; function print_newline:
+;;; Print a newline character. Takes no arguments.
+print_newline:
     push ax
     mov al, 10
     call print_char
@@ -174,13 +191,36 @@ print_nl:
     pop ax
     ret
 
-print_cm:
+;;; function print_comma:
+;;; Print a comma character. Takes no arguments.
+print_comma:
     push ax
     mov al, 44
     call print_char
     pop ax
     ret
-        
+
+;;; function print_error:
+;;; Print the string "ERROR: ". Takes no arguments.
+print_error:
+    push ax
+    mov al, 'E'
+    call print_char
+    mov al, 'R'
+    call print_char
+    mov al, 'R'
+    call print_char
+    mov al, 'O'
+    call print_char
+    mov al, 'R'
+    call print_char
+    mov al, ':'
+    call print_char
+    mov al, ' '
+    call print_char
+    pop ax
+    ret
+
 [bits 32]
 begin_pm:
     call OS_OFFSET
