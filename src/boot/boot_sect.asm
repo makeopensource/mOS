@@ -1,7 +1,16 @@
 [org 0x7c00]
 OS_OFFSET equ 0x1000
 MAX_READ_TRIES equ 3
-SECTORS_TO_READ equ 41
+
+
+;;; Total number of sectors to read from the boot drive, including the boot
+;;; sector.
+;;; WARNING: This MUST be equal to the identically named constant in the
+;;; Makefile.
+OS_BIN_TOTAL_SECTORS equ 42
+;;; The number of sectors to read from the boot drive in addition to the boot
+;;; sector.
+ADDITIONAL_SECTORS_TO_READ equ OS_BIN_TOTAL_SECTORS-1
 
 [bits 16]
 begin:
@@ -48,7 +57,7 @@ read:
     mov al, bl ; current sector to read
     call read_drive
     add bl, 1
-    cmp bl, SECTORS_TO_READ
+    cmp bl, ADDITIONAL_SECTORS_TO_READ
     jle read
     call enter_pm
 
