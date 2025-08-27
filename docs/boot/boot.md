@@ -9,7 +9,7 @@ Finally, we get to the OS, BIOS will load the first sector (512-bytes) of the di
 
 ## Boot Sector
 
-The boot sector (see [boot_sect.asm](../../src/boot/boot_sect.asm)) is the very first code that we write that gets executed. It is important to keep in mind at this point we only have 512-bytes of code/data loaded, which is not much. In addition we also need the "magic word" 0xaa55 as the last word in the sector to signify that this is a bootable sector. `times 509 - ($ - $$) db 0` is a neat assembly trick that gets our binary to exactly 512-bytes.
+The boot sector (see [boot_sect.asm](../../src/boot/boot_sect.asm)) is the very first code that we write that gets executed. It is important to keep in mind at this point we only have 512-bytes of code/data loaded, which is not much. In addition we also need the "magic word" 0xaa55 as the last word in the sector to signify that this is a bootable sector. `times 506 - ($ - $$) db 0` is a neat assembly trick that gets our binary to exactly 512-bytes.
 You may have noticed `[bits 16]` in the assembly, this is because BIOS starts us out in "real mode" which is fancy for 16-bit. Real mode uses segmentation heavily, but discussing segmentation is outside of the scope of this document since we don't have to deal with it.
 First we store the boot drive in a defined place in memory. BIOS puts the boot drive in `dl` on boot. Next we set the stack to be at 0x9000 (`bp` and `sp` are the 16-bit stack registers). Our next step is to load the rest of the kernel. BIOS uses Cylinder Head Sector (CHS) addressing for disk access, here are some important details:
 
@@ -17,8 +17,20 @@ First we store the boot drive in a defined place in memory. BIOS puts the boot d
 - A cylinder is a ring on a platter that is indexed from 0.
 - A head is the physical reader that is also indexed from 0.
 
-Since we want the second sector (first is the boot sector) onwards, we only need the very first cylinder and head. Now we want to tell the BIOS to execute a read operation.
-We move `2` into `ah` to signify we want to read. Then `42` into `al` to signify we want to read 42 sectors (512 * 42 = 21504-bytes). Then `cl` gets 2 for the sector, `ch` and `dh` get 0 for cylinder and head respectively. Then `OS_OFFSET` (0x1000) is put in `bx`, this tells BIOS where we want the result of our read to be stored in memory. Finally, we do `int 0x13` which is the disk interrupt for BIOS.  
+CHS addressing is not super convenient to use; it would be better if we could use Logical Block Addresses (LBA) instead, which would just give us a simple linear address space for our drive.
+Thus, to aid in loading the rest of the binary for our OS, we define an assembly routine called `read_drive` which takes an LBA in register `al`, converts the LBA to a CHS address, reads from the drive, and returns the status of the read in the registers `cf`, `ah`, and `al` (see [boot_sect.asm](../../src/boot/boot_sect.asm)). LBAs are converted to CHS addresses using an algorithm described on OSDev (see [https://wiki.osdev.org/Disk_access_using_the_BIOS_(INT_13h)]).
+
+The `read_drive` routine is implemented on top of the `int 0x13` BIOS interrupt, which provides functionality for manipulating drives (see https://en.wikipedia.org/wiki/INT_13H). In our case we call `int 0x13` with the following register arguments:
+ - `ah=2` -- 2 tells it to do a read.
+ - `al=1` -- Read just one sector.
+ - `cl=sector` -- Where `sector` is computed from the LBA.
+ - `ch=cylinder` -- Where `cylinder` is computed from the LBA.
+ - `dh=head` -- Where `head` is computed from the LBA.
+ - `dl=drive` -- Where `drive` is the drive number to read from.
+ - `es=0:bx=offset` -- Where `offset` is computed from the LBA (that was passed in to `read_drive`) such that `offset=((LBA-1)*512)+0x1000`, which has the effect of mapping LBA 1 onward onto the memory region starting at 0x1000.
+
+The `read_drive` routine is used inside of a loop that reads the rest of the OS binary one sector at a time. If a read for any given sector fails, we attempt to read that that sector at most two more times before giving up on booting entirely.
+
 Now that we have the OS loaded, we need to get into 32-bit mode (also known as protected mode, long mode is 64-bit). Now we switch over to [enter_pm.asm](../../src/boot/enter_pm.asm) and [gdt.asm](../../src/boot/gdt.asm).  
 
 ### Protected Mode
