@@ -14,12 +14,12 @@ GDB := gdb
 endif
 
 ifeq ($(DEBUG), true)
-DEBUG_CFLAGS := -g3 -O0
+DEBUG_CFLAGS := -g3 -O0 -fno-stack-protector
 DEBUG_NASM_FLAGS := -O0
 DEBUG_QEMU_FLAGS := -monitor stdio
 DEBUG_LFLAGS := -g
 else
-DEBUG_CFLAGS := -Os
+DEBUG_CFLAGS := -Os -fno-stack-protector
 DEBUG_NASM_FLAGS := -Ox
 DEBUG_QEMU_FLAGS :=
 DEBUG_LFLAGS :=

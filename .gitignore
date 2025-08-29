@@ -11,6 +11,11 @@ mOS
 # Emacs
 *.~
 
+# Nix
+.envrc
+.lock
+.nix
+
 # Powershell (b/c qemu's fussy)
 *.ps1
 
