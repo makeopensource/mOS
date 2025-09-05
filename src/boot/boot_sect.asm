@@ -63,7 +63,7 @@ read:
 
 ;;; function read_drive:
 ;;; Reads one sector from the drive at the given LBA into the kernel memory
-;;; space at the appropriate offset (assumming 512 byte sectors).
+;;; space at the appropriate offset (assuming 512 byte sectors).
 ;;; Input:
 ;;;   [al] = LBA of sector to read
 ;;; Output:
