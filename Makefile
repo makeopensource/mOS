@@ -45,6 +45,12 @@ ASM_OS_ENTRY_SOURCE := ./src/boot/os_entry.asm
 BOOT_OBJ := boot.o
 OS_BIN := mOS.bin
 
+# The total number of 512-byte sectors for the size of the OS binary.
+# WARNING: This MUST be equal to the identically named constant in the
+# file 'src/boot/boot_sect.asm'.
+OS_BIN_TOTAL_SECTORS := 42
+OS_BIN_SIZE_BYTES := $$((512*$(OS_BIN_TOTAL_SECTORS)))
+
 C_FILES = $(shell find ./ -name '*.[ch]')
 
 OBJ_NAMES := src/os/main.o src/os/test.o os_entry.o src/os/paging.o \
@@ -62,6 +68,12 @@ $(OS_BIN): $(OBJ_NAMES) $(BOOT_OBJ)
 	$(LD) $(LFLAGS) -T link.ld $(OBJ_NAMES) -o mOS.elf
 	$(OBJCOPY) -O binary mOS.elf intermediate.bin
 	cat $(BOOT_OBJ) intermediate.bin > $(OS_BIN)
+	@if [ $$(du -b mOS.bin | grep -o "[0-9]*") -gt $(OS_BIN_SIZE_BYTES) ]; \
+	then \
+		echo "ERROR: mOS.bin too large!"; \
+		false; \
+	fi
+	truncate -s ">$(OS_BIN_SIZE_BYTES)" $(OS_BIN)
 
 $(BOOT_OBJ): $(ASM_BOOT_SECT_SOURCE)
 	nasm $^ -f bin -o $@ $(DEBUG_NASM_FLAGS)
