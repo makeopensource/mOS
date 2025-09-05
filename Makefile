@@ -43,7 +43,7 @@ ASM_BOOT_SECT_SOURCE := ./src/boot/boot_sect.asm
 ASM_OS_ENTRY_SOURCE := ./src/boot/os_entry.asm
 
 BOOT_OBJ := boot.o
-OS_BIN := mOS.bin\
+OS_BIN := mOS.bin
 
 # The total number of 512-byte sectors for the size of the OS binary.
 # WARNING: This MUST be equal to the identically named constant in the
