@@ -154,8 +154,8 @@ print_char:
 print_half_byte:
     pushfd
     and al, 0x0F
-    add al, 48
-    cmp al, 57
+    add al, '0'
+    cmp al, '9'
     jle skip_hex
     add al, 7
 skip_hex:
@@ -193,9 +193,9 @@ print_word:
 ;;; Print a newline character. Takes no arguments.
 print_newline:
     push ax
-    mov al, 10
+    mov al, `\n`
     call print_char
-    mov al, 13
+    mov al, `\r`
     call print_char
     pop ax
     ret
@@ -204,7 +204,7 @@ print_newline:
 ;;; Print a comma character. Takes no arguments.
 print_comma:
     push ax
-    mov al, 44
+    mov al, ','
     call print_char
     pop ax
     ret
