@@ -168,7 +168,6 @@ skip_hex:
 print_byte:
     push ax
 
-    mov ax, [esp]
     shr al, 4
     call print_half_byte
     mov ax, [esp]
